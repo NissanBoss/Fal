@@ -1,0 +1,7 @@
+funcion a con x
+    devuelve b con x
+fin
+funcion b con x
+    devuelve x entre 0
+fin
+escribe a con 10

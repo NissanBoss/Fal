@@ -1,0 +1,9 @@
+X  No se puede dividir entre cero.
+
+     linea 5 |  devuelve x entre 0
+
+     Se llego aqui asi:
+       dentro de b, llamada en la linea 2  |  devuelve b con x
+       dentro de a, llamada en la linea 7  |  escribe a con 10
+
+     Pista: Comprueba el valor antes de dividir.

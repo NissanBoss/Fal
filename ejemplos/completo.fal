@@ -1,0 +1,134 @@
+# Un recorrido por todo lo que sabe hacer Fal.
+# Se ejecuta solo, no hace falta escribir nada.
+
+escribe "=== TEXTOS ==="
+frase es "  El veloz murcielago hindu  "
+escribe recorta de frase
+escribe mayusculas de recorta de frase
+palabras es parte de recorta de frase con " "
+escribe "Palabras: " mas largo de palabras
+escribe une de palabras con " | "
+escribe reemplaza de frase con "veloz" y "lento"
+escribe "La 'z' esta en la posicion " mas posicion de frase con "z"
+
+escribe ""
+escribe "=== NUMEROS ==="
+escribe "raiz de 144 = " mas raiz de 144
+escribe "2 elevado a 10 = " mas potencia con 2 y 10
+escribe "17 resto 5 = " mas 17 resto 5
+escribe "pi redondeado = " mas redondea de pi con 4
+
+escribe ""
+escribe "=== LISTAS ==="
+notas es lista con 7 y 4 y 9 y 6 y 10
+escribe "Notas: " mas notas
+escribe "Ordenadas: " mas ordena de notas
+escribe "Suma: " mas suma de notas
+escribe "Media: " mas promedio de notas
+escribe "Mejor: " mas maximo de notas mas "   Peor: " mas minimo de notas
+
+aprobadas es lista vacia
+para cada n en notas
+    si n es mayor o igual que 5
+        agrega n a aprobadas
+    fin
+fin
+escribe "Aprobadas: " mas aprobadas
+
+escribe ""
+escribe "=== DICCIONARIOS ==="
+stock es diccionario con "pan" y 12 y "leche" y 3 y "huevos" y 0
+para cada producto en stock
+    cantidad es elemento producto de stock
+    si cantidad es 0
+        escribe producto mas ": AGOTADO"
+    si no
+        escribe producto mas ": " mas cantidad mas " unidades"
+    fin
+fin
+elemento "huevos" de stock es 24
+escribe "Reponemos huevos -> " mas elemento "huevos" de stock
+
+escribe ""
+escribe "=== OBJETOS ==="
+
+tipo Cuenta con titular y saldo
+    funcion ingresa con cantidad
+        si cantidad es menor o igual que 0
+            falla "el ingreso tiene que ser positivo"
+        fin
+        saldo de mi es saldo de mi mas cantidad
+        devuelve saldo de mi
+    fin
+
+    funcion retira con cantidad
+        si cantidad es mayor que saldo de mi
+            falla "no hay suficiente saldo"
+        fin
+        saldo de mi es saldo de mi menos cantidad
+        devuelve saldo de mi
+    fin
+
+    funcion resumen
+        devuelve titular de mi mas " tiene " mas saldo de mi mas " euros"
+    fin
+fin
+
+cuenta es nuevo Cuenta con "Pedro" y 100
+escribe resumen de cuenta
+ingresa de cuenta con 50
+escribe resumen de cuenta
+
+intenta
+    retira de cuenta con 1000
+si falla
+    escribe "No se pudo retirar: " mas error
+fin
+
+retira de cuenta con 30
+escribe resumen de cuenta
+
+escribe ""
+escribe "=== FUNCIONES Y RECURSION ==="
+
+funcion factorial con n
+    si n es menor o igual que 1
+        devuelve 1
+    fin
+    devuelve n por factorial con (n menos 1)
+fin
+
+para cada i desde 1 hasta 6
+    escribe i mas "! = " mas factorial con i
+fin
+
+funcion es_primo con n
+    si n es menor que 2
+        devuelve falso
+    fin
+    para cada d desde 2 hasta n
+        si d por d es mayor que n
+            detente
+        fin
+        si n resto d es 0
+            devuelve falso
+        fin
+    fin
+    devuelve verdadero
+fin
+
+primos es lista vacia
+para cada n desde 1 hasta 40
+    si es_primo con n
+        agrega n a primos
+    fin
+fin
+escribe "Primos hasta 40: " mas primos
+
+escribe ""
+escribe "=== ARCHIVOS ==="
+graba con "temporal.txt" y une de primos con "\n"
+escribe "Guardados " mas largo de lineas de "temporal.txt" mas " numeros en temporal.txt"
+escribe "Primera linea del archivo: " mas primero de (lineas de "temporal.txt")
+borra de "temporal.txt"
+escribe "Archivo borrado: " mas (no existe de "temporal.txt")

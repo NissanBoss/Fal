@@ -1,0 +1,18 @@
+frase es "  Hola Mundo Cruel  "
+escribe recorta de frase
+escribe mayusculas de recorta de frase
+palabras es parte de recorta de frase con " "
+escribe palabras
+escribe largo de palabras
+escribe une de palabras con "-"
+escribe reemplaza de frase con "Cruel" y "Feliz"
+escribe posicion de "Hola Mundo" con "Mundo"
+escribe trozo de "abcdefg" con 2 y 4
+escribe invierte de "hola"
+escribe empieza de "hola" con "ho"
+escribe repetido de "ab" con 3
+escribe numerico de "42"
+escribe numerico de "hola"
+escribe elemento 1 de "hola"
+escribe elemento menos 1 de "hola"
+escribe ultimo de "hola"

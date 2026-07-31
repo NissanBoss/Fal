@@ -1,0 +1,19 @@
+{ana: 25, luis: 30}
+25
+[ana, luis]
+[25, 30]
+2
+verdadero
+ana tiene 25
+luis tiene 30
+{ana: 25}
+{pan: 1.2, leche: 0.99}
+2.19
+Perro(nombre: Toby, edad: 3)
+Toby
+Toby dice guau
+4
+Hola, soy Toby
+Tobias
+Tobias dice guau
+Rex dice guau

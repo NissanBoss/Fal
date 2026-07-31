@@ -1,0 +1,38 @@
+intenta
+    escribe 1 entre 0
+si falla de matematica
+    escribe "matematica: " mas error
+si falla
+    escribe "otra cosa"
+finalmente
+    escribe "esto pasa siempre"
+fin
+
+intenta
+    escribe lee de "no_existe.txt"
+si falla de matematica
+    escribe "no deberia entrar aqui"
+si falla de archivo
+    escribe "archivo: " mas mensaje de error
+    escribe "clase: " mas clase de error
+fin
+
+funcion arriesga
+    intenta
+        falla "algo mio"
+    si falla
+        escribe "lo vi pasar, lo relanzo"
+        relanza
+    fin
+fin
+intenta
+    arriesga
+si falla de programa
+    escribe "capturado fuera: " mas error
+fin
+
+intenta
+    escribe elemento 9 de lista con 1
+finalmente
+    escribe "el finalmente corre aunque no se capture"
+fin

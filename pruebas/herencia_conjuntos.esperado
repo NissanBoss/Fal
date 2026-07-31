@@ -1,0 +1,13 @@
+Bicho (4 patas) dice ...
+Toby (4 patas) dice guau
+Coco (2 patas) dice hola hola y es verde
+campos del loro: Animal:Coco
+Animal:Bicho
+-- conjuntos --
+{1, 2, 3}
+3
+verdadero
+{1, 2, 3, 4}
+{3}
+{1, 2}
+{1, 2, 3, 9}

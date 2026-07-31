@@ -1,0 +1,69 @@
+escribe "-- ambito --"
+total es "importante"
+funcion suma_lista con l
+    total es 0
+    para cada n en l
+        total es total mas n
+    fin
+    devuelve total
+fin
+escribe suma_lista con (lista con 1 y 2 y 3)
+escribe total
+
+contador es 0
+funcion sube
+    comparte contador
+    contador es contador mas 1
+fin
+sube
+sube
+escribe contador
+
+escribe "-- decimales exactos --"
+escribe 0.1 mas 0.2
+escribe (0.1 mas 0.2) es 0.3
+escribe 1.10 por 3
+escribe 0.1 mas 0.2 mas 0.3 mas 0.4
+precio es 19.99
+escribe precio por 3
+
+escribe "-- funciones como valores --"
+funcion doble con n
+    devuelve n por 2
+fin
+f es funcion doble
+escribe f con 5
+escribe doble de 5
+
+triple es funcion con n
+    devuelve n por 3
+fin
+escribe triple con 7
+
+funcion hacer_sumador con cuanto
+    devuelve funcion con n
+        devuelve n mas cuanto
+    fin
+fin
+suma10 es hacer_sumador con 10
+escribe suma10 con 5
+
+escribe "-- clausuras que recuerdan --"
+funcion contador_desde con inicio
+    cuenta es inicio
+    devuelve funcion
+        comparte cuenta
+        cuenta es cuenta mas 1
+        devuelve cuenta
+    fin
+fin
+uno es contador_desde con 100
+otro es contador_desde con 0
+escribe uno
+escribe uno
+escribe otro
+escribe uno
+
+escribe "-- integradas como valor --"
+escribe mapa con (lista con "ana" y "eva") y funcion mayusculas
+escribe filtra con (lista con "hola" y "" y "eh") y funcion largo

@@ -1,0 +1,46 @@
+# Listas, bucles y funciones.
+
+frutas es lista con "manzana" y "pera" y "uva"
+
+escribe "Tengo " mas largo de frutas mas " frutas:"
+
+para cada fruta en frutas
+    escribe " - " mas fruta
+fin
+
+agrega "sandia" a frutas
+escribe "Ahora la ultima es " mas elemento 4 de frutas
+
+elemento 1 de frutas es "kiwi"
+escribe frutas
+
+escribe ""
+escribe "Tabla del 7:"
+para cada n desde 1 hasta 10
+    escribe "7 por " mas n mas " es " mas 7 por n
+fin
+
+escribe ""
+
+funcion promedio con numeros
+    total es 0
+    para cada n en numeros
+        total es total mas n
+    fin
+    devuelve total entre largo de numeros
+fin
+
+notas es lista con 8 y 6 y 10 y 7
+escribe "La media de " mas notas mas " es " mas promedio con notas
+
+funcion es_par con n
+    devuelve n entre 2 es igual a redondea de (n entre 2)
+fin
+
+para cada n desde 1 hasta 6
+    si es_par con n
+        escribe n mas " es par"
+    si no
+        escribe n mas " es impar"
+    fin
+fin

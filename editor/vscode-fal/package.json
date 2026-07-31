@@ -1,0 +1,34 @@
+{
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "grammars": [
+      {
+        "language": "fal",
+        "path": "./syntaxes/fal.tmLanguage.json",
+        "scopeName": "source.fal"
+      }
+    ],
+    "languages": [
+      {
+        "aliases": [
+          "Fal",
+          "fal"
+        ],
+        "configuration": "./language-configuration.json",
+        "extensions": [
+          ".fal"
+        ],
+        "id": "fal"
+      }
+    ]
+  },
+  "description": "Resaltado de sintaxis para el lenguaje Fal",
+  "displayName": "Fal",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "name": "fal",
+  "version": "3.0.0"
+}

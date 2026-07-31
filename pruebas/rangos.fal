@@ -1,0 +1,8 @@
+para cada n desde 10 hasta 1 de 3
+ escribe n sin salto
+ escribe " " sin salto
+fin
+escribe ""
+escribe rango con 10 y 1 y 2
+escribe rango con 1 y 5
+escribe rango de 4

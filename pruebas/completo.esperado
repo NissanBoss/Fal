@@ -1,0 +1,47 @@
+=== TEXTOS ===
+El veloz murcielago hindu
+EL VELOZ MURCIELAGO HINDU
+Palabras: 4
+El | veloz | murcielago | hindu
+  El lento murcielago hindu  
+La 'z' esta en la posicion 10
+
+=== NUMEROS ===
+raiz de 144 = 12
+2 elevado a 10 = 1024
+17 resto 5 = 2
+pi redondeado = 3.1416
+
+=== LISTAS ===
+Notas: [7, 4, 9, 6, 10]
+Ordenadas: [4, 6, 7, 9, 10]
+Suma: 36
+Media: 7.2
+Mejor: 10   Peor: 4
+Aprobadas: [7, 9, 6, 10]
+
+=== DICCIONARIOS ===
+pan: 12 unidades
+leche: 3 unidades
+huevos: AGOTADO
+Reponemos huevos -> 24
+
+=== OBJETOS ===
+Pedro tiene 100 euros
+Pedro tiene 150 euros
+No se pudo retirar: no hay suficiente saldo
+Pedro tiene 120 euros
+
+=== FUNCIONES Y RECURSION ===
+1! = 1
+2! = 2
+3! = 6
+4! = 24
+5! = 120
+6! = 720
+Primos hasta 40: [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]
+
+=== ARCHIVOS ===
+Guardados 12 numeros en temporal.txt
+Primera linea del archivo: 2
+Archivo borrado: verdadero

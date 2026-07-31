@@ -1,0 +1,13 @@
+matematica: No se puede dividir entre cero.
+esto pasa siempre
+archivo: No pude leer el archivo "no_existe.txt".
+clase: archivo
+lo vi pasar, lo relanzo
+capturado fuera: algo mio
+el finalmente corre aunque no se capture
+
+  X  Pediste el elemento 9, pero solo hay 1.
+
+     linea 35 |  escribe elemento 9 de lista con 1
+
+     Pista: El primer elemento es el 1 y el ultimo es el 1 (o el -1).

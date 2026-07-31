@@ -1,0 +1,105 @@
+# Una agenda de contactos que se guarda en disco.
+# Junta: objetos, listas, archivos, errores y un menu.
+
+tipo Contacto con nombre y telefono
+    funcion linea
+        devuelve nombre de mi mas ";" mas telefono de mi
+    fin
+    funcion muestra
+        escribe "  " mas nombre de mi mas "  ->  " mas telefono de mi
+    fin
+fin
+
+ARCHIVO es "agenda.txt"
+contactos es lista vacia
+
+funcion carga
+    si no existe de ARCHIVO
+        devuelve nada
+    fin
+    para cada l en lineas de ARCHIVO
+        si recorta de l no es igual a ""
+            trozos es parte de l con ";"
+            agrega (nuevo Contacto con elemento 1 de trozos y elemento 2 de trozos) a contactos
+        fin
+    fin
+fin
+
+funcion guarda
+    filas es lista vacia
+    para cada c en contactos
+        agrega linea de c a filas
+    fin
+    graba con ARCHIVO y une de filas con "\n"
+fin
+
+funcion listar
+    si largo de contactos es 0
+        escribe "  (la agenda esta vacia)"
+        devuelve nada
+    fin
+    para cada c en contactos
+        muestra de c
+    fin
+fin
+
+funcion buscar con texto
+    encontrados es lista vacia
+    para cada c en contactos
+        si contiene de minusculas de nombre de c con minusculas de texto
+            agrega c a encontrados
+        fin
+    fin
+    devuelve encontrados
+fin
+
+carga
+escribe "Agenda cargada con " mas largo de contactos mas " contacto(s)."
+
+salir es falso
+mientras no salir
+    escribe ""
+    escribe "1 ver   2 anadir   3 buscar   4 borrar   5 salir"
+    opcion es pregunta "Opcion:"
+
+    si opcion es "1"
+        listar
+
+    si no si opcion es "2"
+        nombre es recorta de pregunta "Nombre:"
+        telefono es recorta de pregunta "Telefono:"
+        si nombre es "" o telefono es ""
+            escribe "  Hacen falta los dos datos."
+        si no
+            agrega (nuevo Contacto con nombre y telefono) a contactos
+            guarda
+            escribe "  Guardado."
+        fin
+
+    si no si opcion es "3"
+        busqueda es pregunta "Buscar:"
+        resultados es buscar con busqueda
+        escribe "  " mas largo de resultados mas " resultado(s):"
+        para cada c en resultados
+            muestra de c
+        fin
+
+    si no si opcion es "4"
+        listar
+        intenta
+            n es numero de pregunta "Numero a borrar:"
+            quita n de contactos
+            guarda
+            escribe "  Borrado."
+        si falla
+            escribe "  No pude borrar: " mas error
+        fin
+
+    si no si opcion es "5"
+        salir es verdadero
+        escribe "Hasta luego."
+
+    si no
+        escribe "  Esa opcion no existe."
+    fin
+fin

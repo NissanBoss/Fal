@@ -1,0 +1,22 @@
+# El juego de adivinar el numero.
+
+escribe "Estoy pensando un numero del 1 al 100."
+
+secreto es azar entre 1 y 100
+intentos es 0
+acertado es falso
+
+mientras no acertado
+    respuesta es pregunta "Tu numero:"
+    intento es numero de respuesta
+    intentos es intentos mas 1
+
+    si intento es mayor que secreto
+        escribe "Demasiado alto."
+    si no si intento es menor que secreto
+        escribe "Demasiado bajo."
+    si no
+        escribe "Acertaste en " mas intentos mas " intentos."
+        acertado es verdadero
+    fin
+fin

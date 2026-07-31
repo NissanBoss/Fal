@@ -1,0 +1,61 @@
+escribe "-- orden superior --"
+nums es lista con 5 y 3 y 8 y 1 y 9 y 2
+escribe mapa con nums y funcion con n
+    devuelve n por n
+fin
+escribe filtra con nums y funcion con n
+    devuelve n resto 2 es 0
+fin
+escribe reduce con nums y funcion con a y b
+    devuelve a mas b
+fin
+escribe cuenta_si con nums y funcion con n
+    devuelve n es mayor que 4
+fin
+escribe alguno con nums y funcion con n
+    devuelve n es mayor que 8
+fin
+escribe todos con nums y funcion con n
+    devuelve n es mayor que 0
+fin
+
+tipo P con nombre y edad
+fin
+gente es lista con (nuevo P con "Ana" y 30) y (nuevo P con "Luis" y 22) y (nuevo P con "Eva" y 41)
+funcion edad_de con p
+    devuelve edad de p
+fin
+por_edad es ordena con gente y funcion edad_de
+escribe mapa con por_edad y funcion con p
+    devuelve nombre de p mas "(" mas edad de p mas ")"
+fin
+
+escribe "-- plantillas --"
+escribe formato de "Hola {}, tienes {} anios y {} euros" con "Ana" y 30 y 19.99
+
+escribe "-- JSON --"
+dato es diccionario con "nombre" y "Ana" y "notas" y (lista con 7 y 9.5)
+texto_json es a_json de dato
+escribe texto_json
+vuelta es de_json de texto_json
+escribe elemento "notas" de vuelta
+escribe (elemento 2 de elemento "notas" de vuelta) mas 0.5
+
+escribe "-- fechas --"
+escribe anio de "2026-07-31"
+escribe nombremes de "2026-07-31"
+escribe diasemana de "2026-07-31"
+escribe dias con "2026-07-31" y "2026-12-25"
+escribe avanza con "2026-07-31" y 45
+escribe fecha con 2026 y 2 y 14
+
+escribe "-- patrones --"
+escribe coincide con "hola@correo.com" y "^[a-z]+@[a-z]+\.[a-z]+$"
+escribe busca con "tel 600111222 y 600333444" y "[0-9]{9}"
+escribe cambia con "hoy es 2026-07-31" y "[0-9]{4}" y "AAAA"
+
+escribe "-- CSV --"
+filas es tabla de "nombre,edad\nAna,30\nLuis,22"
+escribe filas
+escribe elemento 2 de elemento 2 de filas
+escribe a_csv de filas

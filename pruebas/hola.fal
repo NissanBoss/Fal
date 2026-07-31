@@ -1,0 +1,19 @@
+# Tu primer programa en Fal.
+# Todo lo que va despues de # es un comentario: el programa lo ignora.
+
+escribe "Hola mundo"
+
+nombre es "Pedro"
+edad es 25
+
+escribe "Me llamo " mas nombre mas " y tengo " mas edad mas " anios"
+
+si edad es mayor que 18
+    escribe "Soy mayor de edad"
+si no
+    escribe "Soy menor de edad"
+fin
+
+repite 3 veces
+    escribe "Que facil es esto"
+fin

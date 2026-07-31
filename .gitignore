@@ -1,0 +1,20 @@
+# Los paquetes compilados no van al repositorio: se publican en Releases.
+# Si se subieran, el historial engordaria 47 MB por cada version y eso ya
+# no hay forma de quitarlo.
+/dist/
+
+# Binarios sueltos de pruebas locales
+/fal
+/fal.exe
+*.exe
+
+# Cosas del sistema y del editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Archivos que dejan los ejemplos al ejecutarse
+ejemplos/agenda.txt
+ejemplos/temporal.txt
+ejemplos/notas.txt

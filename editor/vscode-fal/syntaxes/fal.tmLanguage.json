@@ -1,0 +1,75 @@
+{
+  "name": "Fal",
+  "patterns": [
+    {
+      "match": "#.*$",
+      "name": "comment.line.number-sign.fal"
+    },
+    {
+      "begin": "[\"“]",
+      "end": "[\"”]",
+      "name": "string.quoted.double.fal",
+      "patterns": [
+        {
+          "match": "\\\\.",
+          "name": "constant.character.escape.fal"
+        }
+      ]
+    },
+    {
+      "begin": "['‘]",
+      "end": "['’]",
+      "name": "string.quoted.single.fal",
+      "patterns": [
+        {
+          "match": "\\\\.",
+          "name": "constant.character.escape.fal"
+        }
+      ]
+    },
+    {
+      "match": "(?\u003c![0-9A-Za-z_À-ſ])\\d+(\\.\\d+)?(?![0-9A-Za-z_À-ſ])",
+      "name": "constant.numeric.fal"
+    },
+    {
+      "match": "(?\u003c![0-9A-Za-z_À-ſ])(?i:verdadero|falso|nada|pi)(?![0-9A-Za-z_À-ſ])",
+      "name": "constant.language.fal"
+    },
+    {
+      "match": "(?\u003c![0-9A-Za-z_À-ſ])(?i:padre|error|mi)(?![0-9A-Za-z_À-ſ])",
+      "name": "variable.language.fal"
+    },
+    {
+      "match": "(?\u003c![0-9A-Za-z_À-ſ])(?i:finalmente|continua|pregunta|mientras|devuelve|escribe|relanza|intenta|retorna|detente|agrega|repite|veces|hasta|desde|falla|quita|cada|para|sino|fin|en|si)(?![0-9A-Za-z_À-ſ])",
+      "name": "keyword.control.fal"
+    },
+    {
+      "match": "(?\u003c![0-9A-Za-z_À-ſ])(?i:función|comparte|funcion|hereda|nuevo|tipo|como|usa)(?![0-9A-Za-z_À-ſ])",
+      "name": "storage.type.fal"
+    },
+    {
+      "match": "(?\u003c![0-9A-Za-z_À-ſ])(?i:diccionario|conjunto|elemento|vacía|vacío|lista|vacia|vacio)(?![0-9A-Za-z_À-ſ])",
+      "name": "support.type.fal"
+    },
+    {
+      "match": "(?\u003c![0-9A-Za-z_À-ſ])(?i:igual|mayor|está|resto|menor|entre|menos|más|esta|por|mas|que|con|no|es|de|o|y|a)(?![0-9A-Za-z_À-ſ])",
+      "name": "keyword.operator.word.fal"
+    },
+    {
+      "match": "(?\u003c![0-9A-Za-z_À-ſ])(?i:intersección|interseccion|mayúsculas|minúsculas|minusculas|capitaliza|mayusculas|argumentos|diferencia|díasemana|nombremes|posición|reemplaza|diasemana|cuenta_si|potencia|repetido|numerico|posicion|coincide|conjunto|contiene|invierte|promedio|archivos|redondea|absoluto|último|formato|valores|número|primero|únicos|empieza|termina|inserta|recorta|de_json|unicos|lineas|reduce|existe|espera|cuenta|a_json|arriba|claves|filtra|ordena|maximo|avanza|cambia|numero|mezcla|minimo|alguno|ultimo|anexa|elige|busca|union|copia|parte|borra|trozo|abajo|a_csv|largo|todos|texto|rango|tabla|graba|fecha|ahora|reloj|pide|suma|anio|dias|raiz|año|azar|día|mapa|lee|une|dia|hoy|mes)(?![0-9A-Za-z_À-ſ])",
+      "name": "support.function.fal"
+    },
+    {
+      "captures": {
+        "1": {
+          "name": "storage.type.fal"
+        },
+        "3": {
+          "name": "entity.name.function.fal"
+        }
+      },
+      "match": "(?i:(?\u003c![0-9A-Za-z_À-ſ])(funci[oó]n|tipo)(?![0-9A-Za-z_À-ſ]))\\s+([0-9A-Za-z_À-ſ]+)"
+    }
+  ],
+  "scopeName": "source.fal"
+}

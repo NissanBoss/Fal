@@ -1,0 +1,31 @@
+-- orden superior --
+[25, 9, 64, 1, 81, 4]
+[8, 2]
+28
+3
+verdadero
+verdadero
+[Luis(22), Ana(30), Eva(41)]
+-- plantillas --
+Hola Ana, tienes 30 anios y 19.99 euros
+-- JSON --
+{"nombre": "Ana", "notas": [7, 9.5]}
+[7, 9.5]
+10
+-- fechas --
+2026
+julio
+viernes
+147
+2026-09-14
+2026-02-14
+-- patrones --
+verdadero
+[600111222, 600333444]
+hoy es AAAA-07-31
+-- CSV --
+[[nombre, edad], [Ana, 30], [Luis, 22]]
+30
+nombre,edad
+Ana,30
+Luis,22

@@ -1,0 +1,16 @@
+# Que git no cambie los saltos de linea por su cuenta segun quien clone.
+* text=auto
+
+# Un .sh con saltos de Windows no arranca en Mac ni en Linux: da el error
+# "bad interpreter". Estos van con LF siempre, pase lo que pase.
+*.sh text eol=lf
+
+# Los .bat son al reves: quieren CRLF.
+*.bat text eol=crlf
+
+# Los programas en Fal y las salidas esperadas, con LF, para que las
+# pruebas den lo mismo en cualquier sistema.
+*.fal text eol=lf
+*.esperado text eol=lf
+
+*.exe binary

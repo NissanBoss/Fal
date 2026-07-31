@@ -1,0 +1,7 @@
+PI_CASERO es 3.14
+funcion area con radio
+    devuelve PI_CASERO por radio por radio
+fin
+funcion doble con n
+    devuelve n por 2
+fin

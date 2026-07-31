@@ -1,0 +1,157 @@
+# Todo lo que Fal aprendió para parecerse a un lenguaje serio.
+# Se ejecuta solo, sin escribir nada (salvo la parte de internet).
+
+escribe "=== 1. LOS DECIMALES NO MIENTEN ==="
+# Esta es la trampa clásica de casi todos los lenguajes:
+escribe "0.1 mas 0.2 = " mas (0.1 mas 0.2)
+escribe "¿y es igual a 0.3? " mas ((0.1 mas 0.2) es 0.3)
+carrito es lista con 19.99 y 4.95 y 0.60
+escribe "Total del carrito: " mas suma de carrito mas " euros"
+
+escribe ""
+escribe "=== 2. LAS FUNCIONES SON DATOS ==="
+numeros es rango de 12
+
+escribe filtra con numeros y funcion con n
+    devuelve n resto 3 es 0
+fin
+
+escribe mapa con (lista con "ana" y "luis") y funcion capitaliza
+
+funcion contador_desde con inicio
+    cuenta es inicio
+    devuelve funcion
+        comparte cuenta
+        cuenta es cuenta mas 1
+        devuelve cuenta
+    fin
+fin
+siguiente es contador_desde con 100
+escribe siguiente
+escribe siguiente
+escribe siguiente
+
+escribe ""
+escribe "=== 3. LAS FUNCIONES NO PISAN TUS VARIABLES ==="
+total es "esto no se toca"
+funcion suma_todo con l
+    total es 0
+    para cada n en l
+        total es total mas n
+    fin
+    devuelve total
+fin
+escribe suma_todo con (lista con 1 y 2 y 3)
+escribe total
+
+escribe ""
+escribe "=== 4. HERENCIA ==="
+
+tipo Figura con nombre
+    funcion area
+        falla "cada figura tiene que decir cuál es su área"
+    fin
+    funcion texto
+        devuelve nombre de mi mas " de area " mas area de mi
+    fin
+fin
+
+tipo Circulo hereda de Figura con radio
+    funcion crea con r
+        nombre de mi es "circulo"
+        radio de mi es r
+    fin
+    funcion area
+        devuelve redondea con (pi por radio de mi por radio de mi) y 2
+    fin
+fin
+
+tipo Rectangulo hereda de Figura con ancho y alto
+    funcion crea con a y b
+        nombre de mi es "rectangulo"
+        ancho de mi es a
+        alto de mi es b
+    fin
+    funcion area
+        devuelve ancho de mi por alto de mi
+    fin
+fin
+
+tipo Cuadrado hereda de Rectangulo
+    funcion crea con lado
+        nombre de mi es "cuadrado"
+        ancho de mi es lado
+        alto de mi es lado
+    fin
+    funcion texto
+        devuelve "el " mas (texto de padre)
+    fin
+fin
+
+figuras es lista con (nuevo Circulo con 3) y (nuevo Rectangulo con 4 y 5) y (nuevo Cuadrado con 6)
+para cada f en figuras
+    escribe f
+fin
+
+escribe "De mayor a menor area:"
+funcion area_de con f
+    devuelve area de f
+fin
+para cada f en invierte de (ordena con figuras y funcion area_de)
+    escribe "  " mas f
+fin
+
+intenta
+    escribe area de (nuevo Figura con "abstracta")
+si falla de programa
+    escribe "Como esperaba: " mas error
+fin
+
+escribe ""
+escribe "=== 5. ERRORES QUE SE PUEDEN DISTINGUIR ==="
+pruebas es lista con "10" y "hola" y "0"
+para cada entrada en pruebas
+    intenta
+        n es numero de entrada
+        escribe formato de "100 entre {} = {}" con entrada y (100 entre n)
+    si falla de valor
+        escribe formato de "{} no es un numero" con entrada
+    si falla de matematica
+        escribe formato de "{} no sirve para dividir" con entrada
+    finalmente
+        escribe "  (intento terminado)"
+    fin
+fin
+
+escribe ""
+escribe "=== 6. CONJUNTOS ==="
+a es conjunto con 1 y 2 y 3 y 4
+b es conjunto con 3 y 4 y 5
+escribe "en los dos:     " mas interseccion con a y b
+escribe "en alguno:      " mas union con a y b
+escribe "solo en el 1º:  " mas diferencia con a y b
+palabras es parte de "el gato y el perro y el gato" con " "
+escribe "palabras distintas: " mas conjunto de palabras
+
+escribe ""
+escribe "=== 7. JSON, FECHAS Y PATRONES ==="
+ficha es diccionario con "nombre" y "Ana" y "nacimiento" y "1995-03-14"
+texto_ficha es a_json de ficha
+escribe texto_ficha
+vuelta es de_json de texto_ficha
+nacimiento es elemento "nacimiento" de vuelta
+escribe formato de "{} nacio un {} de {} de {}" con (elemento "nombre" de vuelta) y (diasemana de nacimiento) y (nombremes de nacimiento) y (anio de nacimiento)
+escribe formato de "Han pasado {} dias hasta hoy" con (dias con nacimiento y hoy)
+
+texto es "Escribe a ana@correo.com o a luis@correo.com"
+escribe "Correos encontrados: " mas busca con texto y "[a-z]+@[a-z.]+"
+escribe cambia con texto y "[a-z]+@[a-z.]+" y "(oculto)"
+
+escribe ""
+escribe "=== 8. INTERNET ==="
+intenta
+    pagina es pide de "example.com"
+    escribe "Descargados " mas largo de pagina mas " caracteres de example.com"
+si falla de red
+    escribe "Sin internet, no pasa nada."
+fin

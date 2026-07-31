@@ -1,0 +1,13 @@
+usa "_mates.fal" como mates
+usa "_modtextos.fal" como textos
+
+escribe area de mates con 10
+escribe doble de mates con 21
+escribe doble de textos con "ab"
+escribe PI_CASERO de mates
+
+# los dos modulos tienen "doble" y no chocan
+funcion doble con n
+    devuelve "el mio: " mas n
+fin
+escribe doble de 5

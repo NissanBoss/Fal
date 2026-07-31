@@ -1,0 +1,83 @@
+name: Publicar
+
+# Cada vez que se marca una version (git tag v1, v2...) esto compila los
+# cinco sistemas y cuelga los paquetes en Releases. Asi no hay que compilar
+# a mano ni subir binarios al repositorio.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Comprobar el formato
+        run: test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+
+      - name: Analisis estatico
+        run: go vet ./...
+
+      - name: Pruebas
+        run: go test ./...
+
+      - name: Construir los paquetes
+        run: |
+          mkdir -p dist
+          armar() {
+            CARPETA="dist/$1"
+            mkdir -p "$CARPETA/ejemplos"
+            GOOS="$2" GOARCH="$3" go build -ldflags "-s -w" -o "$CARPETA/$4" .
+            cp ejemplos/*.fal "$CARPETA/ejemplos/"
+            cp README.md LEEME.md MANUAL.md LICENSE "$CARPETA/"
+          }
+          armar fal-windows   windows amd64 fal.exe
+          armar fal-mac-apple darwin  arm64 fal
+          armar fal-mac-intel darwin  amd64 fal
+          armar fal-linux     linux   amd64 fal
+          armar fal-linux-arm linux   arm64 fal
+
+          cp instalador/instalar.bat instalador/desinstalar.bat dist/fal-windows/
+          for P in fal-mac-apple fal-mac-intel fal-linux fal-linux-arm; do
+            cp instalador/instalar.sh "dist/$P/"
+            chmod +x "dist/$P/instalar.sh"
+          done
+
+          cd dist
+          zip -r fal-windows.zip fal-windows
+          for P in fal-mac-apple fal-mac-intel fal-linux fal-linux-arm; do
+            tar -czf "$P.tar.gz" "$P"
+          done
+          ls -lh *.zip *.tar.gz
+
+      - name: Colgarlos en Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/fal-windows.zip
+            dist/fal-mac-apple.tar.gz
+            dist/fal-mac-intel.tar.gz
+            dist/fal-linux.tar.gz
+            dist/fal-linux-arm.tar.gz
+          body: |
+            Descarga el paquete de tu sistema, descomprimelo entero y ejecuta
+            el instalador que viene dentro.
+
+            | Sistema | Paquete |
+            |---|---|
+            | Windows | `fal-windows.zip` |
+            | Mac con chip Apple | `fal-mac-apple.tar.gz` |
+            | Mac con Intel | `fal-mac-intel.tar.gz` |
+            | Linux | `fal-linux.tar.gz` |
+            | Linux en ARM | `fal-linux-arm.tar.gz` |

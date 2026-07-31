@@ -1,0 +1,33 @@
+intenta
+    escribe 10 entre 0
+si falla
+    escribe "Se rompio: " mas error
+fin
+
+intenta
+    edad es numero de "no soy un numero"
+si falla
+    escribe "Aviso: " mas error
+    edad es 0
+fin
+escribe "edad = " mas edad
+
+funcion divide con a y b
+    si b es 0
+        falla "no divido entre cero, listo"
+    fin
+    devuelve a entre b
+fin
+
+intenta
+    escribe divide con 10 y 0
+si falla
+    escribe "Capturado: " mas error
+fin
+escribe divide con 10 y 2
+
+intenta
+    escribe elemento 99 de lista con 1 y 2
+si falla
+    escribe "Capturado: " mas error
+fin

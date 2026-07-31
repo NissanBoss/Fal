@@ -1,0 +1,47 @@
+# --- Diccionarios ---
+edades es diccionario vacio
+elemento "ana" de edades es 25
+elemento "luis" de edades es 30
+escribe edades
+escribe elemento "ana" de edades
+escribe claves de edades
+escribe valores de edades
+escribe largo de edades
+escribe contiene de edades con "ana"
+para cada nombre en edades
+    escribe nombre mas " tiene " mas elemento nombre de edades
+fin
+quita "luis" de edades
+escribe edades
+
+precios es diccionario con "pan" y 1.20 y "leche" y 0.99
+escribe precios
+escribe suma de valores de precios
+
+# --- Objetos ---
+tipo Perro con nombre y edad
+    funcion ladra
+        escribe nombre de mi mas " dice guau"
+    fin
+    funcion cumple
+        edad de mi es edad de mi mas 1
+        devuelve edad de mi
+    fin
+    funcion presenta con saludo
+        devuelve saludo mas ", soy " mas nombre de mi
+    fin
+fin
+
+toby es nuevo Perro con "Toby" y 3
+escribe toby
+escribe nombre de toby
+ladra de toby
+escribe cumple de toby
+escribe presenta de toby con "Hola"
+nombre de toby es "Tobias"
+escribe nombre de toby
+
+perros es lista con toby y (nuevo Perro con "Rex" y 5)
+para cada p en perros
+    ladra de p
+fin

@@ -1,0 +1,6 @@
+Se rompio: No se puede dividir entre cero.
+Aviso: "no soy un numero" no se puede convertir en numero.
+edad = 0
+Capturado: no divido entre cero, listo
+5
+Capturado: Pediste el elemento 99, pero solo hay 2.

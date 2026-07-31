@@ -1,0 +1,53 @@
+tipo Animal con nombre y patas
+    funcion habla
+        devuelve "..."
+    fin
+    funcion presenta
+        devuelve nombre de mi mas " (" mas patas de mi mas " patas) dice " mas habla de mi
+    fin
+    funcion texto
+        devuelve "Animal:" mas nombre de mi
+    fin
+fin
+
+tipo Perro hereda de Animal
+    funcion habla
+        devuelve "guau"
+    fin
+fin
+
+tipo Loro hereda de Animal con colores
+    funcion crea con n y c
+        nombre de mi es n
+        patas de mi es 2
+        colores de mi es c
+    fin
+    funcion habla
+        devuelve "hola hola"
+    fin
+    funcion presenta
+        devuelve (presenta de padre) mas " y es " mas colores de mi
+    fin
+fin
+
+a es nuevo Animal con "Bicho" y 4
+p es nuevo Perro con "Toby" y 4
+l es nuevo Loro con "Coco" y "verde"
+
+escribe presenta de a
+escribe presenta de p
+escribe presenta de l
+escribe "campos del loro: " mas l
+escribe a
+
+escribe "-- conjuntos --"
+c1 es conjunto con 1 y 2 y 3 y 2 y 1
+escribe c1
+escribe largo de c1
+escribe 2 esta en c1
+c2 es conjunto con 3 y 4
+escribe union con c1 y c2
+escribe interseccion con c1 y c2
+escribe diferencia con c1 y c2
+agrega 9 a c1
+escribe c1

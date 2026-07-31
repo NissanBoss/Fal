@@ -1,0 +1,171 @@
+# El juego de la serpiente, en Fal.
+#
+# Como se juega:
+#   w a s d   arriba, izquierda, abajo, derecha
+#   (enter)   sigue en la misma direccion
+#   q         salir
+#
+# Puedes escribir varias letras de golpe: "dddw" mueve tres veces a la
+# derecha y una arriba. Es lo que hace que el juego corra de verdad.
+
+ANCHO es 22
+ALTO es 12
+PAUSA es 0.06
+
+# Una casilla se guarda como un solo numero: fila por 100 mas columna.
+# Asi la serpiente es una simple lista de numeros y preguntar si se ha
+# mordido la cola es tan corto como "contiene de cuerpo con casilla".
+funcion casilla con fila y columna
+    devuelve fila por 100 mas columna
+fin
+
+funcion fila_de con c
+    devuelve abajo de (c entre 100)
+fin
+
+funcion columna_de con c
+    devuelve c resto 100
+fin
+
+# Empieza con cinco trozos: con menos de cinco es imposible morderse la
+# cola, y entonces media gracia del juego no existe.
+cuerpo es lista con (casilla con 6 y 8) y (casilla con 6 y 7) y (casilla con 6 y 6) y (casilla con 6 y 5) y (casilla con 6 y 4)
+paso_fila es 0
+paso_columna es 1
+comida es nada
+puntos es 0
+vivo es verdadero
+motivo es ""
+
+
+funcion nueva_comida
+    comparte comida
+    intentos es 0
+    mientras verdadero
+        f es azar entre 1 y ALTO
+        c es azar entre 1 y ANCHO
+        sitio es casilla con f y c
+        si no contiene de cuerpo con sitio
+            comida es sitio
+            devuelve nada
+        fin
+        intentos es intentos mas 1
+        si intentos es mayor que 500
+            devuelve nada
+        fin
+    fin
+fin
+
+
+funcion dibuja
+    limpia
+    escribe " SNAKE en Fal      Puntos: " mas puntos mas "      Largo: " mas largo de cuerpo
+    escribe " +" mas (repetido de "-" con ANCHO) mas "+"
+    para cada f desde 1 hasta ALTO
+        linea es " |"
+        para cada c desde 1 hasta ANCHO
+            aqui es casilla con f y c
+            si aqui es primero de cuerpo
+                linea es linea mas "@"
+            si no si contiene de cuerpo con aqui
+                linea es linea mas "o"
+            si no si aqui es comida
+                linea es linea mas "*"
+            si no
+                linea es linea mas " "
+            fin
+        fin
+        escribe linea mas "|"
+    fin
+    escribe " +" mas (repetido de "-" con ANCHO) mas "+"
+fin
+
+
+funcion gira con tecla
+    comparte paso_fila y paso_columna
+    # No se puede dar media vuelta sobre uno mismo.
+    si tecla es "w" y paso_fila no es igual a 1
+        paso_fila es menos 1
+        paso_columna es 0
+    si no si tecla es "s" y paso_fila no es igual a menos 1
+        paso_fila es 1
+        paso_columna es 0
+    si no si tecla es "a" y paso_columna no es igual a 1
+        paso_fila es 0
+        paso_columna es menos 1
+    si no si tecla es "d" y paso_columna no es igual a menos 1
+        paso_fila es 0
+        paso_columna es 1
+    fin
+fin
+
+
+funcion avanza
+    comparte cuerpo y puntos y vivo y motivo
+
+    cabeza es primero de cuerpo
+    f es (fila_de con cabeza) mas paso_fila
+    c es (columna_de con cabeza) mas paso_columna
+
+    si f es menor que 1 o f es mayor que ALTO o c es menor que 1 o c es mayor que ANCHO
+        vivo es falso
+        motivo es "Te has dado contra la pared."
+        devuelve nada
+    fin
+
+    siguiente es casilla con f y c
+
+    # La cola se mueve a la vez, asi que pisar la ultima casilla vale.
+    cola es ultimo de cuerpo
+    si (contiene de cuerpo con siguiente) y siguiente no es igual a cola
+        vivo es falso
+        motivo es "Te has mordido la cola."
+        devuelve nada
+    fin
+
+    inserta con cuerpo y 1 y siguiente
+
+    si siguiente es comida
+        puntos es puntos mas 10
+        nueva_comida
+    si no
+        quita (largo de cuerpo) de cuerpo
+    fin
+fin
+
+
+# ---- el juego ----
+
+nueva_comida
+dibuja
+
+mientras vivo
+    ordenes es minusculas de pregunta " > "
+
+    si ordenes es "q"
+        motivo es "Lo dejaste tu."
+        vivo es falso
+
+    si no si ordenes es ""
+        avanza
+        dibuja
+
+    si no
+        para cada tecla en ordenes
+            si no vivo
+                detente
+            fin
+            si tecla esta en "wasd"
+                gira con tecla
+            fin
+            avanza
+            dibuja
+            espera de PAUSA
+        fin
+    fin
+fin
+
+escribe ""
+escribe " " mas motivo
+escribe " Puntuacion final: " mas puntos mas " puntos, con " mas largo de cuerpo mas " de largo."
+escribe ""
