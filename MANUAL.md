@@ -651,10 +651,10 @@ Si te equivocas, el error te enseña dónde ponerlos.
 Fal está escrito en Go, sin ninguna librería de terceros, y se reparte como un
 **único ejecutable**: no hace falta instalar nada para usarlo. Por dentro son cuatro partes:
 
-1. **El lector** (`lector.go`) — parte el texto en piezas.
-2. **El armador** (`armador*.go`) — junta las piezas en un árbol de instrucciones.
-3. **El ejecutor** (`interprete.go`, `ejecutar.go`, `evaluar.go`) — recorre el árbol y hace lo que dice.
-4. **La consola** (`main.go`) — ejecuta archivos y presenta los errores.
+1. **El lector** (`lector.go`): parte el texto en piezas.
+2. **El armador** (`armador*.go`): junta las piezas en un árbol de instrucciones.
+3. **El ejecutor** (`interprete.go`, `ejecutar.go`, `evaluar.go`): recorre el árbol y hace lo que dice.
+4. **La consola** (`main.go`): ejecuta archivos y presenta los errores.
 
 Los números exactos viven aparte, en `numero.go`: un número es un entero rápido
 mientras quepa, una fracción exacta cuando tiene decimales, y solo se vuelve

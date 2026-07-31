@@ -118,8 +118,8 @@ fal ejemplos/snake.fal
 
 ## Documentación
 
-- **[LEEME.md](LEEME.md)** — instalar, desinstalar y poner el color en el editor
-- **[MANUAL.md](MANUAL.md)** — el lenguaje entero, con una tabla de traducción
+- **[LEEME.md](LEEME.md)**: instalar, desinstalar y poner el color en el editor
+- **[MANUAL.md](MANUAL.md)**: el lenguaje entero, con una tabla de traducción
   desde Python y JavaScript al final
 
 ## Compilar tú mismo

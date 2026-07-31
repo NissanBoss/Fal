@@ -48,18 +48,18 @@ fal --ayuda
 
 ### Para desinstalar
 
-- **Windows** — `desinstalar.bat`, que viene en el mismo paquete.
-- **Mac y Linux** — `sh instalar.sh --quitar`.
+- **Windows**: `desinstalar.bat`, que viene en el mismo paquete.
+- **Mac y Linux**: `sh instalar.sh --quitar`.
 
 ### Si tu sistema bloquea el programa
 
 Le pasa a todo programa nuevo que no venga firmado por una empresa con certificado.
 No es un virus: es que Fal es tuyo y aún no tiene firma.
 
-- **Windows** — botón derecho sobre `fal.exe` → **Propiedades** → marca **Desbloquear**.
+- **Windows**: botón derecho sobre `fal.exe` → **Propiedades** → marca **Desbloquear**.
   Si además tienes activado *Smart App Control*, hay que desactivarlo en
   *Seguridad de Windows → Control de aplicaciones y navegador*.
-- **Mac** — *Ajustes → Privacidad y seguridad*, y pulsa **Abrir igualmente**.
+- **Mac**: *Ajustes → Privacidad y seguridad*, y pulsa **Abrir igualmente**.
 
 ### Sin instalador
 
@@ -92,8 +92,8 @@ fal --editor
 
 Genera la carpeta `vscode-fal`. Cópiala dentro de:
 
-- **Windows** — `%USERPROFILE%\.vscode\extensions\fal`
-- **Mac y Linux** — `~/.vscode/extensions/fal`
+- **Windows**: `%USERPROFILE%\.vscode\extensions\fal`
+- **Mac y Linux**: `~/.vscode/extensions/fal`
 
 Reinicia VS Code y los `.fal` salen coloreados, con sangría automática
 después de `si` o `funcion` y quitándola al escribir `fin`.
