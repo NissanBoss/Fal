@@ -1,0 +1,50 @@
+name: Playground
+
+# Compila el interprete a WebAssembly y publica la pagina donde se puede
+# probar Fal sin instalar nada. Se lanza en cada cambio de main.
+#
+# Para que funcione hay que activarlo una vez en el repositorio:
+#   Settings -> Pages -> Source -> GitHub Actions
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Si se empujan dos cambios seguidos, que solo se publique el ultimo.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.desplegar.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Compilar a WebAssembly
+        run: |
+          GOOS=js GOARCH=wasm go build -ldflags "-s -w" -o docs/fal.wasm .
+          cp "$(go env GOROOT)/lib/wasm/wasm_exec.js" docs/
+          ls -lh docs/
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - id: desplegar
+        uses: actions/deploy-pages@v4

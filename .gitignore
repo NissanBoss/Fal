@@ -18,3 +18,7 @@ Thumbs.db
 ejemplos/agenda.txt
 ejemplos/temporal.txt
 ejemplos/notas.txt
+
+# El playground se compila al publicar, no se guarda aqui.
+/docs/fal.wasm
+/docs/wasm_exec.js

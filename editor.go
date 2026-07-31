@@ -1,3 +1,5 @@
+//go:build !js
+
 package main
 
 // Genera la extension de VS Code que colorea los archivos .fal.

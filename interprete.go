@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 )
 
 const limiteLlamadas = 3000
@@ -126,9 +127,15 @@ type Interprete struct {
 	argumentos []string
 	cargados   map[string]Valor
 	pila       []Marco
-	tipoError  *Tipo
-	salida     *bufio.Writer
-	entrada    *bufio.Reader
+
+	// Tope de tiempo. En el navegador hace falta: sin el, un bucle sin
+	// salida colgaria la pestaña. Con la hora a cero no se comprueba nada,
+	// que es como corre en el escritorio.
+	limite    time.Time
+	pasos     int
+	tipoError *Tipo
+	salida    *bufio.Writer
+	entrada   *bufio.Reader
 }
 
 func nuevoInterprete(carpeta string, args []string) *Interprete {
@@ -237,8 +244,28 @@ func (in *Interprete) ejecutarBloque(cuerpo []Instruccion, mem *Memoria) (result
 	return seguir, nil
 }
 
+// sinTiempo corta los bucles eternos. Mirar el reloj en cada vuelta
+// costaria caro, asi que solo se comprueba de vez en cuando.
+func (in *Interprete) sinTiempo(ln int) *ErrorFal {
+	if in.limite.IsZero() {
+		return nil
+	}
+	in.pasos++
+	if in.pasos%2048 != 0 {
+		return nil
+	}
+	if time.Now().After(in.limite) {
+		return nuevoError("El programa lleva demasiado rato dando vueltas.", ln,
+			"Comprueba que el bucle tenga forma de terminar.", ClaseLimite)
+	}
+	return nil
+}
+
 // bucle ejecuta el cuerpo y dice si hay que seguir dando vueltas.
 func (in *Interprete) bucle(cuerpo []Instruccion, mem *Memoria) (bool, resultado, *ErrorFal) {
+	if err := in.sinTiempo(0); err != nil {
+		return false, seguir, err
+	}
 	r, err := in.ejecutarBloque(cuerpo, mem)
 	if err != nil {
 		return false, seguir, err

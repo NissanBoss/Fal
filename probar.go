@@ -1,3 +1,5 @@
+//go:build !js
+
 package main
 
 // El banco de pruebas, dentro del propio ejecutable.

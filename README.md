@@ -15,6 +15,10 @@ para cada p en perros
 fin
 ```
 
+### [Pruébalo aquí, sin instalar nada](https://nissanboss.github.io/Fal/)
+
+El intérprete entero corre dentro del navegador. Escribes, le das a ejecutar y ya.
+
 No hay `;` ni `{}` ni `==` ni `+`. Los bloques cierran con `fin`, las cuentas se
 escriben `3 mas 4`, y las comparaciones `si edad es mayor que 18`. Con tildes o
 sin ellas, en mayúsculas o en minúsculas: da igual.
