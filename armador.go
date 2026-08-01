@@ -9,16 +9,10 @@ import "strings"
 // tener una variable llamada "numero", "lista" o "suma" sin problema.
 var reservadas = map[string]bool{}
 
-// "y" no esta en la lista aunque sea el "y" logico y tambien el separador
-// de argumentos. Puede ser el nombre de una variable porque las dos cosas
-// nunca caen en el mismo sitio: como palabra del lenguaje siempre va
-// DETRAS de algo ("si a y b", "suma con 1 y 2"), y como nombre siempre va
-// donde se espera un valor ("y es 5", "escribe y"). El armador sabe en
-// cual de las dos posiciones esta, asi que no hay confusion posible.
-//
-// Incluso "si x y y" se entiende bien: el primer "y" es el operador y el
-// segundo la variable. Y en las listas de nombres ("con x y y") se turnan
-// nombre y separador, asi que tampoco hay duda.
+// La "y" no esta aqui a proposito, aunque sea operador y separador. Como
+// palabra del lenguaje va siempre DETRAS de algo ("si a y b"), y como
+// nombre va donde se espera un valor ("y es 5"), asi que no chocan. Los
+// casos raros estan en y_test.go.
 func init() {
 	for _, p := range strings.Fields(`escribe es no si sino fin esta mientras repite
 		veces para cada en desde hasta funcion devuelve retorna con de o mas menos
