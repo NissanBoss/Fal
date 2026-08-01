@@ -368,7 +368,7 @@ const LECCIONES = [
     titulo: "Escribir en pantalla",
     cuerpo: `<p>Para que un programa diga algo se usa <code>escribe</code>, y el texto
       va entre comillas.</p>
-      <pre>escribe "Buenos dias"</pre>`,
+      <pre>escribe "Buenos días"</pre>`,
     tarea: 'Haz que el programa escriba exactamente <code>Hola mundo</code>.',
     inicial: "",
     espera: "Hola mundo"
@@ -378,22 +378,22 @@ const LECCIONES = [
     cuerpo: `<p>Una variable es una caja con nombre. Se llena con <code>es</code>.</p>
       <pre>ciudad es "Madrid"
 escribe ciudad</pre>
-      <p>Fijate que al escribir la variable no lleva comillas: si las pusieras,
-      escribiria la palabra en vez de lo que hay dentro.</p>`,
-    tarea: 'Guarda <code>15</code> en una variable llamada <code>edad</code> y escribela.',
+      <p>Fíjate que al escribir la variable no lleva comillas: si las pusieras,
+      escribiría la palabra en vez de lo que hay dentro.</p>`,
+    tarea: 'Guarda <code>15</code> en una variable llamada <code>edad</code> y escríbela.',
     inicial: "",
     espera: "15"
   },
   {
     titulo: "Juntar textos",
-    cuerpo: `<p>La palabra <code>mas</code> une cosas. Sirve para sumar numeros y
-      tambien para pegar textos.</p>
-      <pre>nombre es "Ana"
-escribe "Hola " mas nombre</pre>
-      <p>Ojo al espacio dentro de las comillas: sin el saldria <code>HolaAna</code>.</p>`,
-    tarea: 'Con <code>edad</code> valiendo 15, escribe <code>Tengo 15 anios</code>.',
+    cuerpo: `<p>La palabra <code>mas</code> une cosas. Sirve para sumar números y
+      también para pegar textos.</p>
+      <pre>ciudad es "Madrid"
+escribe "Vivo en " mas ciudad</pre>
+      <p>Ojo al espacio dentro de las comillas: sin él saldría <code>Vivo enMadrid</code>.</p>`,
+    tarea: 'Con <code>edad</code> valiendo 15, escribe <code>Tengo 15 años</code>.',
     inicial: "edad es 15\n",
-    espera: "Tengo 15 anios"
+    espera: "Tengo 15 años"
   },
   {
     titulo: "Hacer cuentas",
@@ -422,9 +422,9 @@ fin</pre>`,
   },
   {
     titulo: "Repetir",
-    cuerpo: `<p>Para hacer algo varias veces esta <code>repite</code>.</p>
+    cuerpo: `<p>Para hacer algo varias veces está <code>repite</code>.</p>
       <pre>repite 5 veces
-    escribe "Alla voy"
+    escribe "Allá voy"
 fin</pre>`,
     tarea: 'Escribe <code>Hola</code> tres veces, usando <code>repite</code>.',
     inicial: "",
@@ -433,13 +433,13 @@ fin</pre>`,
   },
   {
     titulo: "Contar",
-    cuerpo: `<p>Cuando necesitas saber por que numero vas, se usa
+    cuerpo: `<p>Cuando necesitas saber por qué número vas, se usa
       <code>para cada</code>:</p>
       <pre>para cada n desde 1 hasta 3
     escribe n
 fin</pre>
       <p>La variable <code>n</code> va valiendo 1, luego 2, luego 3.</p>`,
-    tarea: 'Escribe los numeros del 1 al 5, uno por linea.',
+    tarea: 'Escribe los números del 1 al 5, uno por línea.',
     inicial: "",
     espera: "1\n2\n3\n4\n5",
     debeUsar: ["para"]
@@ -451,20 +451,20 @@ fin</pre>
 escribe largo de colores        # 2
 escribe elemento 1 de colores   # rojo</pre>
       <p>Se cuenta desde el 1, como en la vida real.</p>`,
-    tarea: 'Con la lista de abajo, escribe cuantas frutas hay y luego la segunda.',
+    tarea: 'Con la lista de abajo, escribe cuántas frutas hay y luego la segunda.',
     inicial: 'frutas es lista con "pera" y "uva" y "kiwi"\n',
     espera: "3\nuva"
   },
   {
     titulo: "Funciones",
-    cuerpo: `<p>Una funcion es un trozo de programa con nombre, para no repetirlo.</p>
+    cuerpo: `<p>Una función es un trozo de programa con nombre, para no repetirlo.</p>
       <pre>funcion saluda con nombre
     devuelve "Hola " mas nombre
 fin
 
 escribe saluda con "Ana"</pre>
-      <p><code>devuelve</code> es lo que la funcion entrega cuando termina.</p>`,
-    tarea: 'Haz una funcion <code>doble</code> que multiplique por 2, y escribe el doble de 5.',
+      <p><code>devuelve</code> es lo que la función entrega cuando termina.</p>`,
+    tarea: 'Haz una función <code>doble</code> que multiplique por 2, y escribe el doble de 5.',
     inicial: "",
     espera: "10",
     debeUsar: ["funcion", "devuelve"]
@@ -478,7 +478,7 @@ para cada n desde 1 hasta 3
     total es total mas n
 fin
 escribe total          # 6</pre>`,
-    tarea: 'Suma todos los numeros del 1 al 10 y escribe el resultado.',
+    tarea: 'Suma todos los números del 1 al 10 y escribe el resultado.',
     inicial: "",
     espera: "55",
     debeUsar: ["para"]
@@ -567,7 +567,7 @@ function pintarLeccion() {
   const l = LECCIONES[actual];
   document.getElementById("lecTitulo").textContent = l.titulo;
   document.getElementById("lecCuenta").textContent =
-    "Leccion " + (actual + 1) + " de " + LECCIONES.length;
+    "Lección " + (actual + 1) + " de " + LECCIONES.length;
   document.getElementById("lecCuerpo").innerHTML = l.cuerpo;
   document.getElementById("lecTarea").innerHTML = l.tarea;
 
@@ -584,7 +584,7 @@ function pintarLeccion() {
   });
 
   $programa.value = l.inicial || "";
-  $salida.innerHTML = '<span class="aviso">Escribe tu solucion y pulsa «Comprobar».</span>';
+  $salida.innerHTML = '<span class="aviso">Escribe tu solución y pulsa «Comprobar».</span>';
   document.getElementById("lecAnterior").disabled = actual === 0;
   document.getElementById("lecSiguiente").disabled = actual === LECCIONES.length - 1;
 }
@@ -655,7 +655,7 @@ function comprobarLeccion() {
   }
 
   $salida.innerHTML = escapar(r.salida || "(no escribio nada)") +
-    '<span class="casi">\nCasi. Deberia salir:\n' + escapar(l.espera) + "</span>";
+    '<span class="casi">\nCasi. Debería salir:\n' + escapar(l.espera) + "</span>";
 }
 
 function pintarPuntos() {
