@@ -79,6 +79,50 @@ pre.salida .error { color: var(--rojo); }
 pre.salida .aviso { color: var(--suave); }
 .pista { font-size: 13px; color: var(--suave); margin-top: 6px; }
 
+.pestanas { display: flex; gap: 6px; margin-bottom: 16px; }
+.pestanas button {
+  cursor: pointer; padding: 9px 20px; font-size: 15px;
+  background: transparent; border: 1px solid transparent; color: var(--suave);
+}
+.pestanas button.activa {
+  background: var(--panel); border-color: var(--borde); color: var(--texto);
+  font-weight: 600;
+}
+.pestanas button:hover:not(.activa) { color: var(--texto); }
+
+.leccion {
+  background: var(--panel); border: 1px solid var(--borde);
+  border-radius: 10px; padding: 18px 20px; margin-bottom: 14px;
+}
+.leccion .cabecera {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.leccion h2 { margin: 0; font-size: 19px; }
+.leccion .cuenta { font-size: 13px; color: var(--suave); }
+.leccion p { margin: 0 0 10px; }
+.leccion pre {
+  font-family: var(--mono); font-size: 13.5px; background: var(--fondo);
+  border: 1px solid var(--borde); border-radius: 8px; padding: 10px 12px;
+  margin: 0 0 10px; overflow-x: auto;
+}
+.tarea {
+  border-left: 3px solid var(--acento); padding: 2px 0 2px 12px;
+  margin: 12px 0 0;
+}
+.tarea strong { color: var(--acento); }
+
+.puntos { display: flex; gap: 5px; margin-left: auto; }
+.puntos span {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--borde); display: block;
+}
+.puntos span.hecha { background: var(--verde); }
+.puntos span.actual { box-shadow: 0 0 0 2px var(--acento); }
+
+.bien { color: var(--verde); font-weight: 600; }
+.casi { color: var(--suave); }
+
 footer {
   text-align: center; color: var(--suave); font-size: 14px;
   padding: 30px 20px 50px; border-top: 1px solid var(--borde);
@@ -104,9 +148,30 @@ code { font-family: var(--mono); font-size: .92em; }
 </header>
 
 <main>
-  <div class="barra">
+  <div class="pestanas">
+    <button id="pestanaProbar" class="activa">Probar</button>
+    <button id="pestanaAprender">Aprender</button>
+  </div>
+
+  <div class="leccion" id="panelLeccion" hidden>
+    <div class="cabecera">
+      <h2 id="lecTitulo"></h2>
+      <span class="cuenta" id="lecCuenta"></span>
+      <div class="puntos" id="lecPuntos"></div>
+    </div>
+    <div id="lecCuerpo"></div>
+    <p class="tarea"><strong>Tu turno:</strong> <span id="lecTarea"></span></p>
+  </div>
+
+  <div class="barra" id="barraProbar">
     <select id="ejemplos" aria-label="Elegir un ejemplo"></select>
     <button class="correr" id="correr" disabled>Cargando…</button>
+  </div>
+
+  <div class="barra" id="barraAprender" hidden>
+    <button id="lecAnterior">Anterior</button>
+    <button id="lecSiguiente">Siguiente</button>
+    <button class="correr" id="comprobar" disabled>Comprobar</button>
   </div>
 
   <div class="rejilla">
@@ -295,6 +360,128 @@ escribe siguiente`,
   }
 ];
 
+const LECCIONES = [
+  {
+    titulo: "Escribir en pantalla",
+    cuerpo: `<p>Para que un programa diga algo se usa <code>escribe</code>, y el texto
+      va entre comillas.</p>
+      <pre>escribe "Buenos dias"</pre>`,
+    tarea: 'Haz que el programa escriba exactamente <code>Hola mundo</code>.',
+    inicial: "",
+    espera: "Hola mundo"
+  },
+  {
+    titulo: "Guardar un valor",
+    cuerpo: `<p>Una variable es una caja con nombre. Se llena con <code>es</code>.</p>
+      <pre>ciudad es "Madrid"
+escribe ciudad</pre>
+      <p>Fijate que al escribir la variable no lleva comillas: si las pusieras,
+      escribiria la palabra en vez de lo que hay dentro.</p>`,
+    tarea: 'Guarda <code>15</code> en una variable llamada <code>edad</code> y escribela.',
+    inicial: "",
+    espera: "15"
+  },
+  {
+    titulo: "Juntar textos",
+    cuerpo: `<p>La palabra <code>mas</code> une cosas. Sirve para sumar numeros y
+      tambien para pegar textos.</p>
+      <pre>nombre es "Ana"
+escribe "Hola " mas nombre</pre>
+      <p>Ojo al espacio dentro de las comillas: sin el saldria <code>HolaAna</code>.</p>`,
+    tarea: 'Con <code>edad</code> valiendo 15, escribe <code>Tengo 15 anios</code>.',
+    inicial: "edad es 15\n",
+    espera: "Tengo 15 anios"
+  },
+  {
+    titulo: "Hacer cuentas",
+    cuerpo: `<p>Las cuentas se escriben con palabras, como en clase de mates:</p>
+      <pre>escribe 3 mas 4      # 7
+escribe 10 menos 4   # 6
+escribe 3 por 4      # 12
+escribe 10 entre 2   # 5</pre>`,
+    tarea: 'Escribe el resultado de multiplicar 7 por 6.',
+    inicial: "",
+    espera: "42"
+  },
+  {
+    titulo: "Decidir",
+    cuerpo: `<p>Con <code>si</code> el programa elige. El bloque se cierra con
+      <code>fin</code>.</p>
+      <pre>si nota es mayor o igual que 5
+    escribe "Aprobado"
+si no
+    escribe "Suspenso"
+fin</pre>`,
+    tarea: 'Escribe <code>Mayor</code> si la edad llega a 18, y <code>Menor</code> si no.',
+    inicial: "edad es 20\n",
+    espera: "Mayor",
+    debeUsar: ["si"]
+  },
+  {
+    titulo: "Repetir",
+    cuerpo: `<p>Para hacer algo varias veces esta <code>repite</code>.</p>
+      <pre>repite 5 veces
+    escribe "Alla voy"
+fin</pre>`,
+    tarea: 'Escribe <code>Hola</code> tres veces, usando <code>repite</code>.',
+    inicial: "",
+    espera: "Hola\nHola\nHola",
+    debeUsar: ["repite"]
+  },
+  {
+    titulo: "Contar",
+    cuerpo: `<p>Cuando necesitas saber por que numero vas, se usa
+      <code>para cada</code>:</p>
+      <pre>para cada n desde 1 hasta 3
+    escribe n
+fin</pre>
+      <p>La variable <code>n</code> va valiendo 1, luego 2, luego 3.</p>`,
+    tarea: 'Escribe los numeros del 1 al 5, uno por linea.',
+    inicial: "",
+    espera: "1\n2\n3\n4\n5",
+    debeUsar: ["para"]
+  },
+  {
+    titulo: "Listas",
+    cuerpo: `<p>Una lista guarda varias cosas de golpe.</p>
+      <pre>colores es lista con "rojo" y "verde"
+escribe largo de colores        # 2
+escribe elemento 1 de colores   # rojo</pre>
+      <p>Se cuenta desde el 1, como en la vida real.</p>`,
+    tarea: 'Con la lista de abajo, escribe cuantas frutas hay y luego la segunda.',
+    inicial: 'frutas es lista con "pera" y "uva" y "kiwi"\n',
+    espera: "3\nuva"
+  },
+  {
+    titulo: "Funciones",
+    cuerpo: `<p>Una funcion es un trozo de programa con nombre, para no repetirlo.</p>
+      <pre>funcion saluda con nombre
+    devuelve "Hola " mas nombre
+fin
+
+escribe saluda con "Ana"</pre>
+      <p><code>devuelve</code> es lo que la funcion entrega cuando termina.</p>`,
+    tarea: 'Haz una funcion <code>doble</code> que multiplique por 2, y escribe el doble de 5.',
+    inicial: "",
+    espera: "10",
+    debeUsar: ["funcion", "devuelve"]
+  },
+  {
+    titulo: "Reto final",
+    cuerpo: `<p>Ya tienes todas las piezas. Este junta un contador con una variable
+      que va creciendo.</p>
+      <pre>total es 0
+para cada n desde 1 hasta 3
+    total es total mas n
+fin
+escribe total          # 6</pre>`,
+    tarea: 'Suma todos los numeros del 1 al 10 y escribe el resultado.',
+    inicial: "",
+    espera: "55",
+    debeUsar: ["para"]
+  }
+];
+
 const $programa = document.getElementById("programa");
 const $entradas = document.getElementById("entradas");
 const $salida   = document.getElementById("salida");
@@ -344,8 +531,136 @@ function ejecutar() {
 
 $correr.addEventListener("click", ejecutar);
 document.addEventListener("keydown", e => {
-  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); ejecutar(); }
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+    e.preventDefault();
+    modoAprender ? comprobarLeccion() : ejecutar();
+  }
 });
+
+// Modo lecciones. Es opcional: quien entra solo a trastear ni se entera.
+const $pestanaProbar = document.getElementById("pestanaProbar");
+const $pestanaAprender = document.getElementById("pestanaAprender");
+const $panelLeccion = document.getElementById("panelLeccion");
+const $barraProbar = document.getElementById("barraProbar");
+const $barraAprender = document.getElementById("barraAprender");
+const $comprobar = document.getElementById("comprobar");
+const $cajaEntradas = document.getElementById("entradas").parentElement;
+
+let modoAprender = false;
+let actual = 0;
+let hechas = new Set();
+
+try {
+  hechas = new Set(JSON.parse(localStorage.getItem("fal_lecciones") || "[]"));
+} catch (e) {}
+
+function guardarProgreso() {
+  try {
+    localStorage.setItem("fal_lecciones", JSON.stringify([...hechas]));
+  } catch (e) {}
+}
+
+function pintarLeccion() {
+  const l = LECCIONES[actual];
+  document.getElementById("lecTitulo").textContent = l.titulo;
+  document.getElementById("lecCuenta").textContent =
+    "Leccion " + (actual + 1) + " de " + LECCIONES.length;
+  document.getElementById("lecCuerpo").innerHTML = l.cuerpo;
+  document.getElementById("lecTarea").innerHTML = l.tarea;
+
+  const puntos = document.getElementById("lecPuntos");
+  puntos.innerHTML = "";
+  LECCIONES.forEach((_, i) => {
+    const p = document.createElement("span");
+    if (hechas.has(i)) p.classList.add("hecha");
+    if (i === actual) p.classList.add("actual");
+    p.title = "Leccion " + (i + 1);
+    p.style.cursor = "pointer";
+    p.onclick = () => { actual = i; pintarLeccion(); };
+    puntos.appendChild(p);
+  });
+
+  $programa.value = l.inicial || "";
+  $salida.innerHTML = '<span class="aviso">Escribe tu solucion y pulsa «Comprobar».</span>';
+  document.getElementById("lecAnterior").disabled = actual === 0;
+  document.getElementById("lecSiguiente").disabled = actual === LECCIONES.length - 1;
+}
+
+function cambiarModo(aprender) {
+  modoAprender = aprender;
+  $pestanaAprender.classList.toggle("activa", aprender);
+  $pestanaProbar.classList.toggle("activa", !aprender);
+  $panelLeccion.hidden = !aprender;
+  $barraAprender.hidden = !aprender;
+  $barraProbar.hidden = aprender;
+  $cajaEntradas.hidden = aprender;
+  if (aprender) pintarLeccion(); else cargar(+$ejemplos.value);
+}
+
+$pestanaProbar.addEventListener("click", () => cambiarModo(false));
+$pestanaAprender.addEventListener("click", () => cambiarModo(true));
+document.getElementById("lecAnterior").addEventListener("click", () => {
+  if (actual > 0) { actual--; pintarLeccion(); }
+});
+document.getElementById("lecSiguiente").addEventListener("click", () => {
+  if (actual < LECCIONES.length - 1) { actual++; pintarLeccion(); }
+});
+
+// Se comparan las salidas sin distinguir espacios de sobra ni mayusculas.
+function igualan(a, b) {
+  const limpia = t => t.trim().split("\n").map(l => l.trim()).join("\n").toLowerCase();
+  return limpia(a) === limpia(b);
+}
+
+function comprobarLeccion() {
+  const l = LECCIONES[actual];
+  const codigo = $programa.value;
+
+  if (l.debeUsar) {
+    const usadas = (codigo.toLowerCase().match(/[a-záéíóúñ_]+/g) || []);
+    const falta = l.debeUsar.find(pal => !usadas.includes(pal));
+    if (falta) {
+      $salida.innerHTML = '<span class="casi">Para esta leccion hace falta usar <b>' +
+        falta + "</b>. Vuelve a mirar el ejemplo de arriba.</span>";
+      return;
+    }
+  }
+
+  let r;
+  try {
+    r = falEjecutar(codigo, "");
+  } catch (e) {
+    r = { salida: "", error: String(e) };
+  }
+
+  if (r.error) {
+    $salida.innerHTML = escapar(r.salida || "") +
+      '<span class="error">' + escapar(r.error) + "</span>" +
+      '<span class="casi">\nEl programa tiene un fallo. El error de arriba te dice donde.</span>';
+    return;
+  }
+
+  if (igualan(r.salida, l.espera)) {
+    hechas.add(actual);
+    guardarProgreso();
+    const quedan = LECCIONES.length - hechas.size;
+    $salida.innerHTML = escapar(r.salida) + '<span class="bien">\nCorrecto. ' +
+      (quedan === 0 ? "Has terminado las diez, enhorabuena." :
+       "Te quedan " + quedan + ".") + "</span>";
+    pintarPuntos();
+    return;
+  }
+
+  $salida.innerHTML = escapar(r.salida || "(no escribio nada)") +
+    '<span class="casi">\nCasi. Deberia salir:\n' + escapar(l.espera) + "</span>";
+}
+
+function pintarPuntos() {
+  const puntos = document.getElementById("lecPuntos");
+  [...puntos.children].forEach((p, i) => p.classList.toggle("hecha", hechas.has(i)));
+}
+
+$comprobar.addEventListener("click", comprobarLeccion);
 
 const go = new Go();
 WebAssembly.instantiateStreaming(fetch("fal.wasm"), go.importObject)
@@ -353,6 +668,7 @@ WebAssembly.instantiateStreaming(fetch("fal.wasm"), go.importObject)
     go.run(res.instance);
     $correr.disabled = false;
     $correr.textContent = "Ejecutar";
+    $comprobar.disabled = false;
   })
   .catch(err => {
     $salida.innerHTML = '<span class="error">No pude cargar el lenguaje: ' +

@@ -18,6 +18,8 @@ fin
 ### [Pruébalo aquí, sin instalar nada](https://nissanboss.github.io/Fal/)
 
 El intérprete entero corre dentro del navegador. Escribes, le das a ejecutar y ya.
+Y si estás empezando, tiene **diez lecciones** con sus ejercicios, desde escribir
+en pantalla hasta funciones.
 
 No hay `;` ni `{}` ni `==` ni `+`. Los bloques cierran con `fin`, las cuentas se
 escriben `3 mas 4`, y las comparaciones `si edad es mayor que 18`. Con tildes o
