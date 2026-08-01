@@ -2,7 +2,10 @@ package main
 
 // El armador: junta las piezas sueltas en un arbol de instrucciones.
 
-import "strings"
+import (
+	"sort"
+	"strings"
+)
 
 // Palabras del lenguaje: no sirven como nombres de variables.
 // Las 82 funciones integradas NO estan aqui a proposito, para que puedas
@@ -21,6 +24,29 @@ func init() {
 		relanza hereda padre como`) {
 		reservadas[p] = true
 	}
+}
+
+// Lo que la gente escribe por costumbre de otros sitios o por poner el
+// infinitivo. Son los tropiezos de siempre al empezar, asi que vale la
+// pena reconocerlos por su nombre en vez de fiarlo al parecido.
+var seEquivocaCon = map[string]string{
+	"imprime": "escribe", "imprimir": "escribe", "print": "escribe",
+	"muestra": "escribe", "mostrar": "escribe", "escribir": "escribe",
+	"decir": "escribe", "di": "escribe", "repetir": "repite",
+	"mientrasque": "mientras", "sino_si": "si no", "elif": "si no si",
+	"else": "si no", "if": "si", "while": "mientras", "for": "para cada",
+	"return": "devuelve", "true": "verdadero", "false": "falso",
+}
+
+// listaReservadas sirve para el "quizas querias decir" cuando alguien
+// escribe una palabra del lenguaje casi bien.
+func listaReservadas() []string {
+	var salida []string
+	for p := range reservadas {
+		salida = append(salida, p)
+	}
+	sort.Strings(salida)
+	return salida
 }
 
 // El arbol

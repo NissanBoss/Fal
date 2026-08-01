@@ -187,7 +187,25 @@ func (a *Armador) instruccion() (Instruccion, *ErrorFal) {
 		}
 		return &InsGuarda{base{ln}, objetivo, valor}, a.finDeLinea()
 	}
-	return &InsSuelta{base{ln}, objetivo}, a.finDeLinea()
+	if err := a.finDeLinea(); err != nil {
+		// Escribir "escribir" en vez de "escribe" es el error mas comun de
+		// todos al empezar. Sin esto el mensaje seria "sobra algo al final
+		// de la linea", que no lleva a ninguna parte.
+		if n, ok := objetivo.(*ExNombre); ok {
+			pista := ""
+			if bien, hay := seEquivocaCon[n.Nombre]; hay {
+				pista = `En Fal se dice "` + bien + `".`
+			} else {
+				pista = sugerir(n.Nombre, listaReservadas())
+			}
+			if pista != "" {
+				return nil, nuevoError(`No conozco la palabra "`+n.Nombre+`".`,
+					ln, pista, ClaseSintaxis)
+			}
+		}
+		return nil, err
+	}
+	return &InsSuelta{base{ln}, objetivo}, nil
 }
 
 // abreSino reconoce "sino" y tambien "si no" escrito en dos palabras.
