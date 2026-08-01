@@ -179,13 +179,15 @@ code { font-family: var(--mono); font-size: .92em; }
     <div class="caja">
       <label for="programa">Tu programa</label>
       <textarea id="programa" spellcheck="false" autocomplete="off"></textarea>
-      <label for="entradas" style="margin-top:14px">
-        Respuestas para <code>pregunta</code>, una por línea
-      </label>
-      <textarea id="entradas" spellcheck="false" autocomplete="off"></textarea>
-      <p class="pista">
-        Aquí no hay teclado en directo, así que las respuestas se dan de antemano.
-      </p>
+      <div class="caja" id="cajaRespuestas">
+        <label for="entradas" style="margin-top:14px">
+          Respuestas para <code>pregunta</code>, una por línea
+        </label>
+        <textarea id="entradas" spellcheck="false" autocomplete="off"></textarea>
+        <p class="pista">
+          Aquí no hay teclado en directo, así que las respuestas se dan de antemano.
+        </p>
+      </div>
     </div>
 
     <div class="caja">
@@ -545,7 +547,7 @@ const $panelLeccion = document.getElementById("panelLeccion");
 const $barraProbar = document.getElementById("barraProbar");
 const $barraAprender = document.getElementById("barraAprender");
 const $comprobar = document.getElementById("comprobar");
-const $cajaEntradas = document.getElementById("entradas").parentElement;
+const $cajaRespuestas = document.getElementById("cajaRespuestas");
 
 let modoAprender = false;
 let actual = 0;
@@ -594,7 +596,7 @@ function cambiarModo(aprender) {
   $panelLeccion.hidden = !aprender;
   $barraAprender.hidden = !aprender;
   $barraProbar.hidden = aprender;
-  $cajaEntradas.hidden = aprender;
+  $cajaRespuestas.hidden = aprender;
   if (aprender) pintarLeccion(); else cargar(+$ejemplos.value);
 }
 
