@@ -3,7 +3,7 @@
 
 escribe "Hola mundo"
 
-nombre es "Pedro"
+nombre es "Ana"
 edad es 25
 
 escribe "Me llamo " mas nombre mas " y tengo " mas edad mas " anios"

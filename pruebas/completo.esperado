@@ -27,10 +27,10 @@ huevos: AGOTADO
 Reponemos huevos -> 24
 
 === OBJETOS ===
-Pedro tiene 100 euros
-Pedro tiene 150 euros
+Ana tiene 100 euros
+Ana tiene 150 euros
 No se pudo retirar: no hay suficiente saldo
-Pedro tiene 120 euros
+Ana tiene 120 euros
 
 === FUNCIONES Y RECURSION ===
 1! = 1

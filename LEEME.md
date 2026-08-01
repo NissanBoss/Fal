@@ -12,7 +12,7 @@ tipo Cuenta con titular y saldo
     fin
 fin
 
-cuenta es nuevo Cuenta con "Pedro" y 100
+cuenta es nuevo Cuenta con "Ana" y 100
 ingresa de cuenta con 50
 escribe saldo de cuenta        # 150
 ```
