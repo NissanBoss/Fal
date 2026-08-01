@@ -664,7 +664,10 @@ function pintarPuntos() {
 $comprobar.addEventListener("click", comprobarLeccion);
 
 const go = new Go();
-WebAssembly.instantiateStreaming(fetch("fal.wasm"), go.importObject)
+// no-cache no significa "no guardes", sino "pregunta si cambio".
+// Sin esto, tras una actualizacion te puede tocar la pagina nueva
+// con el interprete viejo durante unos minutos.
+WebAssembly.instantiateStreaming(fetch("fal.wasm", { cache: "no-cache" }), go.importObject)
   .then(res => {
     go.run(res.instance);
     $correr.disabled = false;
