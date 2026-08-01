@@ -401,10 +401,14 @@ escribe "Vivo en " mas ciudad</pre>
       <pre>escribe 3 mas 4      # 7
 escribe 10 menos 4   # 6
 escribe 3 por 4      # 12
-escribe 10 entre 2   # 5</pre>`,
+escribe 10 entre 2   # 5</pre>
+      <p>Eso de <code>#</code> es un comentario: el programa lo ignora por
+      completo. Aquí lo uso para enseñarte lo que sale por pantalla, pero no
+      hace falta que lo escribas.</p>`,
     tarea: 'Escribe el resultado de multiplicar 7 por 6.',
     inicial: "",
-    espera: "42"
+    espera: "42",
+    debeUsar: ["por"]
   },
   {
     titulo: "Decidir",
@@ -462,7 +466,7 @@ escribe elemento 1 de colores   # rojo</pre>
     devuelve "Hola " mas nombre
 fin
 
-escribe saluda con "Ana"</pre>
+escribe saluda con "Ana"    # Hola Ana</pre>
       <p><code>devuelve</code> es lo que la función entrega cuando termina.</p>`,
     tarea: 'Haz una función <code>doble</code> que multiplique por 2, y escribe el doble de 5.',
     inicial: "",
@@ -620,8 +624,11 @@ function comprobarLeccion() {
   const codigo = $programa.value;
 
   if (l.debeUsar) {
-    const usadas = (codigo.toLowerCase().match(/[a-záéíóúñ_]+/g) || []);
-    const falta = l.debeUsar.find(pal => !usadas.includes(pal));
+    // Sin quitar las tildes, quien escriba "función" (que Fal acepta) se
+    // comeria un "hace falta usar funcion" que no hay quien entienda.
+    const sinTildes = t => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const usadas = sinTildes(codigo.toLowerCase()).match(/[a-zñ_]+/g) || [];
+    const falta = l.debeUsar.find(pal => !usadas.includes(sinTildes(pal)));
     if (falta) {
       $salida.innerHTML = '<span class="casi">Para esta leccion hace falta usar <b>' +
         falta + "</b>. Vuelve a mirar el ejemplo de arriba.</span>";
