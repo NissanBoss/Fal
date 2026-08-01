@@ -462,7 +462,7 @@ Se usan igual que un objeto: `doble de mate con 21`.
 
 ---
 
-# Todo lo que trae puesto (80 funciones)
+# Todo lo que trae puesto (82 funciones)
 
 Todas se llaman igual: `nombre de dato` o `nombre con dato1 y dato2`.
 
@@ -682,7 +682,7 @@ Los números exactos viven aparte, en `numero.go`: un número es un entero rápi
 mientras quepa, una fracción exacta cuando tiene decimales, y solo se vuelve
 aproximado si no queda más remedio (una raíz cuadrada, por ejemplo).
 
-**Para añadir una función al lenguaje** basta una entrada en la tabla de `integradas.go`.
+**Para añadir una función al lenguaje** basta una entrada en la tabla de `biblioteca.go`.
 No hay que tocar ni el lector ni el armador:
 
 ```go

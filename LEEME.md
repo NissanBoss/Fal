@@ -110,7 +110,7 @@ añades una función nueva y vuelves a lanzarlo, sale pintada sola.
 | `dist/` | Los ejecutables, uno por sistema |
 | `LEEME.md` | Esto |
 | `MANUAL.md` | El manual completo del lenguaje |
-| `ejemplos/` | 6 programas, de `hola.fal` a `avanzado.fal` |
+| `ejemplos/` | 7 programas, de `hola.fal` al Snake |
 | `pruebas/` | 13 pruebas con su salida exacta esperada |
 | `construir.sh` | Vuelve a compilar para todos los sistemas |
 
@@ -123,8 +123,10 @@ Y el código fuente del intérprete, en Go:
 | `interprete.go` `ejecutar.go` `evaluar.go` `operaciones.go` | Árbol → resultado |
 | `numero.go` | Los números exactos |
 | `valor.go` | Los tipos de dato y los errores |
-| `integradas.go` `integradas2.go` | Las 80 funciones |
-| `main.go` `probar.go` `editor.go` | Consola, pruebas y editor |
+| `biblioteca.go` `colecciones.go` `entorno.go` | Las 82 funciones |
+| `main.go` `fuente.go` `web.go` | Consola, arranque y navegador |
+| `probar.go` `editor.go` | Banco de pruebas y coloreado |
+| `consola_windows.go` `consola_otros.go` | Preparar la consola de cada sistema |
 
 ---
 
@@ -140,7 +142,7 @@ fal --probar             # las pruebas del lenguaje
 ```
 
 **Para añadir una función al lenguaje** basta con una entrada en la tabla de
-`integradas.go`. No hay que tocar ni el lector ni el armador:
+`biblioteca.go`. No hay que tocar ni el lector ni el armador:
 
 ```go
 integrada("dobla", 1, 1, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
