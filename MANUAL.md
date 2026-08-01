@@ -1,7 +1,7 @@
 # Fal
 
 Un lenguaje de programación **completo** escrito íntegramente en español y **sin un solo
-símbolo raro**: 51 palabras, 82 funciones, y todo se lee en voz alta.
+símbolo raro**: 50 palabras, 82 funciones, y todo se lee en voz alta.
 
 Se reparte como un **único ejecutable** que no necesita nada instalado. Para ponerlo en
 marcha, mira [LEEME.md](LEEME.md).
@@ -579,16 +579,38 @@ escribe azar entre 1 y 100      # siempre sale lo mismo
 
 ---
 
-# Palabras reservadas (51)
+# Palabras reservadas (50)
 
 `agrega` `cada` `como` `comparte` `con` `continua` `de` `desde` `detente` `devuelve` `en`
 `entre` `es` `escribe` `esta` `falla` `falso` `fin` `finalmente` `funcion` `hasta`
 `hereda` `igual` `intenta` `mas` `mayor` `menor` `menos` `mi` `mientras` `nada` `no`
 `nuevo` `o` `padre` `para` `por` `pregunta` `que` `quita` `relanza` `repite` `resto`
-`retorna` `si` `sino` `tipo` `usa` `veces` `verdadero` `y`
+`retorna` `si` `sino` `tipo` `usa` `veces` `verdadero`
 
-Las dos que más molestan en la práctica: **`y`** (es el "y" lógico; para coordenadas usa
-`posx` y `posy`) y **`que`** (de `es mayor que`).
+La que más molesta es **`que`**, de `es mayor que`.
+
+## La `y` sí puede ser una variable
+
+Aunque `y` es el "y" lógico y además el separador de argumentos, **puedes usarla
+como nombre**:
+
+```
+y es 5
+escribe y por 2                  # 10
+
+tipo Punto con x y y             # campos x e y, sin renombrar nada
+funcion distancia con x y y      # parámetros x e y
+para cada y desde 1 hasta 3      # variable de bucle
+```
+
+Funciona porque las dos cosas nunca caen en el mismo sitio. Como palabra del
+lenguaje, `y` va siempre **detrás** de algo; como nombre, va siempre donde se
+espera un **valor**. Hasta esto se entiende bien:
+
+```
+escribe x y y                    # "x Y la variable y"
+escribe lista con y y y          # [valor de y, valor de y]
+```
 
 Las 82 funciones integradas **no** son palabras reservadas: puedes tener una variable
 llamada `numero`, `lista` o `suma` sin problema.
