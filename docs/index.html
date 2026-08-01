@@ -379,21 +379,21 @@ const LECCIONES = [
       <pre>ciudad es "Madrid"
 escribe ciudad</pre>
       <p>Fíjate que al escribir la variable no lleva comillas: si las pusieras,
-      escribiría la palabra en vez de lo que hay dentro.</p>`,
-    tarea: 'Guarda <code>15</code> en una variable llamada <code>edad</code> y escríbela.',
+      escribiría la palabra <code>ciudad</code> en vez de lo que hay dentro.</p>`,
+    tarea: 'Guarda <code>"Sevilla"</code> en una variable llamada <code>ciudad</code> y escríbela.',
     inicial: "",
-    espera: "15"
+    espera: "Sevilla"
   },
   {
     titulo: "Juntar textos",
     cuerpo: `<p>La palabra <code>mas</code> une cosas. Sirve para sumar números y
       también para pegar textos.</p>
       <pre>ciudad es "Madrid"
-escribe "Vivo en " mas ciudad</pre>
+escribe "Vivo en " mas ciudad     # Vivo en Madrid</pre>
       <p>Ojo al espacio dentro de las comillas: sin él saldría <code>Vivo enMadrid</code>.</p>`,
-    tarea: 'Con <code>edad</code> valiendo 15, escribe <code>Tengo 15 años</code>.',
-    inicial: "edad es 15\n",
-    espera: "Tengo 15 años"
+    tarea: 'La ciudad ya está guardada abajo. Escribe <code>Vivo en Sevilla</code>.',
+    inicial: 'ciudad es "Sevilla"\n',
+    espera: "Vivo en Sevilla"
   },
   {
     titulo: "Hacer cuentas",
@@ -402,9 +402,9 @@ escribe "Vivo en " mas ciudad</pre>
 escribe 10 menos 4   # 6
 escribe 3 por 4      # 12
 escribe 10 entre 2   # 5</pre>
-      <p>Eso de <code>#</code> es un comentario: el programa lo ignora por
-      completo. Aquí lo uso para enseñarte lo que sale por pantalla, pero no
-      hace falta que lo escribas.</p>`,
+      <p>Eso de <code>#</code> es un comentario: el programa lo ignora por completo.
+      Aquí lo uso para enseñarte lo que sale por pantalla, pero no hace falta que
+      lo escribas.</p>`,
     tarea: 'Escribe el resultado de multiplicar 7 por 6.',
     inicial: "",
     espera: "42",
@@ -414,14 +414,16 @@ escribe 10 entre 2   # 5</pre>
     titulo: "Decidir",
     cuerpo: `<p>Con <code>si</code> el programa elige. El bloque se cierra con
       <code>fin</code>.</p>
-      <pre>si nota es mayor o igual que 5
+      <pre>nota es 3
+si nota es mayor o igual que 5
     escribe "Aprobado"
 si no
     escribe "Suspenso"
-fin</pre>`,
-    tarea: 'Escribe <code>Mayor</code> si la edad llega a 18, y <code>Menor</code> si no.',
-    inicial: "edad es 20\n",
-    espera: "Mayor",
+fin</pre>
+      <p>Con esa nota saldría <code>Suspenso</code>.</p>`,
+    tarea: 'La nota de abajo es un 8. Escribe <code>Aprobado</code> si llega a 5, y <code>Suspenso</code> si no.',
+    inicial: "nota es 8\n",
+    espera: "Aprobado",
     debeUsar: ["si"]
   },
   {
@@ -429,7 +431,8 @@ fin</pre>`,
     cuerpo: `<p>Para hacer algo varias veces está <code>repite</code>.</p>
       <pre>repite 5 veces
     escribe "Allá voy"
-fin</pre>`,
+fin</pre>
+      <p>Eso escribe <code>Allá voy</code> cinco veces seguidas.</p>`,
     tarea: 'Escribe <code>Hola</code> tres veces, usando <code>repite</code>.',
     inicial: "",
     espera: "Hola\nHola\nHola",
@@ -442,7 +445,8 @@ fin</pre>`,
       <pre>para cada n desde 1 hasta 3
     escribe n
 fin</pre>
-      <p>La variable <code>n</code> va valiendo 1, luego 2, luego 3.</p>`,
+      <p>La variable <code>n</code> va valiendo 1, luego 2, luego 3, y se escribe
+      cada uno.</p>`,
     tarea: 'Escribe los números del 1 al 5, uno por línea.',
     inicial: "",
     espera: "1\n2\n3\n4\n5",
@@ -455,9 +459,9 @@ fin</pre>
 escribe largo de colores        # 2
 escribe elemento 1 de colores   # rojo</pre>
       <p>Se cuenta desde el 1, como en la vida real.</p>`,
-    tarea: 'Con la lista de abajo, escribe cuántas frutas hay y luego la segunda.',
-    inicial: 'frutas es lista con "pera" y "uva" y "kiwi"\n',
-    espera: "3\nuva"
+    tarea: 'La lista de abajo tiene tres colores. Escribe cuántos hay y luego el segundo.',
+    inicial: 'colores es lista con "rojo" y "verde" y "azul"\n',
+    espera: "3\nverde"
   },
   {
     titulo: "Funciones",
@@ -466,11 +470,11 @@ escribe elemento 1 de colores   # rojo</pre>
     devuelve "Hola " mas nombre
 fin
 
-escribe saluda con "Ana"    # Hola Ana</pre>
+escribe saluda con "Ana"     # Hola Ana</pre>
       <p><code>devuelve</code> es lo que la función entrega cuando termina.</p>`,
-    tarea: 'Haz una función <code>doble</code> que multiplique por 2, y escribe el doble de 5.',
+    tarea: 'Haz otra función llamada <code>despide</code> que devuelva <code>Adiós </code> y el nombre, y escribe la despedida de Ana.',
     inicial: "",
-    espera: "10",
+    espera: "Adiós Ana",
     debeUsar: ["funcion", "devuelve"]
   },
   {
@@ -481,8 +485,9 @@ escribe saluda con "Ana"    # Hola Ana</pre>
 para cada n desde 1 hasta 3
     total es total mas n
 fin
-escribe total          # 6</pre>`,
-    tarea: 'Suma todos los números del 1 al 10 y escribe el resultado.',
+escribe total          # 6</pre>
+      <p>Ha sumado 1, luego 2, luego 3.</p>`,
+    tarea: 'Haz lo mismo pero sumando del 1 al 10, y escribe el resultado.',
     inicial: "",
     espera: "55",
     debeUsar: ["para"]
