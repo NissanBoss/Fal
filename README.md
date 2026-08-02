@@ -29,41 +29,6 @@ No hay `;` ni `{}` ni `==` ni `+`. Los bloques cierran con `fin`, las cuentas se
 escriben `3 mas 4`, y las comparaciones `si edad es mayor que 18`. Con tildes o
 sin ellas, en mayúsculas o en minúsculas: da igual.
 
-## Descargar
-
-Coge el paquete de tu sistema en la [página de versiones](../../releases),
-descomprímelo entero y ejecuta el instalador que viene dentro.
-
-| Tu sistema | Paquete | Instalador |
-|---|---|---|
-| Windows | `fal-windows.zip` | doble clic en `instalar.bat` |
-| Mac con chip Apple | `fal-mac-apple.tar.gz` | `sh instalar.sh` |
-| Mac con Intel | `fal-mac-intel.tar.gz` | `sh instalar.sh` |
-| Linux | `fal-linux.tar.gz` | `sh instalar.sh` |
-| Linux en ARM | `fal-linux-arm.tar.gz` | `sh instalar.sh` |
-
-No hace falta ser administrador. Si tu sistema avisa de que el programa no está
-firmado, mira [LEEME](LEEME.md#si-tu-sistema-bloquea-el-programa).
-
-## Primer programa
-
-Guarda esto como `hola.fal`:
-
-```fal
-nombre es pregunta "¿Cómo te llamas?"
-escribe "Hola " mas nombre
-
-si largo de nombre es mayor que 5
-    escribe "Tienes un nombre largo"
-fin
-```
-
-Y ejecútalo:
-
-```bash
-fal hola.fal
-```
-
 ## Qué sabe hacer
 
 Todo lo que se espera de un lenguaje de verdad: listas, diccionarios, conjuntos,
@@ -98,6 +63,41 @@ arregla:
 **Trae de todo dentro.** El mismo ejecutable corre tus programas, pasa su propio
 banco de pruebas (`fal --probar`) y genera el coloreado para VS Code
 (`fal --editor`).
+
+## Descargar
+
+Coge el paquete de tu sistema en la [página de versiones](../../releases),
+descomprímelo entero y ejecuta el instalador que viene dentro.
+
+| Tu sistema | Paquete | Instalador |
+|---|---|---|
+| Windows | `fal-windows.zip` | doble clic en `instalar.bat` |
+| Mac con chip Apple | `fal-mac-apple.tar.gz` | `sh instalar.sh` |
+| Mac con Intel | `fal-mac-intel.tar.gz` | `sh instalar.sh` |
+| Linux | `fal-linux.tar.gz` | `sh instalar.sh` |
+| Linux en ARM | `fal-linux-arm.tar.gz` | `sh instalar.sh` |
+
+No hace falta ser administrador. Si tu sistema avisa de que el programa no está
+firmado, mira [LEEME](LEEME.md#si-tu-sistema-bloquea-el-programa).
+
+## Primer programa
+
+Guarda esto como `hola.fal`:
+
+```fal
+nombre es pregunta "¿Cómo te llamas?"
+escribe "Hola " mas nombre
+
+si largo de nombre es mayor que 5
+    escribe "Tienes un nombre largo"
+fin
+```
+
+Y ejecútalo:
+
+```bash
+fal hola.fal
+```
 
 ## Ejemplos
 
