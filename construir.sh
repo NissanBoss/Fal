@@ -49,6 +49,12 @@ for P in fal-mac-apple fal-mac-intel fal-linux fal-linux-arm; do
     chmod +x "dist/$P/instalar.sh" 2>/dev/null || true
 done
 
+# La extension de VS Code, solo si hay vsce a mano.
+if command -v vsce >/dev/null 2>&1; then
+    (cd editor/vscode-fal && vsce package --out ../../dist/fal-vscode.vsix >/dev/null 2>&1)
+    echo "  fal-vscode.vsix"
+fi
+
 echo ""
 echo "Comprimiendo..."
 cd dist

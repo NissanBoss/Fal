@@ -86,6 +86,19 @@ fal ejemplos/avanzado.fal
 
 ## Color en el editor
 
+En la [página de versiones](../../releases) hay un archivo
+**`fal-vscode.vsix`**. Para instalarlo:
+
+1. Abre VS Code
+2. Ve a **Extensiones**, el icono de los cuadraditos, o `Ctrl+Shift+X`
+3. Arriba del panel, los **tres puntos** y **Install from VSIX...**
+4. Elige el archivo que has descargado
+
+Los `.fal` salen coloreados, con sangría automática después de `si` o
+`funcion` y quitándola al escribir `fin`.
+
+### O generándolo tú
+
 ```bash
 fal --editor
 ```
