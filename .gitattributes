@@ -14,3 +14,11 @@
 *.esperado text eol=lf
 
 *.exe binary
+
+# Pistas para Linguist, que es quien decide como cuenta GitHub el codigo
+# de un repositorio. Sin esto podria tomar los ejemplos por documentacion
+# y no contarlos.
+*.fal linguist-detectable=true
+ejemplos/*.fal linguist-documentation=false
+pruebas/*.fal linguist-documentation=false
+docs/*.gif -linguist-detectable

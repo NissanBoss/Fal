@@ -3,7 +3,7 @@
 Un lenguaje de programación en español, sin símbolos raros. Un solo ejecutable,
 sin nada que instalar.
 
-```
+```fal
 tipo Perro hereda de Animal con nombre
     funcion habla
         devuelve nombre de mi mas " dice guau"
@@ -49,7 +49,7 @@ firmado, mira [LEEME](LEEME.md#si-tu-sistema-bloquea-el-programa).
 
 Guarda esto como `hola.fal`:
 
-```
+```fal
 nombre es pregunta "¿Cómo te llamas?"
 escribe "Hola " mas nombre
 
