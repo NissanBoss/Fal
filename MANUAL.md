@@ -1,7 +1,7 @@
 # Fal
 
 Un lenguaje de programación **completo** escrito íntegramente en español y **sin un solo
-símbolo raro**: 50 palabras, 82 funciones, y todo se lee en voz alta.
+símbolo raro**: 42 palabras, 82 funciones, y todo se lee en voz alta.
 
 Se reparte como un **único ejecutable** que no necesita nada instalado. Para ponerlo en
 marcha, mira [LEEME.md](LEEME.md).
@@ -580,40 +580,53 @@ escribe azar entre 1 y 100      # siempre sale lo mismo
 
 ---
 
-# Palabras reservadas (50)
+# Palabras reservadas (42)
 
-`agrega` `cada` `como` `comparte` `con` `continua` `de` `desde` `detente` `devuelve` `en`
-`entre` `es` `escribe` `esta` `falla` `falso` `fin` `finalmente` `funcion` `hasta`
-`hereda` `igual` `intenta` `mas` `mayor` `menor` `menos` `mi` `mientras` `nada` `no`
-`nuevo` `o` `padre` `para` `por` `pregunta` `que` `quita` `relanza` `repite` `resto`
-`retorna` `si` `sino` `tipo` `usa` `veces` `verdadero`
+`agrega` `como` `comparte` `con` `continua` `de` `detente` `devuelve` `entre` `es`
+`escribe` `esta` `falla` `falso` `fin` `finalmente` `funcion` `hereda` `igual`
+`intenta` `mas` `menos` `mi` `mientras` `nada` `no` `nuevo` `o` `padre` `para` `por`
+`pregunta` `quita` `relanza` `repite` `resto` `retorna` `si` `sino` `tipo` `usa`
+`verdadero`
 
-La que más molesta es **`que`**, de `es mayor que`.
+## Y nueve palabras del lenguaje que **sí** puedes usar como variables
 
-## La `y` sí puede ser una variable
+`y` `veces` `hasta` `mayor` `menor` `que` `cada` `en` `desde`
 
-Aunque `y` es el "y" lógico y además el separador de argumentos, **puedes usarla
-como nombre**:
+Son palabras del lenguaje, pero no están prohibidas como nombres. Y no hay que
+elegir: la misma palabra puede ser las dos cosas en la misma línea.
 
 ```
-y es 5
-escribe y por 2                  # 10
+veces es 2
+repite veces veces ... fin           # repite <la variable veces> veces
 
-tipo Punto con x y y             # campos x e y, sin renombrar nada
-funcion distancia con x y y      # parámetros x e y
-para cada y desde 1 hasta 3      # variable de bucle
+hasta es 3
+para cada n desde 1 hasta hasta      # hasta <la variable hasta>
+
+mayor es 5
+si 9 es mayor que mayor ... fin
+
+en es lista con 3
+escribe 3 esta en en
+
+para cada cada en lista ... fin
+
+y es 5
+escribe y por 2                      # 10
+tipo Punto con x y y                 # campos x e y, sin renombrar nada
+escribe lista con y y y              # [valor de y, valor de y]
 ```
 
 Funciona porque las dos cosas nunca caen en el mismo sitio. Como palabra del
-lenguaje, `y` va siempre **detrás** de algo; como nombre, va siempre donde se
-espera un **valor**. Hasta esto se entiende bien:
+lenguaje van siempre **detrás** de algo (`repite 3 veces`, `es mayor que`,
+`desde 1 hasta 10`); como nombre, una variable va siempre donde se espera un
+**valor**. El armador las distingue por la posición, así que no hace falta
+prohibirlas.
 
-```
-escribe x y y                    # "x Y la variable y"
-escribe lista con y y y          # [valor de y, valor de y]
-```
+Esto importa más de lo que parece: `veces`, `mayor` y `hasta` son nombres de
+variable normalísimos, y en casi cualquier lenguaje tendrías que renombrarlos
+por culpa de la gramática.
 
-Las 82 funciones integradas **no** son palabras reservadas: puedes tener una variable
+Las 82 funciones integradas tampoco son palabras reservadas: puedes tener una variable
 llamada `numero`, `lista` o `suma` sin problema.
 
 ---

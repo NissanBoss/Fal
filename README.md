@@ -34,7 +34,7 @@ sin ellas, en mayúsculas o en minúsculas: da igual.
 Todo lo que se espera de un lenguaje de verdad: listas, diccionarios, conjuntos,
 funciones que se pasan como datos, clausuras, objetos con herencia, errores con
 clase, módulos, archivos, JSON, fechas, expresiones regulares e internet. Son 82
-funciones y 50 palabras.
+funciones y 42 palabras.
 
 Tres cosas que lo separan de un lenguaje de juguete:
 

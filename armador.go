@@ -12,16 +12,19 @@ import (
 // tener una variable llamada "numero", "lista" o "suma" sin problema.
 var reservadas = map[string]bool{}
 
-// La "y" no esta aqui a proposito, aunque sea operador y separador. Como
-// palabra del lenguaje va siempre DETRAS de algo ("si a y b"), y como
-// nombre va donde se espera un valor ("y es 5"), asi que no chocan. Los
-// casos raros estan en y_test.go.
+// Faltan a proposito varias palabras que si son del lenguaje: y, veces,
+// hasta, mayor, menor, que, cada, en y desde. Todas aparecen en un unico
+// sitio de la gramatica y siempre DETRAS de algo:
+//
+//	repite 3 veces          si a es mayor que b
+//	desde 1 hasta 10        para cada x en lista
+//
+// Como nombre, en cambio, una variable va siempre donde se espera un
+// valor. Nunca coinciden, asi que el armador las distingue por la
+// posicion y no hace falta prohibirlas. Los casos retorcidos estan en
+// palabras_libres_test.go y en y_test.go.
 func init() {
-	for _, p := range strings.Fields(`escribe es no si sino fin esta mientras repite
-		veces para cada en desde hasta funcion devuelve retorna con de o mas menos
-		por entre resto mayor menor igual que verdadero falso nada pregunta agrega
-		quita detente continua intenta falla usa tipo nuevo mi comparte finalmente
-		relanza hereda padre como`) {
+	for _, p := range strings.Fields(`escribe es no si sino fin esta mientras repite para funcion devuelve retorna con de o mas menos por entre resto igual verdadero falso nada pregunta agrega quita detente continua intenta falla usa tipo nuevo mi comparte finalmente relanza hereda padre como`) {
 		reservadas[p] = true
 	}
 }
