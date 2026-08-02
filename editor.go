@@ -122,10 +122,21 @@ func generarEditor(destino string) int {
 	paquete := map[string]interface{}{
 		"name":        "fal",
 		"displayName": "Fal",
-		"description": "Resaltado de sintaxis para el lenguaje Fal",
+		"description": "Resaltado de sintaxis para Fal, el lenguaje de programacion en español sin simbolos",
 		"version":     "1.0.0", // lo exige VS Code, no es la version de Fal
+		"publisher":   "NissanBoss",
+		"license":     "MIT",
+		"icon":        "icono.png",
 		"engines":     map[string]string{"vscode": "^1.60.0"},
 		"categories":  []string{"Programming Languages"},
+		"keywords":    []string{"fal", "espanol", "spanish", "principiantes", "aprender"},
+		"repository": map[string]string{
+			"type": "git",
+			"url":  "https://github.com/NissanBoss/Fal.git",
+		},
+		"homepage":      "https://nissanboss.github.io/Fal/",
+		"bugs":          map[string]string{"url": "https://github.com/NissanBoss/Fal/issues"},
+		"galleryBanner": map[string]string{"color": "#14161a", "theme": "dark"},
 		"contributes": map[string]interface{}{
 			"languages": []interface{}{map[string]interface{}{
 				"id": "fal", "aliases": []string{"Fal", "fal"},
@@ -159,6 +170,14 @@ func generarEditor(destino string) int {
 			return 1
 		}
 	}
+
+	// vsce se queja si falta la licencia, y sin .vscodeignore mete en el
+	// paquete hasta el propio .vsix que acaba de crear.
+	if lic, err := os.ReadFile("LICENSE"); err == nil {
+		os.WriteFile(filepath.Join(destino, "LICENSE"), lic, 0644)
+	}
+	os.WriteFile(filepath.Join(destino, ".vscodeignore"),
+		[]byte(".vscodeignore\n*.vsix\n"), 0644)
 
 	fmt.Println("Extension de VS Code generada en " + destino)
 	fmt.Printf("  %d palabras del lenguaje, %d funciones integradas\n",

@@ -1,4 +1,7 @@
 {
+  "bugs": {
+    "url": "https://github.com/NissanBoss/Fal/issues"
+  },
   "categories": [
     "Programming Languages"
   ],
@@ -24,11 +27,30 @@
       }
     ]
   },
-  "description": "Resaltado de sintaxis para el lenguaje Fal",
+  "description": "Resaltado de sintaxis para Fal, el lenguaje de programacion en español sin simbolos",
   "displayName": "Fal",
   "engines": {
     "vscode": "^1.60.0"
   },
+  "galleryBanner": {
+    "color": "#14161a",
+    "theme": "dark"
+  },
+  "homepage": "https://nissanboss.github.io/Fal/",
+  "icon": "icono.png",
+  "keywords": [
+    "fal",
+    "espanol",
+    "spanish",
+    "principiantes",
+    "aprender"
+  ],
+  "license": "MIT",
   "name": "fal",
-  "version": "3.0.0"
+  "publisher": "NissanBoss",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NissanBoss/Fal.git"
+  },
+  "version": "1.0.0"
 }

@@ -22,3 +22,6 @@ ejemplos/notas.txt
 # El playground se compila al publicar, no se guarda aqui.
 /docs/fal.wasm
 /docs/wasm_exec.js
+
+# El paquete de la extension se genera, no se guarda.
+editor/vscode-fal/*.vsix

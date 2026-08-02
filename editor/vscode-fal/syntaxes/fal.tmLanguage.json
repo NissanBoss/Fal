@@ -56,7 +56,7 @@
       "name": "keyword.operator.word.fal"
     },
     {
-      "match": "(?\u003c![0-9A-Za-z_À-ſ])(?i:intersección|interseccion|mayúsculas|minúsculas|minusculas|capitaliza|mayusculas|argumentos|diferencia|díasemana|nombremes|posición|reemplaza|diasemana|cuenta_si|potencia|repetido|numerico|posicion|coincide|conjunto|contiene|invierte|promedio|archivos|redondea|absoluto|último|formato|valores|número|primero|únicos|empieza|termina|inserta|recorta|de_json|unicos|lineas|reduce|existe|espera|cuenta|a_json|arriba|claves|filtra|ordena|maximo|avanza|cambia|numero|mezcla|minimo|alguno|ultimo|anexa|elige|busca|union|copia|parte|borra|trozo|abajo|a_csv|largo|todos|texto|rango|tabla|graba|fecha|ahora|reloj|pide|suma|anio|dias|raiz|año|azar|día|mapa|lee|une|dia|hoy|mes)(?![0-9A-Za-z_À-ſ])",
+      "match": "(?\u003c![0-9A-Za-z_À-ſ])(?i:intersección|interseccion|mayúsculas|minúsculas|díasemana|diferencia|minusculas|argumentos|mayusculas|capitaliza|posición|diasemana|reemplaza|nombremes|cuenta_si|archivos|redondea|invierte|posicion|coincide|conjunto|contiene|absoluto|numerico|promedio|repetido|potencia|recorta|inserta|de_json|semilla|termina|último|empieza|número|primero|únicos|valores|formato|cuenta|numero|a_json|filtra|unicos|existe|ultimo|alguno|limpia|lineas|reduce|maximo|espera|arriba|avanza|mezcla|minimo|cambia|claves|ordena|elige|reloj|copia|graba|parte|union|abajo|fecha|busca|borra|ahora|largo|rango|trozo|todos|texto|tabla|a_csv|anexa|dias|suma|año|pide|mapa|día|anio|raiz|azar|mes|une|hoy|lee|dia)(?![0-9A-Za-z_À-ſ])",
       "name": "support.function.fal"
     },
     {
