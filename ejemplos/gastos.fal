@@ -1,0 +1,143 @@
+# Analizador de gastos.
+#
+# Lee un CSV con fecha, concepto, categoria e importe, y saca un informe de
+# en que se te va el dinero.
+#
+#   fal gastos.fal
+#   fal gastos.fal mis_gastos.csv
+#
+# Los totales salen exactos, y eso aqui no es un detalle bonito: sumar
+# veintitantos importes con decimales en cualquier lenguaje normal te deja
+# un resto de centimos que no cuadra con el extracto del banco.
+
+ARCHIVO es "gastos.csv"
+argus es argumentos
+si largo de argus es mayor que 0
+    ARCHIVO es elemento 1 de argus
+fin
+
+si no existe de ARCHIVO
+    escribe "No encuentro el archivo " mas ARCHIVO
+    escribe "Pasame uno asi:   fal gastos.fal mis_gastos.csv"
+    termina de 1
+fin
+
+filas es tabla de lee de ARCHIVO
+si largo de filas es menor que 2
+    escribe "El archivo esta vacio o solo tiene la cabecera."
+    termina de 1
+fin
+
+# La primera fila son los titulos de las columnas, no un gasto.
+quita 1 de filas
+
+
+# Deja el texto con el ancho justo para que las columnas queden alineadas.
+funcion ancho con texto y columnas
+    faltan es columnas menos largo de texto
+    si faltan es menor que 1
+        devuelve texto
+    fin
+    devuelve texto mas (repetido de " " con faltan)
+fin
+
+# redondea quita los ceros del final, pero el dinero se enseña con dos
+# decimales siempre: 133.1 esta mal escrito, son 133.10.
+funcion euros con cantidad
+    t es texto de (redondea con cantidad y 2)
+    si no contiene de t con "."
+        devuelve t mas ".00 EUR"
+    fin
+    si largo de (elemento 2 de (parte de t con ".")) es 1
+        devuelve t mas "0 EUR"
+    fin
+    devuelve t mas " EUR"
+fin
+
+
+totales es diccionario vacio
+apuntes es diccionario vacio
+total es 0
+mas_caro es nada
+
+para cada fila en filas
+    si largo de fila es menor que 4
+        continua
+    fin
+    categoria es elemento 3 de fila
+    importe es numero de elemento 4 de fila
+
+    si contiene de totales con categoria
+        elemento categoria de totales es (elemento categoria de totales) mas importe
+        elemento categoria de apuntes es (elemento categoria de apuntes) mas 1
+    si no
+        elemento categoria de totales es importe
+        elemento categoria de apuntes es 1
+    fin
+
+    total es total mas importe
+    si mas_caro es nada o importe es mayor que (numero de elemento 4 de mas_caro)
+        mas_caro es fila
+    fin
+fin
+
+
+funcion gastado_en con categoria
+    devuelve elemento categoria de totales
+fin
+
+# ordena deja lo pequeño delante, asi que se le da la vuelta.
+orden es invierte de (ordena con (claves de totales) y funcion gastado_en)
+
+funcion barra con parte
+    trozos es redondea de (parte por 28 entre total)
+    si trozos es 0
+        devuelve ""
+    fin
+    devuelve repetido de "#" con trozos
+fin
+
+
+escribe ""
+escribe "  GASTOS DE " mas ARCHIVO
+escribe "  " mas (repetido de "=" con 58)
+escribe ""
+
+para cada categoria en orden
+    gasto es elemento categoria de totales
+    cuantos es elemento categoria de apuntes
+    porcien es redondea con (gasto por 100 entre total) y 1
+
+    linea es "  " mas (ancho con categoria y 12)
+    linea es linea mas (ancho con (euros de gasto) y 13)
+    linea es linea mas (ancho con (porcien mas "%") y 8)
+    linea es linea mas (ancho con (cuantos mas " veces") y 10)
+    escribe linea mas (barra de gasto)
+fin
+
+escribe ""
+escribe "  " mas (repetido de "-" con 58)
+resumen es "  " mas (ancho con "TOTAL" y 12) mas (euros de total)
+escribe resumen mas "   en " mas largo de filas mas " gastos"
+escribe ""
+
+escribe "  Gasto medio:  " mas (euros de (total entre largo de filas))
+caro es euros de (numero de elemento 4 de mas_caro)
+escribe "  El mas caro:  " mas (elemento 2 de mas_caro) mas ", " mas caro
+escribe "  Categorias:   " mas largo de orden
+escribe ""
+
+# La prueba de que las cuentas cuadran de verdad: si las sumas fueran
+# aproximadas, esto casi nunca daria igual.
+suma_partes es 0
+para cada categoria en orden
+    suma_partes es suma_partes mas (elemento categoria de totales)
+fin
+
+escribe "  " mas (repetido de "-" con 58)
+si suma_partes es total
+    escribe "  Las seis categorias suman el total al centimo. Cuadra."
+si no
+    escribe "  Descuadre de " mas (euros de (total menos suma_partes))
+fin
+escribe ""

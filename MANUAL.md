@@ -57,6 +57,7 @@ fal --probar
 | `agenda.fal` | Programa real: objetos + archivos + menú |
 | `avanzado.fal` | Clausuras, herencia, JSON, fechas, patrones, internet |
 | `snake.fal` | El juego de la serpiente: `limpia`, `comparte`, listas |
+| `gastos.fal` | Programa de verdad: CSV, diccionarios y dinero exacto |
 
 ---
 

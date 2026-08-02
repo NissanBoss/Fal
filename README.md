@@ -77,6 +77,11 @@ escribe (0.1 mas 0.2) es 0.3     → verdadero
 escribe 19.99 por 3              → 59.97
 ```
 
+Y no es un detalle de juguete. `ejemplos/gastos.fal` suma 23 gastos de un CSV:
+Fal da **1546.19** y las categorías cuadran al céntimo. Las mismas sumas en
+coma flotante dan **1546.1900000000005**, que no cuadra con la suma de sus
+partes. Con dinero, eso es un descuadre en el arqueo.
+
 **Los errores enseñan.** Dicen la línea, por dónde pasó el programa y cómo se
 arregla:
 
@@ -103,6 +108,7 @@ Vienen en el paquete, en la carpeta `ejemplos`:
 | `agenda.fal` | Objetos, archivos y un menú |
 | `avanzado.fal` | Clausuras, herencia, JSON, fechas, internet |
 | `snake.fal` | El juego de la serpiente |
+| `gastos.fal` | Analiza un CSV de gastos y saca un informe |
 
 ```bash
 fal ejemplos/snake.fal
