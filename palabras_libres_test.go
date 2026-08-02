@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestPalabrasLiberadas(t *testing.T) {
 	casos := []struct{ programa, espera, porque string }{
@@ -31,6 +34,23 @@ func TestPalabrasLiberadas(t *testing.T) {
 		}
 		if salida != c.espera {
 			t.Errorf("%-38s esperaba %q, dio %q", c.porque, c.espera, salida)
+		}
+	}
+}
+
+// El unico sitio donde liberar una palabra sale caro: "si x es mayor" se
+// puede entender como una comparacion sin terminar o como la variable
+// mayor. Gana el operador, asi que el error tiene que contar la otra
+// forma en vez de quedarse en "falta un valor".
+func TestComparacionSinTerminar(t *testing.T) {
+	for _, palabra := range []string{"mayor", "menor"} {
+		_, err := ejecutarEnMemoria("x es 3\n" + palabra + " es 3\nsi x es " + palabra + "\n escribe \"a\"\nfin")
+		if err == nil {
+			t.Errorf("%s: esperaba un error y no hubo ninguno", palabra)
+			continue
+		}
+		if !strings.Contains(err.Pista, "parentesis") {
+			t.Errorf("%s: la pista no dice como pedir la variable: %q", palabra, err.Pista)
 		}
 	}
 }

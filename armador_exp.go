@@ -85,8 +85,10 @@ func (a *Armador) comparacion() (Expresion, *ErrorFal) {
 	ln := a.avanzar().Linea
 
 	op := "=="
+	comparador := "" // "mayor" o "menor", para avisar si luego no viene nada
 	switch {
 	case a.come("mayor"):
+		comparador = "mayor"
 		if a.come("o") {
 			if err := a.exige("igual", "en la comparacion"); err != nil {
 				return nil, err
@@ -100,6 +102,7 @@ func (a *Armador) comparacion() (Expresion, *ErrorFal) {
 			op = ">"
 		}
 	case a.come("menor"):
+		comparador = "menor"
 		if a.come("o") {
 			if err := a.exige("igual", "en la comparacion"); err != nil {
 				return nil, err
@@ -114,6 +117,16 @@ func (a *Armador) comparacion() (Expresion, *ErrorFal) {
 		}
 	case a.come("igual"):
 		a.come("a")
+	}
+
+	// "mayor" y "menor" tambien sirven como nombre de variable, asi que
+	// "si x es mayor" se puede leer de dos formas. Gana el operador, que es
+	// lo que quiere decir casi siempre, pero si detras no queda nada hay que
+	// contar la otra manera en vez de soltar un "falta un valor" a secas.
+	if comparador != "" && (a.tipo() == PFinLinea || a.tipo() == PFinArchivo) {
+		return nil, nuevoError(`Falta decir con que comparar, despues de "`+comparador+`".`, a.ln(),
+			`Si te referias a la variable "`+comparador+`", ponla entre parentesis:   `+
+				`si x es (`+comparador+`)`, ClaseSintaxis)
 	}
 
 	der, err := a.suma()

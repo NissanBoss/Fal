@@ -626,6 +626,16 @@ Esto importa más de lo que parece: `veces`, `mayor` y `hasta` son nombres de
 variable normalísimos, y en casi cualquier lenguaje tendrías que renombrarlos
 por culpa de la gramática.
 
+Solo hay un sitio donde tienes que echar una mano. `si x es mayor` se puede
+entender de dos formas, y gana la comparación:
+
+```
+si x es mayor            # entiende "x es mayor que...", y falta el que
+si x es (mayor)          # con paréntesis, compara x con la variable mayor
+```
+
+Pasa únicamente con `mayor` y `menor`, y el error te lo recuerda.
+
 Las 82 funciones integradas tampoco son palabras reservadas: puedes tener una variable
 llamada `numero`, `lista` o `suma` sin problema.
 
