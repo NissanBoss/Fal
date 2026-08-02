@@ -15,6 +15,10 @@ para cada p en perros
 fin
 ```
 
+<img src="docs/snake.gif" alt="El juego de la serpiente corriendo en Fal" width="433">
+
+Eso es `ejemplos/snake.fal`, escrito entero en el lenguaje.
+
 ### [Pruébalo aquí, sin instalar nada](https://nissanboss.github.io/Fal/)
 
 El intérprete entero corre dentro del navegador. Escribes, le das a ejecutar y ya.
