@@ -123,7 +123,7 @@ añades una función nueva y vuelves a lanzarlo, sale pintada sola.
 | `dist/` | Los ejecutables, uno por sistema |
 | `LEEME.md` | Esto |
 | `MANUAL.md` | El manual completo del lenguaje |
-| `ejemplos/` | 8 programas, de `hola.fal` al Snake |
+| `ejemplos/` | 11 programas, de `hola.fal` al Snake |
 | `pruebas/` | 13 pruebas con su salida exacta esperada |
 | `construir.sh` | Vuelve a compilar para todos los sistemas |
 

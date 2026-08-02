@@ -1,0 +1,45 @@
+# Las torres de Hanoi.
+#
+#   fal hanoi.fal
+#
+# Hay tres postes y unos discos de distinto tamaño apilados en el primero,
+# el mas grande abajo. Hay que pasarlos todos al tercero moviendo un disco
+# cada vez y sin poner nunca uno grande encima de uno pequeño.
+#
+# Lo bonito es que el programa no sabe resolverlo, y no le hace falta. Solo
+# sabe una cosa: para mover n discos, mueve n-1 al poste de en medio, pasa
+# el de abajo al destino, y vuelve a traer esos n-1 encima. Como cada paso
+# es el mismo problema mas pequeño, la funcion se llama a si misma. Eso es
+# la recursion.
+
+DISCOS es 4
+
+movimientos es 0
+
+funcion mueve con cuantos y origen y destino y apoyo
+    comparte movimientos
+    si cuantos es 0
+        devuelve nada
+    fin
+    mueve con (cuantos menos 1) y origen y apoyo y destino
+    movimientos es movimientos mas 1
+    escribe "  " mas texto de movimientos mas ".  disco " mas texto de cuantos mas ":  " mas origen mas " -> " mas destino
+    mueve con (cuantos menos 1) y apoyo y destino y origen
+fin
+
+escribe "Torres de Hanoi con " mas texto de DISCOS mas " discos."
+escribe
+mueve con DISCOS y "A" y "C" y "B"
+escribe
+escribe "Han hecho falta " mas texto de movimientos mas " movimientos."
+escribe "Con " mas texto de DISCOS mas " discos siempre salen 2 elevado a " mas texto de DISCOS mas " menos 1, o sea " mas texto de ((potencia con 2 y DISCOS) menos 1) mas "."
+
+# La leyenda dice que unos monjes llevan desde el principio del mundo
+# moviendo una torre de 64 discos, y que cuando acaben se acaba todo.
+# No hay prisa.
+escribe
+totales es (potencia con 2 y 64) menos 1
+anios es redondea con (totales entre (60 por 60 por 24 por 365)) y 0
+escribe "Con 64 discos serian " mas texto de totales mas " movimientos."
+escribe "A uno por segundo, " mas texto de anios mas " años."
+escribe "El universo lleva unos 13.800.000.000, asi que da tiempo de sobra."

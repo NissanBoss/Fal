@@ -1,0 +1,73 @@
+# Numeros romanos, de ida y de vuelta.
+#
+#   fal romanos.fal
+#
+# Las dos listas van emparejadas: el simbolo de la posicion 3 vale lo que
+# diga el numero de la posicion 3. Y estan de mayor a menor a proposito,
+# porque en ese orden se apoyan las dos funciones.
+
+VALORES es lista con 1000 y 900 y 500 y 400 y 100 y 90 y 50 y 40 y 10 y 9 y 5 y 4 y 1
+SIMBOLOS es lista con "M" y "CM" y "D" y "CD" y "C" y "XC" y "L" y "XL" y "X" y "IX" y "V" y "IV" y "I"
+
+# Ve quitando del numero el trozo mas gordo que quepa, tantas veces como
+# quepa, y apuntando su simbolo. Cuando no quepa, pasa al siguiente.
+funcion a_romano con n
+    salida es ""
+    queda es n
+    para cada i desde 1 hasta largo de VALORES
+        valor es elemento i de VALORES
+        mientras queda es mayor o igual que valor
+            salida es salida mas (elemento i de SIMBOLOS)
+            queda es queda menos valor
+        fin
+    fin
+    devuelve salida
+fin
+
+# Lo mismo del reves: mordisquea el texto por delante mientras empiece por
+# el simbolo que toca. Como CM va antes que C, el 900 se lee entero y no
+# como "cien y luego mil".
+funcion a_numero con romano
+    queda es mayusculas de romano
+    total es 0
+    para cada i desde 1 hasta largo de SIMBOLOS
+        simbolo es elemento i de SIMBOLOS
+        cuantas es largo de simbolo
+        mientras largo de queda es mayor o igual que cuantas
+            si (trozo de queda con 1 y cuantas) no es simbolo
+                detente
+            fin
+            total es total mas (elemento i de VALORES)
+            queda es trozo de queda con (cuantas mas 1)
+        fin
+    fin
+    devuelve total
+fin
+
+escribe "De numero a romano:"
+para cada n en (lista con 4 y 9 y 14 y 40 y 90 y 444 y 1987 y 2026 y 3999)
+    escribe "  " mas texto de n mas "  ->  " mas (a_romano de n)
+fin
+
+escribe
+escribe "Y de romano a numero:"
+para cada r en (lista con "IX" y "XLII" y "MCMLXXXVII" y "MMXXVI")
+    escribe "  " mas r mas "  ->  " mas texto de (a_numero de r)
+fin
+
+# Si las dos funciones son correctas, cualquier numero tiene que volver a
+# ser el mismo despues de ir y venir. Se comprueban todos de una vez.
+escribe
+escribe "Comprobando los 3999 de una pasada..."
+fallos es 0
+para cada n desde 1 hasta 3999
+    si (a_numero de (a_romano de n)) no es n
+        fallos es fallos mas 1
+    fin
+fin
+
+si fallos es 0
+    escribe "Los 3999 van y vuelven sin perderse por el camino."
+si no
+    escribe "Hay " mas texto de fallos mas " que no cuadran."
+fin

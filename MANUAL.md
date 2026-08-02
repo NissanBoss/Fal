@@ -58,6 +58,9 @@ fal --probar
 | `avanzado.fal` | Clausuras, herencia, JSON, fechas, patrones, internet |
 | `snake.fal` | El juego de la serpiente: `limpia`, `comparte`, listas |
 | `gastos.fal` | Programa de verdad: CSV, diccionarios y dinero exacto |
+| `cifrado.fal` | Cifrado Cesar, y como se rompe probando las 25 claves |
+| `romanos.fal` | Numeros romanos en los dos sentidos, con autocomprobacion |
+| `hanoi.fal` | Torres de Hanoi: una funcion que se llama a si misma |
 
 ---
 

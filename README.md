@@ -113,6 +113,9 @@ Vienen en el paquete, en la carpeta `ejemplos`:
 | `avanzado.fal` | Clausuras, herencia, JSON, fechas, internet |
 | `snake.fal` | El juego de la serpiente |
 | `gastos.fal` | Analiza un CSV de gastos y saca un informe |
+| `cifrado.fal` | Cifra un mensaje y luego lo rompe sin saber la clave |
+| `romanos.fal` | Numeros romanos de ida y vuelta, y comprueba los 3999 |
+| `hanoi.fal` | Las torres de Hanoi, para ver que es la recursion |
 
 ```bash
 fal ejemplos/snake.fal
