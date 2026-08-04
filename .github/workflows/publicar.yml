@@ -79,7 +79,7 @@ jobs:
             dist/fal-linux-arm.tar.gz
             dist/fal-vscode.vsix
           body: |
-            Descarga el paquete de tu sistema, descomprimelo entero y ejecuta
+            Descarga el paquete de tu sistema, descomprímelo entero y ejecuta
             el instalador que viene dentro.
 
             | Sistema | Paquete |
