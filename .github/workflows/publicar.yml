@@ -68,6 +68,42 @@ jobs:
           vsce package --out ../../dist/fal-vscode.vsix
           ls -lh ../../dist/fal-vscode.vsix
 
+      # Las novedades salen de NOVEDADES.md, de la seccion que lleve el
+      # nombre de esta etiqueta. Antes el texto estaba escrito aqui y era el
+      # mismo para todas las versiones, asi que ninguna contaba que traia.
+      # Si no hay seccion para esta etiqueta, se cuelga solo la tabla.
+      - name: Preparar el texto de la version
+        run: |
+          if [ -f NOVEDADES.md ]; then
+            awk -v buscada="## $GITHUB_REF_NAME" '
+              $0 == buscada { dentro = 1; next }
+              /^## / { dentro = 0 }
+              dentro { print }
+            ' NOVEDADES.md > notas.md
+          fi
+          touch notas.md
+          cat >> notas.md <<'FIN'
+
+          ## Descargar
+
+          Coge el paquete de tu sistema, descomprímelo entero y ejecuta el
+          instalador que viene dentro.
+
+          | Sistema | Paquete |
+          |---|---|
+          | Windows | `fal-windows.zip` |
+          | Mac con chip Apple | `fal-mac-apple.tar.gz` |
+          | Mac con Intel | `fal-mac-intel.tar.gz` |
+          | Linux | `fal-linux.tar.gz` |
+          | Linux en ARM | `fal-linux-arm.tar.gz` |
+
+          Y si usas VS Code, `fal-vscode.vsix` colorea los archivos .fal.
+          Se instala desde Extensiones, en los tres puntos de arriba,
+          con "Install from VSIX".
+          FIN
+          echo "--- asi quedan las notas ---"
+          cat notas.md
+
       - name: Colgarlos en Releases
         uses: softprops/action-gh-release@v2
         with:
@@ -78,18 +114,4 @@ jobs:
             dist/fal-linux.tar.gz
             dist/fal-linux-arm.tar.gz
             dist/fal-vscode.vsix
-          body: |
-            Descarga el paquete de tu sistema, descomprímelo entero y ejecuta
-            el instalador que viene dentro.
-
-            | Sistema | Paquete |
-            |---|---|
-            | Windows | `fal-windows.zip` |
-            | Mac con chip Apple | `fal-mac-apple.tar.gz` |
-            | Mac con Intel | `fal-mac-intel.tar.gz` |
-            | Linux | `fal-linux.tar.gz` |
-            | Linux en ARM | `fal-linux-arm.tar.gz` |
-
-            Y si usas VS Code, `fal-vscode.vsix` colorea los archivos .fal.
-            Se instala desde Extensiones, en los tres puntos de arriba,
-            con "Install from VSIX".
+          body_path: notas.md
