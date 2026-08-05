@@ -647,6 +647,10 @@ function crearTrabajador() {
         $lienzo.hidden = false;
       }
       if (avisar) avisar({ salida: acumulada, error: m.error || "" });
+      // Un programa que solo dibuja no escribe nada, y dejar el panel de
+      // texto vacio ocupando media pantalla encima del dibujo solo estorba.
+      // Se mira al final, cuando ya esta puesto todo, incluido el error.
+      $salida.hidden = !$lienzo.hidden && !$salida.textContent.trim();
     }
   };
   trabajador.onerror = e => {
@@ -689,6 +693,7 @@ function correrPrograma(programa, respuestas, avisar) {
   alTerminar = avisar;
   acumulada = "";
   $salida.textContent = "";
+  $salida.hidden = false; // pudo quedar oculto si lo anterior solo dibujaba
   $lienzo.hidden = true;
   $lienzo.innerHTML = "";
   $correr.disabled = true;
