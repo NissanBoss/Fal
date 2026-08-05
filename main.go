@@ -17,8 +17,13 @@ func main() {
 	os.Exit(arrancar(os.Args[1:]))
 }
 
-// arrancar va aparte porque os.Exit se salta los defer.
+// arrancar va aparte porque os.Exit se salta los defer. Saliendo en un solo
+// sitio, el de dejar la terminal como estaba se ejecuta siempre.
 func arrancar(args []string) int {
+	// Si el programa uso "tecla", la terminal se quedo en modo directo y hay
+	// que devolverla como estaba o el shell se queda sin eco.
+	defer soltarTeclado()
+
 	if len(args) > 0 {
 		switch args[0] {
 		case "--ayuda", "-h", "--help", "ayuda":

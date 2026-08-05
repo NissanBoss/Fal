@@ -542,6 +542,7 @@ func registrarSistema() {
 			codigo = c
 		}
 		in.salida.Flush()
+		soltarTeclado() // os.Exit no deja correr ningun defer
 		os.Exit(codigo)
 		return nil, nil
 	})

@@ -6,36 +6,67 @@ package main
 //
 // Se compila a WebAssembly y expone una funcion a la pagina:
 //
-//   falEjecutar(programa, respuestas)  ->  { salida, error }
+//   falEjecutar(programa, respuestas, alEscribir, alTerminar)
 //
 // "respuestas" son las lineas que el programa recibira cuando use
-// "pregunta", una por linea. En el navegador no hay teclado bloqueante,
-// asi que se le dan de antemano.
+// "pregunta", una por linea, porque eso si se pide de antemano.
+//
+// "alEscribir" se llama con cada trozo que el programa saca por pantalla, en
+// el momento en que lo saca. Antes se acumulaba todo y se devolvia al final,
+// que es lo que hacia imposible cualquier animacion: cuando veias algo, el
+// programa ya habia acabado.
+//
+// El programa arranca en una gorutina y falEjecutar vuelve enseguida; el
+// final se avisa por "alTerminar". Tiene que ser asi: si el interprete
+// corriera dentro de la propia llamada, el worker se quedaria ocupado y no
+// llegaria a leer los mensajes que le manda la pagina, que es justo por
+// donde entran las teclas.
+//
+// Esto corre dentro de un worker (ver docs/trabajador.js), asi que un bucle
+// largo ya no congela la pagina y no hace falta cortar por tiempo.
 
 import (
 	"bufio"
 	"bytes"
 	"strings"
 	"syscall/js"
-	"time"
 )
 
-// Tope de tiempo por ejecucion. Sin esto, un "mientras verdadero" colgaria
-// la pestaña entera y habria que cerrarla a la fuerza.
-const tiempoMaximo = 5 * time.Second
+// escritorPagina manda cada trozo segun llega, sin guardar nada.
+type escritorPagina struct{ alEscribir js.Value }
+
+func (e escritorPagina) WriteString(s string) (int, error) {
+	if s != "" {
+		e.alEscribir.Invoke(s)
+	}
+	return len(s), nil
+}
+
+func (e escritorPagina) Flush() error { return nil }
 
 func main() {
+	// La pagina si entiende la orden de borrar la pantalla: la reconoce en la
+	// salida y vacia el panel de verdad. Antes esto era false y "limpia" se
+	// apañaba soltando cincuenta saltos de linea.
+	soportaSecuencias = true
 	js.Global().Set("falEjecutar", js.FuncOf(ejecutarDesdeWeb))
-	// El programa no puede terminar: si lo hace, la funcion deja de existir.
+	js.Global().Set("falTecla", js.FuncOf(teclaDesdeWeb))
+	// El programa no puede terminar: si lo hace, las funciones dejan de existir.
 	select {}
 }
 
-func ejecutarDesdeWeb(this js.Value, args []js.Value) any {
-	resultado := map[string]any{"salida": "", "error": ""}
-	if len(args) == 0 {
-		resultado["error"] = "No me llego ningun programa."
-		return js.ValueOf(resultado)
+func teclaDesdeWeb(this js.Value, args []js.Value) any {
+	if len(args) > 0 && args[0].Type() == js.TypeString {
+		apuntarTecla(args[0].String())
 	}
+	return nil
+}
+
+func ejecutarDesdeWeb(this js.Value, args []js.Value) any {
+	if len(args) < 4 {
+		return nil
+	}
+	alTerminar := args[3]
 
 	programa := args[0].String()
 	respuestas := ""
@@ -46,20 +77,23 @@ func ejecutarDesdeWeb(this js.Value, args []js.Value) any {
 		respuestas += "\n"
 	}
 
-	var salida bytes.Buffer
 	in := nuevoInterprete(".", nil)
-	in.salida = bufio.NewWriter(&salida)
+	in.salida = escritorPagina{args[2]}
 	in.entrada = bufio.NewReader(strings.NewReader(respuestas))
-	in.limite = time.Now().Add(tiempoMaximo)
+	// Las teclas de la partida anterior no valen para esta.
+	olvidarTeclas()
 
-	err := correrFuente(in, programa)
-	in.salida.Flush()
-	resultado["salida"] = salida.String()
-
-	if err != nil {
-		var texto bytes.Buffer
-		escribirError(&texto, err, programa)
-		resultado["error"] = strings.TrimRight(texto.String(), "\n")
-	}
-	return js.ValueOf(resultado)
+	go func() {
+		resultado := map[string]any{"error": "", "dibujo": ""}
+		err := correrFuente(in, programa)
+		in.salida.Flush()
+		resultado["dibujo"] = in.tortuga.svg()
+		if err != nil {
+			var texto bytes.Buffer
+			escribirError(&texto, err, programa)
+			resultado["error"] = strings.TrimRight(texto.String(), "\n")
+		}
+		alTerminar.Invoke(js.ValueOf(resultado))
+	}()
+	return nil
 }

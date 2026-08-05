@@ -25,6 +25,9 @@ El intérprete entero corre dentro del navegador. Escribes, le das a ejecutar y 
 Y si estás empezando, tiene **diez lecciones** con sus ejercicios, desde escribir
 en pantalla hasta funciones.
 
+Lo que escribe el programa va apareciendo según pasa, así que las cosas se mueven:
+puedes dibujar, animar y jugar con el teclado sin salir de la página.
+
 No hay `;` ni `{}` ni `==` ni `+`. Los bloques cierran con `fin`, las cuentas se
 escriben `3 mas 4`, y las comparaciones `si edad es mayor que 18`. Con tildes o
 sin ellas, en mayúsculas o en minúsculas: da igual.
@@ -33,7 +36,7 @@ sin ellas, en mayúsculas o en minúsculas: da igual.
 
 Todo lo que se espera de un lenguaje de verdad: listas, diccionarios, conjuntos,
 funciones que se pasan como datos, clausuras, objetos con herencia, errores con
-clase, módulos, archivos, JSON, fechas, expresiones regulares e internet. Son 88
+clase, módulos, archivos, JSON, fechas, expresiones regulares e internet. Son 89
 funciones y 42 palabras.
 
 Tres cosas que lo separan de un lenguaje de juguete:
@@ -64,7 +67,7 @@ arregla:
 banco de pruebas (`fal --probar`) y genera el coloreado para VS Code
 (`fal --editor`).
 
-## Dibujar
+## Dibujar y jugar
 
 Un bucle que dibuja se entiende mejor que un bucle que escribe números. La tortuga
 es un lápiz que se arrastra por la pantalla: `camina` la mueve hacia donde mira y
@@ -80,7 +83,20 @@ fin
 Cuatro líneas y sale una estrella de 36 puntas. En el navegador aparece debajo del
 texto; desde la terminal se guarda en un `.svg` junto a tu programa.
 
-Está en `ejemplos/dibujo.fal`.
+Y `tecla` dice qué tecla acabas de pulsar sin quedarse esperando a nadie, que es lo
+que separa un juego de un cuestionario:
+
+```
+mientras jugando
+    t es tecla
+    si t es "arriba"
+        fila es fila menos 1
+    fin
+    espera de 0.05
+fin
+```
+
+Están en `ejemplos/dibujo.fal` y `ejemplos/mueve.fal`.
 
 ## Descargar
 
@@ -125,6 +141,7 @@ Vienen en el paquete, en la carpeta `ejemplos`:
 |---|---|
 | `hola.fal` | Variables, condiciones, repetir |
 | `dibujo.fal` | La tortuga: un bucle que dibuja en vez de escribir |
+| `mueve.fal` | Un tablero que se mueve con las flechas, usando `tecla` |
 | `listas.fal` | Listas, bucles, funciones |
 | `adivina.fal` | Un juego con `pregunta` y `mientras` |
 | `completo.fal` | Recorrido por lo básico |

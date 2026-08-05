@@ -1,0 +1,79 @@
+# Moverse por un tablero con las flechas.
+#
+# "tecla" dice que tecla se acaba de pulsar, o texto vacio si ninguna. Lo
+# importante es que no espera a nadie: el programa sigue dando vueltas pase
+# lo que pase, y por eso esto es un juego y no un cuestionario.
+#
+# "pregunta" hace lo contrario: se para hasta que escribes una linea entera
+# y le das a Enter. Una sirve para pedir datos, la otra para jugar.
+#
+# Flechas o w a s d para moverte. Escape para salir.
+
+ANCHO es 20
+ALTO es 10
+
+fila es 5
+columna es 10
+jugando es verdadero
+
+funcion pinta con f y c
+    limpia
+    escribe "Flechas para moverte. Escape para salir."
+    borde es "+" mas (repetido con "-" y ANCHO) mas "+"
+    escribe borde
+    para cada y desde 1 hasta ALTO
+        linea es "|"
+        para cada x desde 1 hasta ANCHO
+            si y es f y x es c
+                linea es linea mas "O"
+            si no
+                linea es linea mas " "
+            fin
+        fin
+        escribe linea mas "|"
+    fin
+    escribe borde
+fin
+
+pinta con fila y columna
+
+# El tablero solo se vuelve a pintar cuando algo cambia. Repintarlo en cada
+# vuelta se veria igual, pero seria trabajo tirado.
+mientras jugando
+    t es tecla
+
+    si t es "escape"
+        jugando es falso
+
+    si no si t es "arriba" o t es "w"
+        si fila es mayor que 1
+            fila es fila menos 1
+        fin
+        pinta con fila y columna
+
+    si no si t es "abajo" o t es "s"
+        si fila es menor que ALTO
+            fila es fila mas 1
+        fin
+        pinta con fila y columna
+
+    si no si t es "izquierda" o t es "a"
+        si columna es mayor que 1
+            columna es columna menos 1
+        fin
+        pinta con fila y columna
+
+    si no si t es "derecha" o t es "d"
+        si columna es menor que ANCHO
+            columna es columna mas 1
+        fin
+        pinta con fila y columna
+    fin
+
+    # Sin esta espera el programa se comeria el procesador entero para no
+    # hacer nada. Ademas, en el navegador es el momento en que entran las
+    # teclas que has pulsado.
+    espera de 0.03
+fin
+
+escribe "Hasta luego."

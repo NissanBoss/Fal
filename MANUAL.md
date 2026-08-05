@@ -1,7 +1,7 @@
 # Fal
 
 Un lenguaje de programación **completo** escrito íntegramente en español y **sin un solo
-símbolo raro**: 42 palabras, 88 funciones, y todo se lee en voz alta.
+símbolo raro**: 42 palabras, 89 funciones, y todo se lee en voz alta.
 
 Se reparte como un **único ejecutable** que no necesita nada instalado. Para ponerlo en
 marcha, mira [LEEME.md](LEEME.md).
@@ -52,6 +52,7 @@ fal --probar
 |---|---|
 | `hola.fal` | Lo mínimo: variables, condiciones, repetir |
 | `dibujo.fal` | La tortuga: un bucle que en vez de escribir, dibuja |
+| `mueve.fal` | Moverse por un tablero con las flechas, usando `tecla` |
 | `listas.fal` | Listas, bucles, funciones |
 | `adivina.fal` | Un juego con `pregunta` y `mientras` |
 | `completo.fal` | Recorrido por lo básico del lenguaje |
@@ -467,7 +468,7 @@ Se usan igual que un objeto: `doble de mate con 21`.
 
 ---
 
-# Todo lo que trae puesto (88 funciones)
+# Todo lo que trae puesto (89 funciones)
 
 Todas se llaman igual: `nombre de dato` o `nombre con dato1 y dato2`.
 
@@ -582,6 +583,38 @@ semilla de 7
 escribe azar entre 1 y 100      # siempre sale lo mismo
 ```
 
+## Teclas
+
+| Función | Qué hace |
+|---|---|
+| `tecla` | la tecla que se acaba de pulsar, o `""` si ninguna |
+
+`tecla` **no espera a nadie**: mira si hay algo pulsado, contesta y el programa sigue.
+Eso es justo lo que hace falta para un juego, donde el mundo tiene que moverse aunque
+tú no toques nada. `pregunta` es lo contrario: se para hasta que escribes una línea
+entera y le das a Enter. Una sirve para pedir datos, la otra para jugar.
+
+Las letras llegan tal cual y en minúscula. Las demás teclas tienen nombre en
+castellano: `arriba`, `abajo`, `izquierda`, `derecha`, `escape`, `intro` y `espacio`.
+
+```
+mientras jugando
+    t es tecla
+    si t es "arriba"
+        fila es fila menos 1
+    si no si t es "escape"
+        jugando es falso
+    fin
+    espera de 0.05
+fin
+```
+
+Esa `espera` del final no es un adorno. Sin ella el programa da vueltas a lo tonto
+comiéndose el procesador, y en el navegador además es el momento en el que entran las
+teclas que has pulsado.
+
+Está en `ejemplos/mueve.fal`.
+
 ## Dibujar: la tortuga
 
 La tortuga es un lápiz que se arrastra por la pantalla y deja raya. Empieza en el
@@ -680,7 +713,7 @@ si x es (mayor)          # con paréntesis, compara x con la variable mayor
 
 Pasa únicamente con `mayor` y `menor`, y el error te lo recuerda.
 
-Las 88 funciones integradas tampoco son palabras reservadas: puedes tener una variable
+Las 89 funciones integradas tampoco son palabras reservadas: puedes tener una variable
 llamada `numero`, `lista` o `suma` sin problema.
 
 ---
@@ -782,4 +815,15 @@ Para ser honestos, esto es lo que Fal todavía no tiene frente a Python:
 - **Paquetes de otra gente.** No hay un `pip` de Fal.
 - **Depurador** con puntos de parada y ejecución paso a paso.
 - **Hilos y concurrencia.**
-- **Generar un `.exe`**: hace falta tener Python instalado.
+- **Empaquetar tu programa como un `.exe`.** El intérprete sí es un único ejecutable
+  y no necesita nada instalado; lo que no sabe todavía es meter tu `.fal` dentro de
+  uno para que lo puedas repartir.
+
+Dicho eso, esa lista compara Fal con Python, que no es a lo que aspira. Medido contra
+lo que de verdad importa —ser el escalón que falta entre Scratch y un lenguaje de
+adulto— lo que queda por hacer es otra cosa:
+
+- **Ver el programa avanzar paso a paso**, con las variables cambiando al lado. Eso
+  sí haría falta, y no es lo mismo que un depurador con puntos de parada.
+- **Compartir lo que has hecho con un enlace**, como en Scratch.
+- **Sonido.**

@@ -99,6 +99,15 @@ func (m *Memoria) nombres() []string {
 	return salida
 }
 
+// Salida es a donde escribe el programa. En el escritorio y en las pruebas
+// es un bufio.Writer de toda la vida. En el navegador es algo que manda cada
+// trozo a la pagina segun se escribe, para que se vea en vivo y no de golpe
+// al terminar.
+type Salida interface {
+	WriteString(string) (int, error)
+	Flush() error
+}
+
 // Señales de control (no son errores)
 
 type senal int
@@ -134,7 +143,7 @@ type Interprete struct {
 	limite    time.Time
 	pasos     int
 	tipoError *Tipo
-	salida    *bufio.Writer
+	salida    Salida
 	entrada   *bufio.Reader
 	tortuga   *Tortuga
 }

@@ -135,6 +135,7 @@ func init() {
 	registrarFechas()
 	registrarSistema()
 	registrarTortuga()
+	registrarTeclado()
 }
 
 // Textos
