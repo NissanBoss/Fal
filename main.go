@@ -14,19 +14,22 @@ import (
 
 func main() {
 	soportaSecuencias = prepararConsola()
-	args := os.Args[1:]
+	os.Exit(arrancar(os.Args[1:]))
+}
 
+// arrancar va aparte porque os.Exit se salta los defer.
+func arrancar(args []string) int {
 	if len(args) > 0 {
 		switch args[0] {
 		case "--ayuda", "-h", "--help", "ayuda":
 			ayuda()
-			return
+			return 0
 		case "--editor":
 			destino := "vscode-fal"
 			if len(args) > 1 {
 				destino = args[1]
 			}
-			os.Exit(generarEditor(destino))
+			return generarEditor(destino)
 		case "--probar":
 			carpeta, filtro := "pruebas", ""
 			if len(args) > 1 {
@@ -35,11 +38,11 @@ func main() {
 			if len(args) > 2 {
 				filtro = args[2]
 			}
-			os.Exit(probar(carpeta, filtro))
+			return probar(carpeta, filtro)
 		}
-		os.Exit(ejecutarArchivo(args[0], args[1:]))
+		return ejecutarArchivo(args[0], args[1:])
 	}
-	os.Exit(consola())
+	return consola()
 }
 
 func ayuda() {
@@ -64,14 +67,31 @@ func ejecutarArchivo(ruta string, args []string) int {
 
 	completa, _ := filepath.Abs(ruta)
 	in := nuevoInterprete(filepath.Dir(completa), args)
-	defer in.salida.Flush()
 
-	if err := correrFuente(in, fuente); err != nil {
-		in.salida.Flush()
+	err := correrFuente(in, fuente)
+	in.salida.Flush()
+	// El dibujo se guarda aunque el programa reviente: lo que llego a
+	// dibujar antes de fallar suele ser justo lo que hay que mirar.
+	guardarDibujo(in, strings.TrimSuffix(ruta, filepath.Ext(ruta))+".svg")
+	if err != nil {
 		mostrarError(err, fuente)
 		return 1
 	}
 	return 0
+}
+
+// guardarDibujo deja en un .svg lo que haya dibujado la tortuga. Si el
+// programa no dibujo nada no se crea ningun archivo.
+func guardarDibujo(in *Interprete, destino string) {
+	svg := in.tortuga.svg()
+	if svg == "" {
+		return
+	}
+	if e := os.WriteFile(destino, []byte(svg), 0644); e != nil {
+		fmt.Fprintf(os.Stderr, "No pude guardar el dibujo en %s\n", destino)
+		return
+	}
+	fmt.Printf("Dibujo guardado en %s\n", filepath.Base(destino))
 }
 
 func mostrarError(err *ErrorFal, fuente string) {
@@ -113,6 +133,7 @@ func consola() int {
 		if len(acumulado) == 0 {
 			switch clave(strings.TrimSpace(linea)) {
 			case "adios", "salir", "chao":
+				guardarDibujo(in, "dibujo.svg")
 				return 0
 			}
 		}

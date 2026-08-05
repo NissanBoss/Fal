@@ -1,0 +1,33 @@
+# Dibujar con la tortuga.
+#
+# La tortuga es un lapiz que se arrastra por la pantalla. "camina" la mueve
+# hacia donde esta mirando y "gira" la tuerce a la derecha los grados que le
+# digas. Con eso solo ya se dibuja casi cualquier cosa.
+#
+# En el navegador el dibujo sale debajo del texto. Desde la terminal se
+# guarda al lado de este archivo, en dibujo.svg.
+
+# Un cuadrado son cuatro lados y cuatro giros de 90 grados.
+color de "azul"
+repite 4 veces
+    camina de 80
+    gira de 90
+fin
+
+# Con el lapiz levantado la tortuga se mueve sin dejar raya, que es como se
+# empieza un dibujo nuevo en otro sitio.
+gira de 90
+levanta
+camina de 170
+apoya
+
+# Y aqui esta la gracia de todo esto: el mismo bucle de siempre, pero en vez
+# de escribir numeros dibuja. Girando 170 grados la tortuga casi se da la
+# vuelta en cada paso, y de ahi salen las puntas.
+color de "rojo"
+repite 36 veces
+    camina de 100
+    gira de 170
+fin
+
+escribe "Ya esta. Mira el dibujo."

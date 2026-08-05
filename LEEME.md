@@ -136,7 +136,8 @@ Y el código fuente del intérprete, en Go:
 | `interprete.go` `ejecutar.go` `evaluar.go` `operaciones.go` | Árbol → resultado |
 | `numero.go` | Los números exactos |
 | `valor.go` | Los tipos de dato y los errores |
-| `biblioteca.go` `colecciones.go` `entorno.go` | Las 83 funciones |
+| `biblioteca.go` `colecciones.go` `entorno.go` | Las 88 funciones |
+| `tortuga.go` | La tortuga que dibuja, y el `.svg` que sale |
 | `main.go` `fuente.go` `web.go` | Consola, arranque y navegador |
 | `probar.go` `editor.go` | Banco de pruebas y coloreado |
 | `consola_windows.go` `consola_otros.go` | Preparar la consola de cada sistema |

@@ -136,6 +136,7 @@ type Interprete struct {
 	tipoError *Tipo
 	salida    *bufio.Writer
 	entrada   *bufio.Reader
+	tortuga   *Tortuga
 }
 
 func nuevoInterprete(carpeta string, args []string) *Interprete {
@@ -148,6 +149,7 @@ func nuevoInterprete(carpeta string, args []string) *Interprete {
 		cargados:   map[string]Valor{},
 		salida:     bufio.NewWriter(os.Stdout),
 		entrada:    bufio.NewReader(os.Stdin),
+		tortuga:    nuevaTortuga(),
 	}
 	in.tipoError = &Tipo{Nombre: "Error", Propios: []string{"mensaje", "clase", "linea", "pista"},
 		Metodos: map[string]*Funcion{}, EsError: true}

@@ -134,6 +134,7 @@ func init() {
 	registrarDatos()
 	registrarFechas()
 	registrarSistema()
+	registrarTortuga()
 }
 
 // Textos

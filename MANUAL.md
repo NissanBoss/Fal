@@ -1,7 +1,7 @@
 # Fal
 
 Un lenguaje de programación **completo** escrito íntegramente en español y **sin un solo
-símbolo raro**: 42 palabras, 83 funciones, y todo se lee en voz alta.
+símbolo raro**: 42 palabras, 88 funciones, y todo se lee en voz alta.
 
 Se reparte como un **único ejecutable** que no necesita nada instalado. Para ponerlo en
 marcha, mira [LEEME.md](LEEME.md).
@@ -51,6 +51,7 @@ fal --probar
 | Archivo | Qué enseña |
 |---|---|
 | `hola.fal` | Lo mínimo: variables, condiciones, repetir |
+| `dibujo.fal` | La tortuga: un bucle que en vez de escribir, dibuja |
 | `listas.fal` | Listas, bucles, funciones |
 | `adivina.fal` | Un juego con `pregunta` y `mientras` |
 | `completo.fal` | Recorrido por lo básico del lenguaje |
@@ -466,7 +467,7 @@ Se usan igual que un objeto: `doble de mate con 21`.
 
 ---
 
-# Todo lo que trae puesto (83 funciones)
+# Todo lo que trae puesto (88 funciones)
 
 Todas se llaman igual: `nombre de dato` o `nombre con dato1 y dato2`.
 
@@ -581,6 +582,46 @@ semilla de 7
 escribe azar entre 1 y 100      # siempre sale lo mismo
 ```
 
+## Dibujar: la tortuga
+
+La tortuga es un lápiz que se arrastra por la pantalla y deja raya. Empieza en el
+centro mirando hacia arriba.
+
+| Función | Qué hace |
+|---|---|
+| `camina de n` | avanza `n` pasos hacia donde mira, dejando raya |
+| `gira de n` | tuerce `n` grados a la derecha |
+| `levanta` | levanta el lápiz: se mueve sin pintar |
+| `apoya` | vuelve a apoyarlo |
+| `color de "azul"` | cambia el color de lo que venga después |
+
+Los colores son `negro`, `blanco`, `gris`, `rojo`, `naranja`, `amarillo`, `verde`,
+`azul`, `cian`, `morado`, `rosa` y `marron`.
+
+No hay palabras para retroceder ni para girar a la izquierda: se hace con un número
+negativo, que entre paréntesis porque detrás de un `de` no cabe un `menos n` suelto.
+
+```
+camina de (menos 40)      # hacia atrás
+gira de (menos 90)        # a la izquierda
+```
+
+Y aquí está la gracia: es el mismo bucle de siempre, pero dibujando.
+
+```
+repite 36 veces
+    camina de 100
+    gira de 170
+fin
+```
+
+Eso son cuatro líneas y sale una estrella de 36 puntas. En el navegador el dibujo
+aparece debajo del texto; desde la terminal se guarda en un `.svg` con el mismo
+nombre que tu programa. El tamaño se ajusta solo a lo que hayas dibujado, así que da
+igual que uses números grandes o pequeños.
+
+Está en `ejemplos/dibujo.fal`.
+
 ---
 
 # Palabras reservadas (42)
@@ -639,7 +680,7 @@ si x es (mayor)          # con paréntesis, compara x con la variable mayor
 
 Pasa únicamente con `mayor` y `menor`, y el error te lo recuerda.
 
-Las 83 funciones integradas tampoco son palabras reservadas: puedes tener una variable
+Las 88 funciones integradas tampoco son palabras reservadas: puedes tener una variable
 llamada `numero`, `lista` o `suma` sin problema.
 
 ---

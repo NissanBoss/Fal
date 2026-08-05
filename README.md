@@ -33,7 +33,7 @@ sin ellas, en mayúsculas o en minúsculas: da igual.
 
 Todo lo que se espera de un lenguaje de verdad: listas, diccionarios, conjuntos,
 funciones que se pasan como datos, clausuras, objetos con herencia, errores con
-clase, módulos, archivos, JSON, fechas, expresiones regulares e internet. Son 82
+clase, módulos, archivos, JSON, fechas, expresiones regulares e internet. Son 88
 funciones y 42 palabras.
 
 Tres cosas que lo separan de un lenguaje de juguete:
@@ -63,6 +63,24 @@ arregla:
 **Trae de todo dentro.** El mismo ejecutable corre tus programas, pasa su propio
 banco de pruebas (`fal --probar`) y genera el coloreado para VS Code
 (`fal --editor`).
+
+## Dibujar
+
+Un bucle que dibuja se entiende mejor que un bucle que escribe números. La tortuga
+es un lápiz que se arrastra por la pantalla: `camina` la mueve hacia donde mira y
+`gira` la tuerce.
+
+```
+repite 36 veces
+    camina de 100
+    gira de 170
+fin
+```
+
+Cuatro líneas y sale una estrella de 36 puntas. En el navegador aparece debajo del
+texto; desde la terminal se guarda en un `.svg` junto a tu programa.
+
+Está en `ejemplos/dibujo.fal`.
 
 ## Descargar
 
@@ -106,6 +124,7 @@ Vienen en el paquete, en la carpeta `ejemplos`:
 | Archivo | Qué enseña |
 |---|---|
 | `hola.fal` | Variables, condiciones, repetir |
+| `dibujo.fal` | La tortuga: un bucle que dibuja en vez de escribir |
 | `listas.fal` | Listas, bucles, funciones |
 | `adivina.fal` | Un juego con `pregunta` y `mientras` |
 | `completo.fal` | Recorrido por lo básico |
