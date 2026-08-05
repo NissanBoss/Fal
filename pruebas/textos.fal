@@ -10,6 +10,8 @@ escribe posicion de "Hola Mundo" con "Mundo"
 escribe trozo de "abcdefg" con 2 y 4
 escribe invierte de "hola"
 escribe empieza de "hola" con "ho"
+escribe acaba de "hola" con "la"
+escribe acaba de "hola" con "ho"
 escribe repetido de "ab" con 3
 escribe numerico de "42"
 escribe numerico de "hola"

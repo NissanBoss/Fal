@@ -28,6 +28,12 @@ var integradas = map[string]infoIntegrada{}
 var azarActual = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func integrada(nombre string, min, max int, fn funcionIntegrada) {
+	// Registrar dos veces el mismo nombre no daria ningun error: la segunda
+	// se comeria a la primera y la funcion perdida solo se echaria de menos
+	// mucho despues. Mejor no arrancar.
+	if _, repetida := integradas[nombre]; repetida {
+		panic("la funcion integrada \"" + nombre + "\" esta registrada dos veces")
+	}
 	integradas[nombre] = infoIntegrada{min, max, fn}
 }
 
@@ -220,7 +226,9 @@ func registrarTextos() {
 		})
 	}
 	dosTextos("empieza", strings.HasPrefix)
-	dosTextos("termina", strings.HasSuffix)
+	// Se llamaba "termina", pero ese nombre ya era el de cortar el programa
+	// y esta se quedaba sin registrar. Ahora hace pareja con "empieza".
+	dosTextos("acaba", strings.HasSuffix)
 
 	integrada("repetido", 2, 2, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
 		s, err := pideTexto(a[0], ln, "repetido")
