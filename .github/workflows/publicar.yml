@@ -38,7 +38,7 @@ jobs:
           armar() {
             CARPETA="dist/$1"
             mkdir -p "$CARPETA/ejemplos"
-            GOOS="$2" GOARCH="$3" go build -ldflags "-s -w" -o "$CARPETA/$4" .
+            GOOS="$2" GOARCH="$3" go build -trimpath -ldflags "-s -w" -o "$CARPETA/$4" .
             cp ejemplos/*.fal "$CARPETA/ejemplos/"
             cp README.md LEEME.md MANUAL.md LICENSE "$CARPETA/"
           }

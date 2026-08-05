@@ -29,7 +29,9 @@ echo ""
 armar() {
     CARPETA="dist/$1"
     mkdir -p "$CARPETA/ejemplos"
-    GOOS="$2" GOARCH="$3" go build -ldflags "$BANDERAS" -o "$CARPETA/$4" .
+    # -trimpath quita del binario la ruta desde la que se compilo. Si no,
+    # cualquiera que abra el ejecutable ve la carpeta de quien lo hizo.
+    GOOS="$2" GOARCH="$3" go build -trimpath -ldflags "$BANDERAS" -o "$CARPETA/$4" .
     cp ejemplos/*.fal "$CARPETA/ejemplos/"
     cp README.md LEEME.md MANUAL.md LICENSE "$CARPETA/"
     echo "  $1"
