@@ -8,6 +8,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
 )
@@ -23,6 +24,7 @@ func arrancar(args []string) int {
 	// Si el programa uso "tecla", la terminal se quedo en modo directo y hay
 	// que devolverla como estaba o el shell se queda sin eco.
 	defer soltarTeclado()
+	devolverTerminalSiCortan()
 
 	if len(args) > 0 {
 		switch args[0] {
@@ -48,6 +50,20 @@ func arrancar(args []string) int {
 		return ejecutarArchivo(args[0], args[1:])
 	}
 	return consola()
+}
+
+// devolverTerminalSiCortan deshace el modo directo cuando se corta el
+// programa con Ctrl+C. Hace falta porque una señal mata el proceso sin dejar
+// correr ningun defer: sin esto, quien corte una partida a medias se queda
+// con el shell sin eco y sin saber por que.
+func devolverTerminalSiCortan() {
+	avisos := make(chan os.Signal, 1)
+	signal.Notify(avisos, os.Interrupt)
+	go func() {
+		<-avisos
+		soltarTeclado()
+		os.Exit(130) // lo que devuelve un programa cortado con Ctrl+C
+	}()
 }
 
 func ayuda() {
