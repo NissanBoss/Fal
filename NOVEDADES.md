@@ -6,6 +6,15 @@ El automatismo de publicar coge de este archivo la sección de la versión que
 se está etiquetando y la pone como texto de la release, así que lo que
 escribas aquí es lo que lee quien vaya a descargarla.
 
+## v7.1
+
+Arreglos de empaquetado. El lenguaje no cambia.
+
+- `ejemplos/gastos.fal` no funcionaba al descargarlo: el paquete llevaba el
+  programa pero no su `gastos.csv`, así que fallaba nada más abrirlo.
+- `fal --probar` tampoco: el banco de pruebas no viajaba dentro del paquete,
+  aunque el manual lo documentara. Ahora van las 13 pruebas dentro.
+
 ## v7
 
 **Dibujar con la tortuga.** Un lápiz que se arrastra por la pantalla y deja

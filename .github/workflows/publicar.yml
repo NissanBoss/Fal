@@ -32,6 +32,9 @@ jobs:
       - name: Pruebas
         run: go test ./...
 
+      # OJO: esto hace lo mismo que la funcion armar() de construir.sh, que se
+      # usa para construir a mano. Si tocas una, toca la otra: de tenerlas
+      # descoordinadas salio que los paquetes fueran meses sin gastos.csv.
       - name: Construir los paquetes
         run: |
           mkdir -p dist
@@ -39,8 +42,14 @@ jobs:
             CARPETA="dist/$1"
             mkdir -p "$CARPETA/ejemplos"
             GOOS="$2" GOARCH="$3" go build -trimpath -ldflags "-s -w" -o "$CARPETA/$4" .
-            cp ejemplos/*.fal "$CARPETA/ejemplos/"
-            cp README.md LEEME.md MANUAL.md LICENSE "$CARPETA/"
+            # Todo lo de ejemplos, no solo los .fal: gastos.fal necesita su
+            # gastos.csv al lado o falla nada mas descargarlo.
+            cp -r ejemplos/. "$CARPETA/ejemplos/"
+            rm -f "$CARPETA/ejemplos/"*.svg
+            # El banco de pruebas va dentro para que "fal --probar" funcione
+            # recien descargado, que es lo que prometen README y manual.
+            cp -r pruebas "$CARPETA/"
+            cp README.md LEEME.md MANUAL.md NOVEDADES.md LICENSE "$CARPETA/"
           }
           armar fal-windows   windows amd64 fal.exe
           armar fal-mac-apple darwin  arm64 fal

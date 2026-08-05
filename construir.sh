@@ -26,14 +26,27 @@ echo "  todo en orden"
 echo ""
 
 # armar <carpeta> <sistema> <arquitectura> <nombre del binario>
+#
+# OJO: el automatismo de publicar (.github/workflows/publicar.yml) repite
+# esto mismo por su cuenta. Si tocas aqui, toca alli tambien.
 armar() {
     CARPETA="dist/$1"
     mkdir -p "$CARPETA/ejemplos"
     # -trimpath quita del binario la ruta desde la que se compilo. Si no,
     # cualquiera que abra el ejecutable ve la carpeta de quien lo hizo.
     GOOS="$2" GOARCH="$3" go build -trimpath -ldflags "$BANDERAS" -o "$CARPETA/$4" .
-    cp ejemplos/*.fal "$CARPETA/ejemplos/"
-    cp README.md LEEME.md MANUAL.md LICENSE "$CARPETA/"
+    # Todo lo que hay en ejemplos, no solo los .fal: gastos.fal necesita su
+    # gastos.csv al lado y copiando solo *.fal se quedaba fuera, asi que el
+    # ejemplo fallaba nada mas descargarlo.
+    cp -r ejemplos/. "$CARPETA/ejemplos/"
+    # Lo que dejan los ejemplos al ejecutarse aqui no tiene que viajar.
+    rm -f "$CARPETA/ejemplos/"*.svg "$CARPETA/ejemplos/agenda.txt" \
+          "$CARPETA/ejemplos/temporal.txt" "$CARPETA/ejemplos/notas.txt"
+    # El banco de pruebas tambien va dentro: son 63 KB y hacen que
+    # "fal --probar" funcione recien descargado, que es lo que promete el
+    # README y documentan LEEME y MANUAL.
+    cp -r pruebas "$CARPETA/"
+    cp README.md LEEME.md MANUAL.md NOVEDADES.md LICENSE "$CARPETA/"
     echo "  $1"
 }
 
