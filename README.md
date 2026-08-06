@@ -32,6 +32,22 @@ No hay `;` ni `{}` ni `==` ni `+`. Los bloques cierran con `fin`, las cuentas se
 escriben `3 mas 4`, y las comparaciones `si edad es mayor que 18`. Con tildes o
 sin ellas, en mayúsculas o en minúsculas: da igual.
 
+## Para quién es
+
+Entre Scratch y un lenguaje de adultos no hay nada. Un crío se harta de arrastrar
+bloques, quiere seguir, y lo que se encuentra es sintaxis llena de símbolos y encima
+en inglés. Ese salto se lleva por delante a un montón de gente que habría continuado.
+
+Si has pasado por PSeInt conoces el otro lado del problema. Sirve para aprender
+lógica, pero es pseudocódigo: no tiene librerías, no abre un archivo, no te deja
+montar un juego. Aprendes y ahí se acaba, no sale del aula.
+
+Fal está pensado para ese hueco. Se lee casi como el pseudocódigo, pero por debajo
+hay un intérprete completo: tipos con herencia, clausuras, módulos, archivos, JSON,
+fechas, expresiones regulares y peticiones a internet. El mismo lenguaje con el que
+aprendes a repetir diez veces una línea te sirve luego para leer un CSV de gastos y
+sacar un informe que cuadra al céntimo.
+
 ## Qué sabe hacer
 
 Todo lo que se espera de un lenguaje de verdad: listas, diccionarios, conjuntos,

@@ -839,9 +839,9 @@ Para ser honestos, esto es lo que Fal todavía no tiene frente a Python:
   y no necesita nada instalado; lo que no sabe todavía es meter tu `.fal` dentro de
   uno para que lo puedas repartir.
 
-Dicho eso, esa lista compara Fal con Python, que no es a lo que aspira. Medido contra
-lo que de verdad importa —ser el escalón que falta entre Scratch y un lenguaje de
-adulto— lo que queda por hacer es otra cosa:
+Dicho eso, esa lista compara Fal con Python, que no es a lo que aspira. Lo que de
+verdad importa es otra cosa: ser el escalón que falta entre Scratch y un lenguaje de
+adulto. Medido con esa vara, lo que queda por hacer es esto:
 
 - **Ver el programa avanzar paso a paso**, con las variables cambiando al lado. Eso
   sí haría falta, y no es lo mismo que un depurador con puntos de parada.
