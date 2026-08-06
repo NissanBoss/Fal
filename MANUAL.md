@@ -77,6 +77,26 @@ fal --probar
 7. **Se cuenta desde el 1.** El primero es el 1, el último es el `menos 1`.
 8. **Los errores enseñan.** Dicen la línea, el camino que siguió el programa, y cómo se arregla.
 
+### Lo que cuesta la regla 2
+
+Quitar los símbolos no sale gratis y conviene decirlo. En cuanto una expresión
+crece, escribirla con palabras es más largo y más ruidoso:
+
+```
+3 mas 4 por 5        frente a        3 + 4 * 5
+```
+
+La apuesta es consciente: se gana en las primeras horas y se paga después. El
+`=` contra el `==` se ha llevado por delante a muchísima gente que empezaba, y
+las llaves y el punto y coma otro tanto. A cambio, quien ya sabe programar
+escribe más de lo que escribiría en otro sitio.
+
+Y hay una segunda pega, que es real: estos símbolos son convención en casi
+todos los lenguajes, en la documentación y en las matemáticas, así que aquí no
+se practican. Por eso Fal está pensado para dejarlo atrás y no para quedarse, y
+por eso el manual acaba con una tabla que traduce cada cosa a Python y
+JavaScript. Ver [Si vienes de otro lenguaje](#si-vienes-de-otro-lenguaje).
+
 ---
 
 # Lo básico
