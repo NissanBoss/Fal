@@ -81,15 +81,28 @@ done
 
 # La extension de VS Code, solo si hay vsce a mano.
 #
+# Se regenera antes de empaquetarla. El package.json que hay guardado en
+# editor/vscode-fal lleva un numero escrito a mano que no se mueve nunca, asi
+# que empaquetando esa carpeta tal cual todas las versiones colgaban una
+# extension con el mismo numero, y el Marketplace no deja publicar dos veces
+# el mismo. Se trabaja sobre una copia para no dejar tocado el repositorio.
+#
+# El icono y el README no los genera nadie, por eso se copia la carpeta
+# entera antes de regenerar encima.
+#
 # vsce habla mucho cuando le sale bien, asi que se le calla; pero si falla hay
 # que ver por que. Antes se tiraba todo a /dev/null y el automatismo de
 # publicar se quedaba sin extension sin decir ni una palabra.
 if command -v vsce >/dev/null 2>&1; then
-    SALIDA_VSCE=$(cd editor/vscode-fal && vsce package --out ../../dist/fal-vscode.vsix 2>&1) || {
+    rm -rf dist/vscode-fal
+    cp -r editor/vscode-fal dist/vscode-fal
+    go run -ldflags "$BANDERAS" . --editor dist/vscode-fal >/dev/null
+    SALIDA_VSCE=$(cd dist/vscode-fal && vsce package --out ../fal-vscode.vsix 2>&1) || {
         echo "  no pude empaquetar la extension de VS Code:"
         echo "$SALIDA_VSCE"
         exit 1
     }
+    rm -rf dist/vscode-fal
     echo "  fal-vscode.vsix"
 fi
 

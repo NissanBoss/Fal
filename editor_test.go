@@ -8,6 +8,30 @@ import (
 	"testing"
 )
 
+// VS Code exige una version de tres numeros y el Marketplace no deja
+// publicar dos veces la misma, asi que la etiqueta de Fal tiene que llegar
+// bien traducida. Estuvo escrita a mano como "1.0.0" mucho tiempo y por eso
+// la extension no se pudo actualizar nunca.
+func TestLaVersionDeLaExtension(t *testing.T) {
+	previa := version
+	defer func() { version = previa }()
+
+	for _, caso := range []struct{ etiqueta, espera string }{
+		{"v8", "8.0.0"},
+		{"v8.1", "8.1.0"},
+		{"v7.1.2", "7.1.2"},
+		{"9", "9.0.0"},
+		{"sin publicar", "0.0.0"}, // compilado a mano, sin etiqueta ninguna
+		{"v8-beta", "0.0.0"},      // no es un numero, mejor no inventarselo
+	} {
+		version = caso.etiqueta
+		if sale := versionExtension(); sale != caso.espera {
+			t.Errorf("con la etiqueta %q esperaba %s y salio %s",
+				caso.etiqueta, caso.espera, sale)
+		}
+	}
+}
+
 // Comprueba que el coloreado que se genera es JSON valido y que sus
 // patrones compilan de verdad.
 func TestGenerarEditor(t *testing.T) {

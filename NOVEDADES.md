@@ -6,6 +6,17 @@ El automatismo de publicar coge de este archivo la sección de la versión que
 se está etiquetando y la pone como texto de la release, así que lo que
 escribas aquí es lo que lee quien vaya a descargarla.
 
+## v8.1
+
+Un arreglo de empaquetado. El lenguaje no cambia.
+
+- La extensión de VS Code seguía colgándose con el número `1.0.0`, que es
+  justo lo que v8 decía haber arreglado. Estaba a medias: el número se
+  calculaba bien al generar la extensión con `fal --editor`, pero al
+  construir se empaquetaba la carpeta guardada en el repositorio, donde ese
+  número está escrito a mano y no se mueve. Ahora se regenera antes de
+  empaquetarla, así que lleva la versión que se está publicando.
+
 ## v8
 
 **El Snake se juega de verdad, y en el navegador.** Estaba escrito con
