@@ -14,6 +14,9 @@ func ejecutarEnMemoria(fuente string) (string, *ErrorFal) {
 	carpeta, _ := os.Getwd()
 	in := nuevoInterprete(carpeta, nil)
 	in.salida = bufio.NewWriter(&buf)
+	// Sin entrada propia, una prueba que use "pregunta" o "tecla" se pondria
+	// a leer del teclado de quien la lanza.
+	in.conEntrada(strings.NewReader(""))
 	if err := correrFuente(in, fuente); err != nil {
 		return "", err
 	}

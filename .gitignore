@@ -24,5 +24,9 @@ ejemplos/*.svg
 /docs/fal.wasm
 /docs/wasm_exec.js
 
+# Los ejemplos se copian a docs/ al publicar la pagina. El original vive en
+# ejemplos/, y esta copia no se guarda para no tener dos.
+/docs/ejemplos/
+
 # El paquete de la extension se genera, no se guarda.
 editor/vscode-fal/*.vsix

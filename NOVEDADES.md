@@ -6,6 +6,52 @@ El automatismo de publicar coge de este archivo la sección de la versión que
 se está etiquetando y la pone como texto de la release, así que lo que
 escribas aquí es lo que lee quien vaya a descargarla.
 
+## v8
+
+**El Snake se juega de verdad, y en el navegador.** Estaba escrito con
+`pregunta`, que se para hasta que le das a Enter: había que teclear `dddw` y
+mirar cómo pasaban cuatro movimientos de golpe. Ahora usa `tecla`, así que la
+serpiente avanza sola y tú solo la tuerces, con `wasd` o con las flechas. Y
+está en el playground, que es donde se puede jugar sin instalar nada.
+
+Curioso el detalle: `tecla` se añadió en v7 justo para esto, y el juego se
+quedó sin enterarse.
+
+**Lo que escribes en el playground ya no se pierde.** Se guarda solo, según lo
+escribes. Antes bastaba con recargar sin querer, darle a atrás o cerrar la
+pestaña para quedarte sin nada, y también al ir a las lecciones y volver.
+
+**Compartir con un enlace.** Hay un botón que te da una dirección con tu
+programa dentro. Se la pasas a quien quieras, la abre, y ahí está. Sin cuentas,
+sin servidor y sin nada que guardar en ninguna parte.
+
+**`fal --version`.** No había forma de saber qué versión tenías instalada. De
+paso arregla la extensión de VS Code, que salía en todas las versiones marcada
+como `1.0.0`: el Marketplace no deja publicar dos veces el mismo número, así
+que estaba de hecho bloqueada.
+
+**Cuatro funciones nuevas:** `seno`, `coseno`, `tangente` y `logaritmo`. Los
+ángulos van en grados, igual que `gira`, para que la trigonometría y la tortuga
+hablen el mismo idioma. Ya se puede dibujar un círculo o una onda.
+
+**Arreglado, en los números:**
+
+- `potencia` con exponente negativo se iba al flotante, así que
+  `potencia con 10 y (menos 2)` daba un 0.01 que luego no cuadraba al sumarlo.
+  Ahora es exacto, que es lo que este lenguaje promete.
+- `arriba` y `abajo` pasaban por el flotante: perdían precisión con números
+  grandes y se salían del entero sin avisar.
+- `escribe azar` soltaba veintiocho decimales
+  (`0.9188921592527634629732347094`). Ahora da nueve.
+
+**Arreglado, en el taller:** los `.go` no estaban fijados a saltos de línea LF,
+así que clonando en Windows salían los 38 archivos marcados como sin formatear
+y `construir.sh` se negaba a compilar. Y el automatismo de publicar repetía por
+su cuenta lo que hace `construir.sh`; ahora lo llama, que de tener dos copias
+separándose salió que los paquetes fueran meses sin el `gastos.csv`.
+
+Van 93 funciones y siguen siendo 42 palabras.
+
 ## v7.1
 
 Arreglos de empaquetado. El lenguaje no cambia.

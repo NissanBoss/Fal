@@ -29,9 +29,9 @@ func juegaConSemilla(t *testing.T, ordenes string, semilla int) string {
 	var buf bytes.Buffer
 	in := nuevoInterprete(filepath.Dir(completa), nil)
 	in.salida = bufio.NewWriter(&buf)
-	in.entrada = bufio.NewReader(strings.NewReader(ordenes))
+	in.conEntrada(strings.NewReader(ordenes))
 
-	fuente := strings.Replace(quitarBOM(string(datos)), "PAUSA es 0.06", "PAUSA es 0", 1)
+	fuente := strings.Replace(quitarBOM(string(datos)), "PAUSA es 0.10", "PAUSA es 0", 1)
 	if semilla > 0 {
 		fuente = "semilla de " + itoa(semilla) + "\n" + fuente
 	}

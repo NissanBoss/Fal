@@ -23,59 +23,24 @@ jobs:
         with:
           go-version: stable
 
-      - name: Comprobar el formato
-        run: test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+      # vsce tiene que estar antes de construir: construir.sh empaqueta la
+      # extension si lo encuentra a mano, y si no, se la salta en silencio.
+      - name: Preparar vsce para la extension
+        run: npm install -g @vscode/vsce
 
-      - name: Analisis estatico
-        run: go vet ./...
-
-      - name: Pruebas
-        run: go test ./...
-
-      # OJO: esto hace lo mismo que la funcion armar() de construir.sh, que se
-      # usa para construir a mano. Si tocas una, toca la otra: de tenerlas
-      # descoordinadas salio que los paquetes fueran meses sin gastos.csv.
+      # Se llama al mismo script que se usa para construir a mano, en vez de
+      # repetir aqui lo que hace. Antes estaba copiado, las dos copias se
+      # fueron separando y de ahi salio que los paquetes estuvieran meses sin
+      # el gastos.csv. Con una sola receta eso no puede volver a pasar.
+      #
+      # construir.sh ya comprueba el formato, pasa go vet y ejecuta las
+      # pruebas antes de compilar nada, asi que esos pasos tampoco hacen
+      # falta aqui. GITHUB_REF_NAME es la etiqueta que se esta publicando, y
+      # es lo que acaba diciendo "fal --version".
       - name: Construir los paquetes
         run: |
-          mkdir -p dist
-          armar() {
-            CARPETA="dist/$1"
-            mkdir -p "$CARPETA/ejemplos"
-            GOOS="$2" GOARCH="$3" go build -trimpath -ldflags "-s -w" -o "$CARPETA/$4" .
-            # Todo lo de ejemplos, no solo los .fal: gastos.fal necesita su
-            # gastos.csv al lado o falla nada mas descargarlo.
-            cp -r ejemplos/. "$CARPETA/ejemplos/"
-            rm -f "$CARPETA/ejemplos/"*.svg
-            # El banco de pruebas va dentro para que "fal --probar" funcione
-            # recien descargado, que es lo que prometen README y manual.
-            cp -r pruebas "$CARPETA/"
-            cp README.md LEEME.md MANUAL.md NOVEDADES.md LICENSE "$CARPETA/"
-          }
-          armar fal-windows   windows amd64 fal.exe
-          armar fal-mac-apple darwin  arm64 fal
-          armar fal-mac-intel darwin  amd64 fal
-          armar fal-linux     linux   amd64 fal
-          armar fal-linux-arm linux   arm64 fal
-
-          cp instalador/instalar.bat instalador/desinstalar.bat dist/fal-windows/
-          for P in fal-mac-apple fal-mac-intel fal-linux fal-linux-arm; do
-            cp instalador/instalar.sh "dist/$P/"
-            chmod +x "dist/$P/instalar.sh"
-          done
-
-          cd dist
-          zip -r fal-windows.zip fal-windows
-          for P in fal-mac-apple fal-mac-intel fal-linux fal-linux-arm; do
-            tar -czf "$P.tar.gz" "$P"
-          done
-          ls -lh *.zip *.tar.gz
-
-      - name: Empaquetar la extension de VS Code
-        run: |
-          npm install -g @vscode/vsce
-          cd editor/vscode-fal
-          vsce package --out ../../dist/fal-vscode.vsix
-          ls -lh ../../dist/fal-vscode.vsix
+          sh construir.sh
+          ls -lh dist/*.zip dist/*.tar.gz dist/*.vsix
 
       # Las novedades salen de NOVEDADES.md, de la seccion que lleve el
       # nombre de esta etiqueta. Antes el texto estaba escrito aqui y era el

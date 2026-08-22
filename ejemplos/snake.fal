@@ -1,16 +1,23 @@
 # El juego de la serpiente, en Fal.
 #
 # Como se juega:
-#   w a s d   arriba, izquierda, abajo, derecha
-#   (enter)   sigue en la misma direccion
+#   w a s d   o las flechas, para girar
 #   q         salir
 #
-# Puedes escribir varias letras de golpe: "dddw" mueve tres veces a la
-# derecha y una arriba. Es lo que hace que el juego corra de verdad.
+# La serpiente no espera a nadie: avanza sola hacia donde mira y tu solo la
+# tuerces. Eso lo hace "tecla", que dice lo que se acaba de pulsar y sigue
+# aunque no hayas tocado nada. Con "pregunta" habria que darle a Enter en
+# cada paso, y entonces esto seria un cuestionario y no un juego.
 
 ANCHO es 22
 ALTO es 12
-PAUSA es 0.06
+
+# Lo que se espera entre movimiento y movimiento. Es a la vez la velocidad
+# del juego y lo suave que se ve: en un tablero de letras la serpiente salta
+# de casilla en casilla, asi que no hay termino medio: cuantos mas movimientos
+# por segundo mas fluido se ve. 0.10 son diez por segundo.
+# Bajalo para que vaya mas fino y mas dificil, subelo para lo contrario.
+PAUSA es 0.10
 
 # Una casilla se guarda como un solo numero: fila por 100 mas columna.
 # Asi la serpiente es una simple lista de numeros y preguntar si se ha
@@ -81,19 +88,21 @@ funcion dibuja
 fin
 
 
-funcion gira con tecla
+funcion gira con t
     comparte paso_fila y paso_columna
+    # Valen las letras y las flechas, que es lo primero que prueba
+    # cualquiera antes de mirar las instrucciones.
     # No se puede dar media vuelta sobre uno mismo.
-    si tecla es "w" y paso_fila no es igual a 1
+    si (t es "w" o t es "arriba") y paso_fila no es igual a 1
         paso_fila es menos 1
         paso_columna es 0
-    si no si tecla es "s" y paso_fila no es igual a menos 1
+    si no si (t es "s" o t es "abajo") y paso_fila no es igual a menos 1
         paso_fila es 1
         paso_columna es 0
-    si no si tecla es "a" y paso_columna no es igual a 1
+    si no si (t es "a" o t es "izquierda") y paso_columna no es igual a 1
         paso_fila es 0
         paso_columna es menos 1
-    si no si tecla es "d" y paso_columna no es igual a menos 1
+    si no si (t es "d" o t es "derecha") y paso_columna no es igual a menos 1
         paso_fila es 0
         paso_columna es 1
     fin
@@ -140,28 +149,19 @@ nueva_comida
 dibuja
 
 mientras vivo
-    ordenes es minusculas de pregunta " > "
+    t es tecla
 
-    si ordenes es "q"
+    si t es "q" o t es "escape"
         motivo es "Lo dejaste tu."
         vivo es falso
-
-    si no si ordenes es ""
+    si no
+        # Si no se pulso nada, t viene vacio y la serpiente sigue recto.
+        si t no es ""
+            gira con t
+        fin
         avanza
         dibuja
-
-    si no
-        para cada tecla en ordenes
-            si no vivo
-                detente
-            fin
-            si tecla esta en "wasd"
-                gira con tecla
-            fin
-            avanza
-            dibuja
-            espera de PAUSA
-        fin
+        espera de PAUSA
     fin
 fin
 

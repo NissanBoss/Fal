@@ -31,6 +31,9 @@ func arrancar(args []string) int {
 		case "--ayuda", "-h", "--help", "ayuda":
 			ayuda()
 			return 0
+		case "--version", "-v", "version":
+			fmt.Println("Fal " + version)
+			return 0
 		case "--editor":
 			destino := "vscode-fal"
 			if len(args) > 1 {
@@ -67,10 +70,11 @@ func devolverTerminalSiCortan() {
 }
 
 func ayuda() {
-	fmt.Println(`Fal - el lenguaje de programacion mas facil del mundo.
-
+	fmt.Println("Fal " + version + " - el lenguaje de programacion mas facil del mundo.")
+	fmt.Println(`
   fal programa.fal        ejecuta un programa
   fal                     abre la consola interactiva
+  fal --version           dice que version es esta
   fal --probar [carpeta]  ejecuta el banco de pruebas
   fal --editor [carpeta]  genera el coloreado para VS Code
 

@@ -1,7 +1,7 @@
 # Fal
 
 Un lenguaje de programación **completo** escrito íntegramente en español y **sin un solo
-símbolo raro**: 42 palabras, 89 funciones, y todo se lee en voz alta.
+símbolo raro**: 42 palabras, 93 funciones, y todo se lee en voz alta.
 
 Se reparte como un **único ejecutable** que no necesita nada instalado. Para ponerlo en
 marcha, mira [LEEME.md](LEEME.md).
@@ -35,13 +35,20 @@ Para comprobar que todo sigue bien después de tocar algo:
 fal --probar
 ```
 
+Y para saber qué versión tienes delante, que es lo primero que hace falta cuando algo
+no va como dice la documentación:
+
+```bash
+fal --version
+```
+
 ## Qué hay en la carpeta
 
 | | |
 |---|---|
 | `dist/` | El ejecutable, uno por sistema. Es todo lo que necesitas. |
 | `LEEME.md` | Cómo instalarlo y usarlo |
-| `pruebas/` | 13 pruebas con su salida esperada. `fal --probar` |
+| `pruebas/` | 14 pruebas con su salida esperada. `fal --probar` |
 | `ejemplos/` | Programas de ejemplo, de lo básico a lo avanzado |
 | `editor/` | Resaltado de sintaxis para VS Code. `fal --editor` |
 | `*.go` | El código fuente del intérprete |
@@ -58,7 +65,7 @@ fal --probar
 | `completo.fal` | Recorrido por lo básico del lenguaje |
 | `agenda.fal` | Programa real: objetos + archivos + menú |
 | `avanzado.fal` | Clausuras, herencia, JSON, fechas, patrones, internet |
-| `snake.fal` | El juego de la serpiente: `limpia`, `comparte`, listas |
+| `snake.fal` | El juego de la serpiente: `tecla`, `limpia`, `comparte`, listas |
 | `gastos.fal` | Programa de verdad: CSV, diccionarios y dinero exacto |
 | `cifrado.fal` | Cifrado Cesar, y como se rompe probando las 25 claves |
 | `romanos.fal` | Numeros romanos en los dos sentidos, con autocomprobacion |
@@ -488,7 +495,7 @@ Se usan igual que un objeto: `doble de mate con 21`.
 
 ---
 
-# Todo lo que trae puesto (89 funciones)
+# Todo lo que trae puesto (93 funciones)
 
 Todas se llaman igual: `nombre de dato` o `nombre con dato1 y dato2`.
 
@@ -509,16 +516,50 @@ formato de "Hola {}, tienes {}" con nombre y edad
 ## Números
 
 `numero` · `texto` · `redondea` · `arriba` · `abajo` · `absoluto` · `raiz` · `potencia` ·
-`minimo` · `maximo` · `azar`
+`minimo` · `maximo` · `azar` · `seno` · `coseno` · `tangente` · `logaritmo`
 
 ```
 redondea de pi con 4        → 3.1416
 azar                        → decimal entre 0 y 1
 azar de 6                   → entero de 1 a 6
 azar entre 10 y 20
+potencia con 10 y (menos 2) → 0.01   exacto, no aproximado
 ```
 
 Constantes: `pi` y `e`.
+
+### Ángulos y logaritmos
+
+Los ángulos van en **grados**, igual que en `gira`: una vuelta son 360. Así la
+trigonometría y la tortuga hablan el mismo idioma y no hay que convertir nada.
+
+```
+escribe seno de 30           → 0.5
+escribe coseno de 60         → 0.5
+escribe tangente de 45       → 1
+escribe coseno de 45         → 0.7071067811865476
+```
+
+Donde el resultado es un número redondo sale exacto; donde es irracional sale
+aproximado, igual que pasa con `raiz`. La tangente de 90 no existe y te lo dice.
+
+Con `seno` y `coseno` ya se puede dibujar un círculo poniendo los puntos uno a uno,
+o una onda:
+
+```
+para cada g desde 0 hasta 360
+    x es g
+    y es 50 por seno de g
+fin
+```
+
+`logaritmo` es en base 10, el del colegio. Para otra base se le dice cuál:
+
+```
+escribe logaritmo de 1000    → 3
+escribe logaritmo con 8 y 2  → 3
+escribe logaritmo con 100 y e   → el logaritmo natural
+```
 
 ## Listas
 
@@ -633,7 +674,20 @@ Esa `espera` del final no es un adorno. Sin ella el programa da vueltas a lo ton
 comiéndose el procesador, y en el navegador además es el momento en el que entran las
 teclas que has pulsado.
 
-Está en `ejemplos/mueve.fal`.
+Está en `ejemplos/mueve.fal` y, ya en serio, en `ejemplos/snake.fal`.
+
+### Una partida escrita de antemano
+
+Cuando el programa no tiene una terminal delante (porque le llega el texto por una
+tubería, o porque lo está ejecutando una prueba), `tecla` saca las pulsaciones de ese
+mismo texto, una por letra. Así una partida se puede escribir antes y repetirla igual:
+
+```bash
+fal ejemplos/snake.fal < partida.txt
+```
+
+Eso es lo que permite **probar un juego**, que si no habría que jugarlo a mano cada
+vez. Junto con `semilla`, una partida entera se vuelve repetible al detalle.
 
 ## Dibujar: la tortuga
 
@@ -733,7 +787,7 @@ si x es (mayor)          # con paréntesis, compara x con la variable mayor
 
 Pasa únicamente con `mayor` y `menor`, y el error te lo recuerda.
 
-Las 89 funciones integradas tampoco son palabras reservadas: puedes tener una variable
+Las 93 funciones integradas tampoco son palabras reservadas: puedes tener una variable
 llamada `numero`, `lista` o `suma` sin problema.
 
 ---

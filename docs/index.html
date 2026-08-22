@@ -51,6 +51,7 @@ select, button {
   border: 1px solid var(--borde); background: var(--panel); color: var(--texto);
 }
 select { flex: 1; min-width: 200px; }
+.avisoCopia { font-size: 14px; color: var(--acento); }
 button.correr {
   background: var(--acento); border-color: var(--acento); color: #06121c;
   font-weight: 600; cursor: pointer; min-width: 130px;
@@ -175,6 +176,8 @@ code { font-family: var(--mono); font-size: .92em; }
     <select id="ejemplos" aria-label="Elegir un ejemplo"></select>
     <button class="correr" id="correr" disabled>Cargando…</button>
     <button id="parar" hidden>Parar</button>
+    <button id="compartir">Compartir</button>
+    <span class="avisoCopia" id="avisoCopia" hidden></span>
   </div>
 
   <div class="barra" id="barraAprender" hidden>
@@ -323,6 +326,14 @@ mientras jugando
 fin
 
 escribe "Hasta luego."`,
+    entradas: ""
+  },
+  {
+    // El unico que no lleva el codigo aqui dentro. Es el mismo archivo que
+    // viene en la descarga, y copiarlo seria tener dos serpientes que se van
+    // separando sin que nadie se entere. Se baja al elegirlo.
+    nombre: "Un juego: la serpiente",
+    archivo: "ejemplos/snake.fal",
     entradas: ""
   },
   {
@@ -609,13 +620,135 @@ EJEMPLOS.forEach((e, i) => {
   $ejemplos.appendChild(o);
 });
 
-function cargar(i) {
-  $programa.value = EJEMPLOS[i].codigo;
-  $entradas.value = EJEMPLOS[i].entradas;
+function ponerPrograma(codigo, entradas) {
+  $programa.value = codigo;
+  $entradas.value = entradas || "";
   $salida.innerHTML = '<span class="aviso">Pulsa «Ejecutar» para empezar.</span>';
+  guardarPrograma();
+}
+
+async function cargar(i) {
+  const e = EJEMPLOS[i];
+  if (!e.archivo) {
+    ponerPrograma(e.codigo, e.entradas);
+    return;
+  }
+  // Los que viven en un archivo aparte se bajan la primera vez y se quedan
+  // en memoria, para no volver a pedirlos al cambiar de ejemplo y volver.
+  if (e.codigo === undefined) {
+    ponerPrograma("# Bajando " + e.archivo + "…", "");
+    try {
+      const r = await fetch(e.archivo);
+      if (!r.ok) throw new Error("el servidor contesto " + r.status);
+      e.codigo = await r.text();
+    } catch (err) {
+      ponerPrograma("# No pude bajar " + e.archivo + ": " + err.message + "\n" +
+        "# Lo tienes en la descarga, dentro de la carpeta ejemplos.", "");
+      return;
+    }
+  }
+  ponerPrograma(e.codigo, e.entradas);
 }
 $ejemplos.addEventListener("change", () => cargar(+$ejemplos.value));
-cargar(0);
+
+// Guardar lo que escribes
+//
+// Se guarda segun se escribe. Antes bastaba con recargar sin querer, darle
+// a atras, o que se cerrara la pestaña, para perderlo todo: en un sitio
+// donde la gente viene justo a probar cosas, eso es lo peor que puede pasar.
+const LLAVE_PROGRAMA = "fal_programa";
+
+function guardarPrograma() {
+  // En las lecciones el cuadro es del ejercicio, no del programa de nadie.
+  if (modoAprender) return;
+  try {
+    localStorage.setItem(LLAVE_PROGRAMA, JSON.stringify({
+      programa: $programa.value,
+      entradas: $entradas.value
+    }));
+  } catch (e) {
+    // Sin sitio, o en una ventana privada. Se sigue pudiendo programar.
+  }
+}
+
+function recuperarPrograma() {
+  try {
+    const guardado = JSON.parse(localStorage.getItem(LLAVE_PROGRAMA) || "null");
+    if (!guardado || !guardado.programa || !guardado.programa.trim()) return false;
+    $programa.value = guardado.programa;
+    $entradas.value = guardado.entradas || "";
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+$programa.addEventListener("input", guardarPrograma);
+$entradas.addEventListener("input", guardarPrograma);
+
+// Compartir con un enlace
+//
+// El programa entero viaja dentro de la direccion, detras de la almohadilla.
+// Nadie tiene que guardar nada en ningun servidor, y por eso esto funciona
+// en GitHub Pages tal cual, sin mover una linea de infraestructura.
+function aTextoDeEnlace(texto) {
+  const bytes = new TextEncoder().encode(texto);
+  let binario = "";
+  for (const b of bytes) binario += String.fromCharCode(b);
+  // base64 de la variante que no lleva ni + ni /, que en una direccion dan
+  // problemas. El relleno con = tampoco hace falta.
+  return btoa(binario).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function deTextoDeEnlace(texto) {
+  let b64 = texto.replace(/-/g, "+").replace(/_/g, "/");
+  while (b64.length % 4) b64 += "=";
+  const binario = atob(b64);
+  return new TextDecoder().decode(Uint8Array.from(binario, c => c.charCodeAt(0)));
+}
+
+function cargarDelEnlace() {
+  const trozo = location.hash.replace(/^#/, "");
+  if (!trozo.startsWith("p=")) return false;
+  try {
+    const partes = new URLSearchParams(trozo);
+    ponerPrograma(
+      deTextoDeEnlace(partes.get("p")),
+      partes.get("e") ? deTextoDeEnlace(partes.get("e")) : "");
+    return true;
+  } catch (e) {
+    return false; // enlace cortado o estropeado al pegarlo
+  }
+}
+
+const $compartir = document.getElementById("compartir");
+const $avisoCopia = document.getElementById("avisoCopia");
+let relojAviso = null;
+
+function avisarCopia(texto) {
+  $avisoCopia.textContent = texto;
+  $avisoCopia.hidden = false;
+  clearTimeout(relojAviso);
+  relojAviso = setTimeout(() => { $avisoCopia.hidden = true; }, 5000);
+}
+
+$compartir.addEventListener("click", async () => {
+  if (!$programa.value.trim()) {
+    avisarCopia("Escribe algo primero.");
+    return;
+  }
+  let enlace = location.origin + location.pathname + "#p=" + aTextoDeEnlace($programa.value);
+  if ($entradas.value.trim()) enlace += "&e=" + aTextoDeEnlace($entradas.value);
+  history.replaceState(null, "", enlace);
+  try {
+    await navigator.clipboard.writeText(enlace);
+    avisarCopia("Enlace copiado. Pegalo donde quieras.");
+  } catch (e) {
+    // Sin permiso para el portapapeles queda en la barra de direcciones,
+    // que es de donde se copia a mano de toda la vida.
+    avisarCopia("Enlace listo arriba, en la barra de direcciones.");
+  }
+});
 
 function escapar(t) {
   return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -640,6 +773,9 @@ function crearTrabajador() {
     } else if (m.tipo === "salida") {
       pintarTrozo(m.texto);
     } else if (m.tipo === "fin") {
+      // Se vuelca ya, sin esperar al fotograma: justo debajo se lee
+      // "acumulada" para corregir la leccion, y tiene que estar entera.
+      volcarPendiente();
       const avisar = alTerminar;
       pararInterfaz();
       if (m.dibujo) {
@@ -654,7 +790,7 @@ function crearTrabajador() {
     }
   };
   trabajador.onerror = e => {
-    pintarTrozo("");
+    olvidarPendiente();
     $salida.innerHTML = '<span class="error">No pude cargar el lenguaje: ' +
       escapar(e.message || String(e)) + "</span>";
     pararInterfaz();
@@ -664,18 +800,68 @@ function crearTrabajador() {
 // pintarTrozo añade texto segun llega, en vez de rehacer el panel entero.
 // Si el programa borro la pantalla, aqui se borra de verdad: eso es lo que
 // permite repintar un tablero en el sitio.
+// pintarTrozo no pinta: apunta. Lo que va llegando se junta y se vuelca de
+// una vez, como mucho una por fotograma del navegador.
+//
+// Antes cada trozo tocaba el DOM por su cuenta, y un tablero del Snake son
+// 31 trozos: el panel se borraba, se quedaba en blanco a la vista, y se
+// rellenaba linea a linea durante unos 9 ms mientras el navegador iba
+// pintando los pasos intermedios. Eso es exactamente lo que se veia como
+// parpadeo. Asi el fotograma entero entra de golpe y no hay estado a medias
+// que se pueda llegar a ver.
+let pendiente = "";
+let volcadoPedido = false;
+let relojVolcado = null;
+
 function pintarTrozo(texto) {
+  pendiente += texto;
+  if (volcadoPedido) return;
+  volcadoPedido = true;
+  // requestAnimationFrame es lo que alinea el volcado con el repintado del
+  // navegador, y por eso quita el parpadeo. Pero no se dispara con la
+  // pestaña de fondo ni en visores que no componen fotogramas, y ahi la
+  // salida se quedaria congelada hasta el final. El temporizador es el
+  // seguro: gana el que llegue antes y el otro se encuentra el trabajo
+  // hecho.
+  requestAnimationFrame(volcarPendiente);
+  relojVolcado = setTimeout(volcarPendiente, 50);
+}
+
+function volcarPendiente() {
+  if (!volcadoPedido) return; // se adelanto el otro aviso
+  volcadoPedido = false;
+  clearTimeout(relojVolcado);
+  if (!pendiente) return;
+  let texto = pendiente;
+  pendiente = "";
+
+  // Si en lo que llego hubo un borrado de pantalla, solo cuenta lo de
+  // despues del ultimo: los fotogramas anteriores ya no se van a ver.
   const borrado = texto.lastIndexOf("\x1b[2J");
-  if (borrado >= 0) {
-    $salida.textContent = "";
-    acumulada = "";
+  const limpiar = borrado >= 0;
+  if (limpiar) {
     texto = texto.slice(borrado);
+    acumulada = "";
   }
   texto = texto.replace(/\x1b\[[0-9;]*[A-Za-z]/g, "");
-  if (!texto) return;
   acumulada += texto;
-  $salida.appendChild(document.createTextNode(texto));
+
+  if (limpiar) {
+    // Un unico cambio: el panel no llega a verse vacio en ningun momento.
+    $salida.textContent = texto;
+  } else if (texto) {
+    $salida.appendChild(document.createTextNode(texto));
+  } else {
+    return;
+  }
   $salida.scrollTop = $salida.scrollHeight;
+}
+
+// olvidarPendiente se usa cuando alguien va a escribir en el panel por su
+// cuenta. Sin esto, un volcado ya pedido caeria encima despues y le pisaria
+// el mensaje.
+function olvidarPendiente() {
+  pendiente = "";
 }
 
 function pararInterfaz() {
@@ -692,6 +878,7 @@ function correrPrograma(programa, respuestas, avisar) {
   corriendo = true;
   alTerminar = avisar;
   acumulada = "";
+  olvidarPendiente(); // lo que quedara de la vez anterior ya no vale
   $salida.textContent = "";
   $salida.hidden = false; // pudo quedar oculto si lo anterior solo dibujaba
   $lienzo.hidden = true;
@@ -817,7 +1004,10 @@ function cambiarModo(aprender) {
   $barraAprender.hidden = !aprender;
   $barraProbar.hidden = aprender;
   $cajaRespuestas.hidden = aprender;
-  if (aprender) pintarLeccion(); else cargar(+$ejemplos.value);
+  // Al volver de las lecciones se recupera lo que estabas escribiendo. Antes
+  // se recargaba el ejemplo elegido y tu programa se perdia por el camino.
+  if (aprender) pintarLeccion();
+  else if (!recuperarPrograma()) cargar(+$ejemplos.value);
 }
 
 $pestanaProbar.addEventListener("click", () => cambiarModo(false));
@@ -889,6 +1079,12 @@ function pintarPuntos() {
 $comprobar.addEventListener("click", comprobarLeccion);
 
 $parar.addEventListener("click", parar);
+
+// Al abrir manda el enlace, si viene con un programa dentro; si no, lo que
+// quedo escrito la ultima vez; y si tampoco hay nada, el primer ejemplo.
+// Va al final porque necesita que este ya montado todo lo de arriba.
+if (!cargarDelEnlace() && !recuperarPrograma()) cargar(0);
+
 crearTrabajador();
 </script>
 </body>

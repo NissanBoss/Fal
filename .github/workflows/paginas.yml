@@ -36,9 +36,16 @@ jobs:
 
       - name: Compilar a WebAssembly
         run: |
-          GOOS=js GOARCH=wasm go build -trimpath -ldflags "-s -w" -o docs/fal.wasm .
+          GOOS=js GOARCH=wasm go build -trimpath \
+            -ldflags "-s -w -X main.version=$GITHUB_REF_NAME" -o docs/fal.wasm .
           cp "$(go env GOROOT)/lib/wasm/wasm_exec.js" docs/
-          ls -lh docs/
+          # Los ejemplos de verdad, para que la pagina pueda ofrecerlos sin
+          # llevar una segunda copia dentro del HTML. Solo se publica lo que
+          # se sube en este paso, asi que sin esto el playground los pediria
+          # y no estarian.
+          mkdir -p docs/ejemplos
+          cp ejemplos/*.fal docs/ejemplos/
+          ls -lh docs/ docs/ejemplos/
 
       - uses: actions/configure-pages@v5
 

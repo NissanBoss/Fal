@@ -5,6 +5,12 @@
 # "bad interpreter". Estos van con LF siempre, pase lo que pase.
 *.sh text eol=lf
 
+# El codigo Go tambien. gofmt solo entiende LF, asi que clonando en Windows
+# salian los 38 archivos marcados como sin formatear y construir.sh se
+# negaba a compilar. Quien hiciera caso al mensaje y ejecutara "gofmt -w ."
+# reescribia el repositorio entero para nada.
+*.go text eol=lf
+
 # Los .bat son al reves: quieren CRLF.
 *.bat text eol=crlf
 

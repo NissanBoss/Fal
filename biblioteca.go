@@ -323,21 +323,17 @@ func registrarNumeros() {
 		return redondearNum(n, decimales), nil
 	})
 
-	integrada("arriba", 1, 1, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
-		n, err := pideNum(a[0], ln, "arriba")
-		if err != nil {
-			return nil, err
-		}
-		return Entero(int64(math.Ceil(n.Float()))), nil
-	})
-
-	integrada("abajo", 1, 1, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
-		n, err := pideNum(a[0], ln, "abajo")
-		if err != nil {
-			return nil, err
-		}
-		return Entero(int64(math.Floor(n.Float()))), nil
-	})
+	redondeoEntero := func(nombre string, haciaArriba bool) {
+		integrada(nombre, 1, 1, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
+			n, err := pideNum(a[0], ln, nombre)
+			if err != nil {
+				return nil, err
+			}
+			return techoSuelo(n, haciaArriba), nil
+		})
+	}
+	redondeoEntero("arriba", true)
+	redondeoEntero("abajo", false)
 
 	integrada("absoluto", 1, 1, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
 		n, err := pideNum(a[0], ln, "absoluto")
@@ -375,18 +371,88 @@ func registrarNumeros() {
 		if err != nil {
 			return nil, err
 		}
-		// Con exponente entero se puede hacer exacto.
+		// Con exponente entero se puede hacer exacto, tambien si es negativo:
+		// elevar a menos 2 es dividir entre el cuadrado, y una fraccion
+		// aguanta eso sin perder nada. Antes solo valia para los positivos y
+		// "potencia con 10 y (menos 2)" caia al flotante, asi que 0.01 dejaba
+		// de cuadrar al sumarlo, que es justo lo que este lenguaje promete
+		// que no pasa.
 		if exp.EsEnteroExacto() {
 			e := exp.Int()
-			if e >= 0 && e < 4096 {
-				resultado := Entero(1)
-				for i := int64(0); i < e; i++ {
-					resultado = multiplicaNum(resultado, base)
+			if e > -4096 && e < 4096 {
+				resultado, vale := potenciaExacta(base, e)
+				if !vale {
+					return nil, nuevoError("No se puede elevar cero a un exponente negativo.",
+						ln, "Seria dividir entre cero.", ClaseMatematica)
 				}
 				return resultado, nil
 			}
 		}
 		return Flotante(math.Pow(base.Float(), exp.Float())), nil
+	})
+
+	// Los angulos van en grados, igual que en "gira": una vuelta son 360 y
+	// no dos pi. Nadie que este empezando ha oido hablar de un radian, y asi
+	// la trigonometria y la tortuga hablan el mismo idioma sin convertir
+	// nada por el camino.
+	trigonometrica := func(nombre string, f func(float64) float64) {
+		integrada(nombre, 1, 1, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
+			n, err := pideNum(a[0], ln, nombre)
+			if err != nil {
+				return nil, err
+			}
+			return ajustaTrigonometrica(n, f(enRadianes(n))), nil
+		})
+	}
+	trigonometrica("seno", math.Sin)
+	trigonometrica("coseno", math.Cos)
+
+	integrada("tangente", 1, 1, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
+		n, err := pideNum(a[0], ln, "tangente")
+		if err != nil {
+			return nil, err
+		}
+		// En 90 grados la tangente no existe. Sin avisar saldria un numero
+		// enorme con toda la pinta de ser bueno, que es peor que un error.
+		if esMultiploDe(n, 90) && !esMultiploDe(n, 180) {
+			return nil, nuevoError("La tangente de "+n.Texto()+" grados no existe.", ln,
+				"Pasa en 90 grados, y luego cada 180: 270, 450, y asi.", ClaseMatematica)
+		}
+		return ajustaTrigonometrica(n, math.Tan(enRadianes(n))), nil
+	})
+
+	integrada("logaritmo", 1, 2, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
+		n, err := pideNum(a[0], ln, "logaritmo")
+		if err != nil {
+			return nil, err
+		}
+		if n.Signo() <= 0 {
+			return nil, nuevoError("El logaritmo solo existe para numeros mayores que cero.",
+				ln, "", ClaseMatematica)
+		}
+		// Sin decir nada mas es en base 10, que es el del colegio:
+		// "logaritmo de 1000" da 3. El natural se pide con la base e.
+		base := Entero(10)
+		valor := math.Log10(n.Float())
+		if len(a) > 1 {
+			if base, err = pideNum(a[1], ln, "logaritmo"); err != nil {
+				return nil, err
+			}
+			if base.Signo() <= 0 || comparaNum(base, Entero(1)) == 0 {
+				return nil, nuevoError("La base de un logaritmo no puede ser cero, ni uno, ni negativa.",
+					ln, "", ClaseMatematica)
+			}
+			valor = math.Log(n.Float()) / math.Log(base.Float())
+		}
+		// Cuando el resultado es un entero justo se devuelve entero, y se
+		// comprueba elevando de verdad. Por el flotante "logaritmo con 81 y 3"
+		// salia 4.000000000000001, que aqui canta mucho.
+		if redondo := math.Round(valor); math.Abs(valor-redondo) < 1e-9 && math.Abs(redondo) < 4096 {
+			if p, vale := potenciaExacta(base, int64(redondo)); vale && comparaNum(p, n) == 0 {
+				return Entero(int64(redondo)), nil
+			}
+		}
+		return Flotante(valor), nil
 	})
 
 	extremo := func(nombre string, quieroMayor bool) {
@@ -432,8 +498,12 @@ func registrarNumeros() {
 	integrada("azar", 0, 2, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
 		switch len(a) {
 		case 0:
-			r := new(big.Rat).SetFloat64(azarActual.Float64())
-			return Racional(r), nil
+			// Nueve cifras y no mas. Antes se guardaba la fraccion binaria
+			// exacta del flotante, que no termina hasta pasados cincuenta
+			// decimales, asi que "escribe azar" soltaba los veintiocho que
+			// se enseñan de una fraccion:
+			//   0.9188921592527634629732347094   en vez de   0.918892159
+			return Racional(big.NewRat(int64(azarActual.Intn(1000000000)), 1000000000)), nil
 		case 1:
 			n, err := pideEntero(a[0], ln, "azar")
 			if err != nil {
@@ -457,6 +527,91 @@ func registrarNumeros() {
 		}
 		return Entero(int64(azarActual.Intn(y-x+1) + x)), nil
 	})
+}
+
+// potenciaExacta eleva a un exponente entero sin perder nada por el camino.
+// Un exponente negativo es el inverso: elevar a menos 2 es dividir entre el
+// cuadrado, y una fraccion aguanta eso tal cual.
+//
+// Devuelve falso con la base a cero y el exponente negativo, que seria
+// dividir entre cero.
+func potenciaExacta(base Num, e int64) (Num, bool) {
+	negativo := e < 0
+	if negativo {
+		e = -e
+		if base.EsCero() {
+			return Num{}, false
+		}
+	}
+	resultado := Entero(1)
+	for i := int64(0); i < e; i++ {
+		resultado = multiplicaNum(resultado, base)
+	}
+	if negativo {
+		return divideNum(Entero(1), resultado), true
+	}
+	return resultado, true
+}
+
+func enRadianes(grados Num) float64 { return grados.Float() * math.Pi / 180 }
+
+// ajustaTrigonometrica devuelve el valor exacto en los angulos donde lo hay.
+//
+// El seno, el coseno y la tangente solo dan un numero redondo en los
+// multiplos de 15 grados, y ahi valen 0, media o uno. Pasando por el flotante
+// no salen limpios: el seno de 30 daria 0.49999999999999994 y la tangente de
+// 45 daria 0.9999999999999999, que en un lenguaje que presume de decimales
+// exactos queda fatal. En los demas angulos el valor es irracional y se
+// devuelve aproximado, igual que ya hace la raiz.
+func ajustaTrigonometrica(grados Num, valor float64) Num {
+	if !esMultiploDe(grados, 15) {
+		return Flotante(valor)
+	}
+	for _, exacto := range []*big.Rat{
+		big.NewRat(0, 1), big.NewRat(1, 2), big.NewRat(-1, 2),
+		big.NewRat(1, 1), big.NewRat(-1, 1),
+	} {
+		f, _ := exacto.Float64()
+		if math.Abs(valor-f) < 1e-9 {
+			return Racional(exacto)
+		}
+	}
+	return Flotante(valor)
+}
+
+// esMultiploDe dice si el angulo cae justo cada tantos grados. De un flotante
+// no hay forma de saberlo con certeza, asi que se contesta que no.
+func esMultiploDe(grados Num, cada int64) bool {
+	if grados.esFlt {
+		return false
+	}
+	return new(big.Rat).Quo(grados.Rat(), new(big.Rat).SetInt64(cada)).IsInt()
+}
+
+// techoSuelo lleva un numero al entero de arriba o al de abajo.
+//
+// Se hace con la fraccion y no con math.Ceil, que era lo de antes, porque
+// pasar por el flotante estropea dos cosas: los numeros grandes pierden
+// decimales al convertirse, y el entero resultante se salia del int64 sin
+// avisar de nada.
+func techoSuelo(n Num, haciaArriba bool) Num {
+	if n.esFlt {
+		if haciaArriba {
+			return Flotante(math.Ceil(n.flt))
+		}
+		return Flotante(math.Floor(n.flt))
+	}
+	if n.EsEnteroExacto() {
+		return n
+	}
+	r := n.Rat()
+	// big.Rat guarda el denominador siempre en positivo, asi que Div redondea
+	// hacia abajo por su cuenta y para el otro lado basta sumar uno.
+	entero := new(big.Int).Div(r.Num(), r.Denom())
+	if haciaArriba {
+		entero.Add(entero, big.NewInt(1))
+	}
+	return Racional(new(big.Rat).SetInt(entero))
 }
 
 func redondearNum(n Num, decimales int) Num {

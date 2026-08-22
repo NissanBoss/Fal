@@ -13,6 +13,17 @@ import (
 // cursor y borrar la pantalla. Se averigua una sola vez, al arrancar.
 var soportaSecuencias bool
 
+// version es la etiqueta con la que se publico este ejecutable. La pone el
+// compilador al armar los paquetes:
+//
+//	go build -ldflags "-X main.version=v8"
+//
+// Compilando a mano no la pone nadie y se queda en "sin publicar", que es
+// justo lo que hay que ver para no confundir un binario de casa con uno
+// bajado de Releases. Vive aqui, y no en main.go, porque la necesita
+// tambien el generador del editor y le vendra bien al navegador.
+var version = "sin publicar"
+
 func correrFuente(in *Interprete, fuente string) *ErrorFal {
 	piezas, err := leer(fuente)
 	if err != nil {

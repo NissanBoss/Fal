@@ -33,6 +33,28 @@ var conTilde = map[string]string{
 // pinte dentro de "masa".
 const letraNombre = `[0-9A-Za-z_À-ſ]`
 
+// versionExtension pasa la etiqueta de Fal al formato que exige VS Code, que
+// son siempre tres numeros: "v7.1" queda en "7.1.0".
+//
+// Antes esto estaba escrito a mano como "1.0.0" y no se movia nunca, asi que
+// todas las versiones colgaban un .vsix con el mismo numero. El Marketplace
+// no deja publicar dos veces el mismo, y quien lo instalara a mano tampoco
+// tenia forma de saber si el suyo estaba viejo.
+func versionExtension() string {
+	trozos := strings.Split(strings.TrimPrefix(version, "v"), ".")
+	for _, t := range trozos {
+		if t == "" || strings.TrimLeft(t, "0123456789") != "" {
+			// Compilado a mano no hay etiqueta, y "sin publicar" no es un
+			// numero de version que VS Code acepte.
+			return "0.0.0"
+		}
+	}
+	for len(trozos) < 3 {
+		trozos = append(trozos, "0")
+	}
+	return strings.Join(trozos[:3], ".")
+}
+
 func grupoPalabras(palabras []string) string {
 	var formas []string
 	for _, p := range palabras {
@@ -123,7 +145,7 @@ func generarEditor(destino string) int {
 		"name":        "fal",
 		"displayName": "Fal",
 		"description": "Resaltado de sintaxis para Fal, el lenguaje de programacion en español sin simbolos",
-		"version":     "1.0.0", // lo exige VS Code, no es la version de Fal
+		"version":     versionExtension(),
 		"publisher":   "NissanBoss",
 		"license":     "MIT",
 		"icon":        "icono.png",

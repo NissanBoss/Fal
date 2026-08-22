@@ -97,6 +97,36 @@ func TestLasLineasSinColorSiguenAlTema(t *testing.T) {
 	}
 }
 
+// El manual y el LEEME dicen cuantas pruebas hay. Pasa lo mismo que con las
+// funciones: se queda viejo en cuanto se añade una, y nadie se entera hasta
+// que alguien las cuenta a mano.
+func TestLosDocumentosCuentanBienLasPruebas(t *testing.T) {
+	entradas, err := os.ReadDir("pruebas")
+	if err != nil {
+		t.Skip("no hay carpeta de pruebas")
+	}
+	hay := 0
+	for _, e := range entradas {
+		// Las que empiezan por "_" son modulos de apoyo, no pruebas.
+		if strings.HasSuffix(e.Name(), ".fal") && !strings.HasPrefix(e.Name(), "_") {
+			hay++
+		}
+	}
+	for _, documento := range []string{"MANUAL.md", "LEEME.md"} {
+		datos, err := os.ReadFile(documento)
+		if err != nil {
+			continue
+		}
+		m := regexp.MustCompile(`(\d+) pruebas con su salida`).FindStringSubmatch(string(datos))
+		if m == nil {
+			continue
+		}
+		if m[1] != itoa(hay) {
+			t.Errorf("%s dice %s pruebas y hay %d", documento, m[1], hay)
+		}
+	}
+}
+
 // El manual dice cuantas funciones trae el lenguaje. Es de las cosas que se
 // quedan viejas sin que nadie se entere, asi que mejor que lo diga una
 // prueba y no la buena voluntad.

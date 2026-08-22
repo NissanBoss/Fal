@@ -15,6 +15,21 @@ mkdir -p dist
 # -s -w quita la informacion de depuracion: el archivo pesa bastante menos.
 BANDERAS="-s -w"
 
+# La version se le mete dentro al binario para que "fal --version" pueda
+# decirla. Sale de la etiqueta que se este publicando: se puede pasar a mano
+# (sh construir.sh v8) y el automatismo de publicar manda la suya en
+# GITHUB_REF_NAME. Construyendo en casa no hay ninguna, y entonces el binario
+# dice "sin publicar", que es justo lo que hay que ver para no confundirlo
+# con uno bajado de Releases.
+VERSION="${1:-$GITHUB_REF_NAME}"
+if [ -n "$VERSION" ]; then
+    BANDERAS="$BANDERAS -X main.version=$VERSION"
+    echo "Version: $VERSION"
+else
+    echo "Version: sin publicar (no me han dicho ninguna etiqueta)"
+fi
+echo ""
+
 echo "Comprobando antes de construir..."
 if gofmt -l . | grep -q .; then
     echo "  hay archivos sin formatear. Ejecuta:  gofmt -w ."
@@ -65,8 +80,16 @@ for P in fal-mac-apple fal-mac-intel fal-linux fal-linux-arm; do
 done
 
 # La extension de VS Code, solo si hay vsce a mano.
+#
+# vsce habla mucho cuando le sale bien, asi que se le calla; pero si falla hay
+# que ver por que. Antes se tiraba todo a /dev/null y el automatismo de
+# publicar se quedaba sin extension sin decir ni una palabra.
 if command -v vsce >/dev/null 2>&1; then
-    (cd editor/vscode-fal && vsce package --out ../../dist/fal-vscode.vsix >/dev/null 2>&1)
+    SALIDA_VSCE=$(cd editor/vscode-fal && vsce package --out ../../dist/fal-vscode.vsix 2>&1) || {
+        echo "  no pude empaquetar la extension de VS Code:"
+        echo "$SALIDA_VSCE"
+        exit 1
+    }
     echo "  fal-vscode.vsix"
 fi
 
@@ -76,11 +99,20 @@ cd dist
 for P in fal-windows fal-mac-apple fal-mac-intel fal-linux fal-linux-arm; do
     if [ "$P" = "fal-windows" ]; then
         # Windows abre los .zip con doble clic, sin instalar nada.
-        if command -v powershell >/dev/null 2>&1; then
+        #
+        # Se prueba zip primero, que es lo que hay en Linux y lo que usa el
+        # automatismo de publicar; powershell es el recambio para quien
+        # construya desde Windows, donde zip no viene de serie. Antes el
+        # ultimo recambio era "tar -a", pero el tar de Linux no sabe hacer
+        # zip: habria dejado un archivo roto sin decir nada.
+        if command -v zip >/dev/null 2>&1; then
+            zip -qr "$P.zip" "$P"
+        elif command -v powershell >/dev/null 2>&1; then
             powershell -NoProfile -Command \
                 "Compress-Archive -Path '$P' -DestinationPath '$P.zip' -Force" >/dev/null
         else
-            tar -a -c -f "$P.zip" "$P"
+            echo "  no encuentro ni zip ni powershell para comprimir $P"
+            exit 1
         fi
     else
         tar -czf "$P.tar.gz" "$P"

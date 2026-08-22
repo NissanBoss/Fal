@@ -10,6 +10,9 @@ package main
 // del bucle: ademas de marcar el ritmo, es el momento en que entran las
 // teclas.
 
+// En el navegador la cola de teclas es el teclado, asi que siempre lo hay.
+func hayTecladoDeVerdad() bool { return true }
+
 var teclasPendientes []string
 
 func apuntarTecla(t string) {

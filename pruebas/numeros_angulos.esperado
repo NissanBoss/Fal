@@ -1,0 +1,38 @@
+-- potencia --
+1024
+0.01
+0.03
+1
+1
+-- arriba y abajo --
+12
+13
+-3
+-2
+7
+7
+-- angulos en grados --
+0
+0.5
+1
+0.5
+0.5
+0
+-1
+0
+1
+-1
+-- y donde no es redondo, aproximado --
+0.7071067811865476
+0.8660254037844386
+-- logaritmo --
+3
+0
+3
+4
+-- lo que no existe avisa --
+La tangente de 90 grados no existe.
+El logaritmo solo existe para numeros mayores que cero.
+No se puede elevar cero a un exponente negativo.
+-- azar sin decimales de sobra --
+verdadero

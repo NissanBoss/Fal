@@ -8,7 +8,7 @@ import (
 )
 
 // Palabras del lenguaje: no sirven como nombres de variables.
-// Las 82 funciones integradas NO estan aqui a proposito, para que puedas
+// Las 93 funciones integradas NO estan aqui a proposito, para que puedas
 // tener una variable llamada "numero", "lista" o "suma" sin problema.
 var reservadas = map[string]bool{}
 

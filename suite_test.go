@@ -71,7 +71,7 @@ func correrArchivoEnMemoria(ruta string) string {
 	var buf bytes.Buffer
 	in := nuevoInterprete(filepath.Dir(completa), nil)
 	in.salida = bufio.NewWriter(&buf)
-	in.entrada = bufio.NewReader(strings.NewReader(""))
+	in.conEntrada(strings.NewReader(""))
 
 	if err := correrFuente(in, fuente); err != nil {
 		in.salida.Flush()

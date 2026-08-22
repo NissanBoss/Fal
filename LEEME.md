@@ -71,6 +71,7 @@ dale permiso de ejecución en Mac y Linux (`chmod +x fal`) y ejecútalo donde es
 ```bash
 fal programa.fal      ejecuta un programa
 fal                     abre la consola interactiva
+fal --version           dice que version es esta
 fal --probar [carpeta]  ejecuta el banco de pruebas
 fal --editor [carpeta]  genera el coloreado para VS Code
 fal --ayuda             recuerda todo esto
@@ -124,8 +125,8 @@ añades una función nueva y vuelves a lanzarlo, sale pintada sola.
 | `LEEME.md` | Esto |
 | `MANUAL.md` | El manual completo del lenguaje |
 | `NOVEDADES.md` | Qué cambia en cada versión |
-| `ejemplos/` | 11 programas, de `hola.fal` al Snake |
-| `pruebas/` | 13 pruebas con su salida exacta esperada |
+| `ejemplos/` | 13 programas, de `hola.fal` al Snake |
+| `pruebas/` | 14 pruebas con su salida exacta esperada |
 | `construir.sh` | Vuelve a compilar para todos los sistemas |
 
 Y el código fuente del intérprete, en Go:
@@ -137,7 +138,7 @@ Y el código fuente del intérprete, en Go:
 | `interprete.go` `ejecutar.go` `evaluar.go` `operaciones.go` | Árbol → resultado |
 | `numero.go` | Los números exactos |
 | `valor.go` | Los tipos de dato y los errores |
-| `biblioteca.go` `colecciones.go` `entorno.go` | Las 89 funciones |
+| `biblioteca.go` `colecciones.go` `entorno.go` | Las 93 funciones |
 | `tortuga.go` | La tortuga que dibuja, y el `.svg` que sale |
 | `teclado.go` `teclado_*.go` | Leer una tecla sin esperar, en cada sistema |
 | `main.go` `fuente.go` `web.go` | Consola, arranque y navegador |
@@ -187,7 +188,7 @@ Y ya puedes escribir `escribe dobla de 21`.
 | Banco de pruebas | `probar.py` | dentro del propio ejecutable |
 | Generar el coloreado | `generar.py` | dentro del propio ejecutable |
 
-**El lenguaje no cambió en nada.** Las 13 pruebas dan exactamente la misma
+**El lenguaje no cambió en nada.** Las pruebas dan exactamente la misma
 salida, byte a byte, que daban con el intérprete de Python.
 
 Los números exactos, que eran lo más delicado de portar, siguen igual de bien:

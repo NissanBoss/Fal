@@ -1,0 +1,60 @@
+# Los numeros que tienen que salir exactos, y los angulos.
+
+escribe "-- potencia --"
+escribe potencia con 2 y 10
+escribe potencia con 10 y (menos 2)
+# Lo que importa de que sea exacto: que luego cuadre al operar con ello.
+escribe (potencia con 10 y (menos 2)) por 3
+escribe (potencia con 2 y (menos 1)) mas (potencia con 2 y (menos 1))
+escribe potencia con 5 y 0
+
+escribe "-- arriba y abajo --"
+escribe abajo de 12.11
+escribe arriba de 12.11
+escribe abajo de (menos 2.5)
+escribe arriba de (menos 2.5)
+escribe abajo de 7
+escribe arriba de 7
+
+escribe "-- angulos en grados --"
+escribe seno de 0
+escribe seno de 30
+escribe seno de 90
+escribe seno de 150
+escribe coseno de 60
+escribe coseno de 90
+escribe coseno de 180
+escribe tangente de 0
+escribe tangente de 45
+escribe tangente de 135
+
+escribe "-- y donde no es redondo, aproximado --"
+escribe coseno de 45
+escribe seno de 60
+
+escribe "-- logaritmo --"
+escribe logaritmo de 1000
+escribe logaritmo de 1
+escribe logaritmo con 8 y 2
+escribe logaritmo con 81 y 3
+
+escribe "-- lo que no existe avisa --"
+intenta
+    escribe tangente de 90
+si falla
+    escribe mensaje de error
+fin
+intenta
+    escribe logaritmo de 0
+si falla
+    escribe mensaje de error
+fin
+intenta
+    escribe potencia con 0 y (menos 1)
+si falla
+    escribe mensaje de error
+fin
+
+escribe "-- azar sin decimales de sobra --"
+semilla de 7
+escribe largo de (texto de azar) es menor que 14

@@ -17,7 +17,8 @@ fin
 
 <img src="docs/snake.gif" alt="El juego de la serpiente corriendo en Fal" width="433">
 
-Eso es `ejemplos/snake.fal`, escrito entero en el lenguaje.
+Eso es `ejemplos/snake.fal`, escrito entero en el lenguaje. **Y se puede jugar en
+el navegador**, con las flechas, sin instalar nada.
 
 ### [Pruébalo aquí, sin instalar nada](https://nissanboss.github.io/Fal/)
 
@@ -27,6 +28,10 @@ en pantalla hasta funciones.
 
 Lo que escribe el programa va apareciendo según pasa, así que las cosas se mueven:
 puedes dibujar, animar y jugar con el teclado sin salir de la página.
+
+Lo que escribes **se guarda solo**, así que puedes cerrar y volver. Y el botón de
+**Compartir** te da un enlace con tu programa dentro, para enseñárselo a quien
+quieras: se abre y ya está ahí, sin cuentas ni nada que instalar.
 
 No hay `;` ni `{}` ni `==` ni `+`. Los bloques cierran con `fin`, las cuentas se
 escriben `3 mas 4`, y las comparaciones `si edad es mayor que 18`. Con tildes o
@@ -52,7 +57,7 @@ sacar un informe que cuadra al céntimo.
 
 Todo lo que se espera de un lenguaje de verdad: listas, diccionarios, conjuntos,
 funciones que se pasan como datos, clausuras, objetos con herencia, errores con
-clase, módulos, archivos, JSON, fechas, expresiones regulares e internet. Son 89
+clase, módulos, archivos, JSON, fechas, expresiones regulares e internet. Son 93
 funciones y 42 palabras.
 
 Tres cosas que lo separan de un lenguaje de juguete:
@@ -163,7 +168,7 @@ Vienen en el paquete, en la carpeta `ejemplos`:
 | `completo.fal` | Recorrido por lo básico |
 | `agenda.fal` | Objetos, archivos y un menú |
 | `avanzado.fal` | Clausuras, herencia, JSON, fechas, internet |
-| `snake.fal` | El juego de la serpiente |
+| `snake.fal` | El juego de la serpiente, en tiempo real con `tecla` |
 | `gastos.fal` | Analiza un CSV de gastos y saca un informe |
 | `cifrado.fal` | Cifra un mensaje y luego lo rompe sin saber la clave |
 | `romanos.fal` | Numeros romanos de ida y vuelta, y comprueba los 3999 |

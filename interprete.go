@@ -4,6 +4,7 @@ package main
 
 import (
 	"bufio"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -146,6 +147,20 @@ type Interprete struct {
 	salida    Salida
 	entrada   *bufio.Reader
 	tortuga   *Tortuga
+
+	// teclado dice si "tecla" le pregunta al teclado de verdad. Cuando esta
+	// apagado, las pulsaciones se sacan del mismo texto que lee "pregunta".
+	// Eso es lo que permite escribir una partida de antemano y repetirla
+	// igual, y sin ello un juego no habria forma de probarlo.
+	teclado bool
+}
+
+// conEntrada cambia de donde lee el programa, y de paso apaga el teclado: si
+// el texto se lo estamos dando nosotros, las teclas tienen que salir de ahi
+// tambien y no del teclado de quien haya lanzado esto.
+func (in *Interprete) conEntrada(r io.Reader) {
+	in.entrada = bufio.NewReader(r)
+	in.teclado = false
 }
 
 func nuevoInterprete(carpeta string, args []string) *Interprete {
@@ -159,6 +174,7 @@ func nuevoInterprete(carpeta string, args []string) *Interprete {
 		salida:     bufio.NewWriter(os.Stdout),
 		entrada:    bufio.NewReader(os.Stdin),
 		tortuga:    nuevaTortuga(),
+		teclado:    hayTecladoDeVerdad(),
 	}
 	in.tipoError = &Tipo{Nombre: "Error", Propios: []string{"mensaje", "clase", "linea", "pista"},
 		Metodos: map[string]*Funcion{}, EsError: true}
@@ -179,11 +195,14 @@ func (in *Interprete) rutaDe(r string) string {
 	return filepath.Join(in.carpeta, r)
 }
 
+// escribir manda el texto y su salto de linea de una sola vez. En el
+// navegador cada escritura es un mensaje que cruza del worker a la pagina,
+// asi que mandarlos por separado costaba el doble de mensajes para nada.
 func (in *Interprete) escribir(s string, salto bool) {
-	in.salida.WriteString(s)
 	if salto {
-		in.salida.WriteString("\n")
+		s += "\n"
 	}
+	in.salida.WriteString(s)
 }
 
 func (in *Interprete) preguntar(mensaje string) (string, bool) {
