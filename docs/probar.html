@@ -1,0 +1,1210 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Probar Fal en el navegador</title>
+<meta name="description" content="Fal es un lenguaje de programación en español, sin símbolos raros. Pruébalo aquí mismo, en el navegador.">
+<style>
+:root {
+  --fondo: #14161a;
+  --panel: #1c1f26;
+  --borde: #2a2f3a;
+  --texto: #e6e8ec;
+  --suave: #9aa3b2;
+  --acento: #5ac8fa;
+  --verde: #7ee787;
+  --rojo: #ff7b72;
+  --mono: ui-monospace, "Cascadia Code", "Consolas", "SF Mono", monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --fondo: #f6f7f9; --panel: #fff; --borde: #dfe3e8;
+    --texto: #1a1d23; --suave: #5c6672; --acento: #0969da;
+    --verde: #116329; --rojo: #cf222e;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0; background: var(--fondo); color: var(--texto);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+header { text-align: center; padding: 40px 20px 24px; }
+h1 { margin: 0; font-size: 40px; letter-spacing: -0.5px; }
+h1 span { color: var(--acento); }
+.lema { margin: 8px auto 0; max-width: 620px; color: var(--suave); }
+.enlaces { margin-top: 16px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.enlaces a {
+  color: var(--texto); text-decoration: none; border: 1px solid var(--borde);
+  padding: 7px 14px; border-radius: 8px; font-size: 14px; background: var(--panel);
+}
+.enlaces a:hover { border-color: var(--acento); color: var(--acento); }
+
+main { max-width: 1080px; margin: 0 auto; padding: 0 20px 60px; }
+.barra {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+select, button {
+  font: inherit; font-size: 15px; border-radius: 8px; padding: 9px 14px;
+  border: 1px solid var(--borde); background: var(--panel); color: var(--texto);
+}
+select { flex: 1; min-width: 200px; }
+.avisoCopia { font-size: 14px; color: var(--acento); }
+button.correr {
+  background: var(--acento); border-color: var(--acento); color: #06121c;
+  font-weight: 600; cursor: pointer; min-width: 130px;
+}
+button.correr:hover:not(:disabled) { filter: brightness(1.12); }
+button.correr:disabled { opacity: .55; cursor: default; }
+
+.rejilla { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 820px) { .rejilla { grid-template-columns: 1fr; } }
+
+.caja { display: flex; flex-direction: column; }
+.caja > label {
+  font-size: 12px; text-transform: uppercase; letter-spacing: .8px;
+  color: var(--suave); margin-bottom: 6px;
+}
+textarea, pre.salida {
+  font-family: var(--mono); font-size: 14px; line-height: 1.55;
+  background: var(--panel); border: 1px solid var(--borde);
+  border-radius: 10px; padding: 14px; color: var(--texto);
+  margin: 0; width: 100%;
+}
+textarea { resize: vertical; }
+#programa { height: 340px; }
+#entradas { height: 92px; }
+pre.salida { height: 340px; overflow: auto; white-space: pre-wrap; }
+pre.salida .error { color: var(--rojo); }
+pre.salida .aviso { color: var(--suave); }
+/* El dibujo de la tortuga. Las lineas sin color propio salen en
+   currentColor, asi que siguen al tema de la pagina sin hacer nada. */
+#lienzo {
+  margin-top: 14px; padding: 14px; text-align: center;
+  background: var(--panel); border: 1px solid var(--borde); border-radius: 10px;
+}
+#lienzo svg { max-width: 100%; height: auto; }
+.pista { font-size: 13px; color: var(--suave); margin-top: 6px; }
+
+.pestanas { display: flex; gap: 6px; margin-bottom: 16px; }
+.pestanas button {
+  cursor: pointer; padding: 9px 20px; font-size: 15px;
+  background: transparent; border: 1px solid transparent; color: var(--suave);
+}
+.pestanas button.activa {
+  background: var(--panel); border-color: var(--borde); color: var(--texto);
+  font-weight: 600;
+}
+.pestanas button:hover:not(.activa) { color: var(--texto); }
+
+.leccion {
+  background: var(--panel); border: 1px solid var(--borde);
+  border-radius: 10px; padding: 18px 20px; margin-bottom: 14px;
+}
+.leccion .cabecera {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.leccion h2 { margin: 0; font-size: 19px; }
+.leccion .cuenta { font-size: 13px; color: var(--suave); }
+.leccion p { margin: 0 0 10px; }
+.leccion pre {
+  font-family: var(--mono); font-size: 13.5px; background: var(--fondo);
+  border: 1px solid var(--borde); border-radius: 8px; padding: 10px 12px;
+  margin: 0 0 10px; overflow-x: auto;
+}
+.tarea {
+  border-left: 3px solid var(--acento); padding: 2px 0 2px 12px;
+  margin: 12px 0 0;
+}
+.tarea strong { color: var(--acento); }
+
+.puntos { display: flex; gap: 5px; margin-left: auto; }
+.puntos span {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--borde); display: block;
+}
+.puntos span.hecha { background: var(--verde); }
+.puntos span.actual { box-shadow: 0 0 0 2px var(--acento); }
+
+.bien { color: var(--verde); font-weight: 600; }
+.casi { color: var(--suave); }
+
+footer {
+  text-align: center; color: var(--suave); font-size: 14px;
+  padding: 30px 20px 50px; border-top: 1px solid var(--borde);
+}
+footer a { color: var(--acento); }
+code { font-family: var(--mono); font-size: .92em; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Fal<span>.</span></h1>
+  <p class="lema">
+    Un lenguaje de programación <strong>en español</strong>, sin símbolos raros.
+    Sin <code>;</code>, sin <code>{}</code>, sin <code>==</code>.
+    Pruébalo aquí mismo. No hay que instalar nada.
+  </p>
+  <div class="enlaces">
+    <a href="/">Qué es Fal</a>
+    <a href="https://aprende.fal-lang.org">Curso</a>
+    <a href="https://github.com/NissanBoss/Fal/releases">Descargar</a>
+    <a href="https://github.com/NissanBoss/Fal/blob/main/MANUAL.md">Manual</a>
+    <a href="https://github.com/NissanBoss/Fal">Código en GitHub</a>
+  </div>
+</header>
+
+<main>
+  <div class="pestanas">
+    <button id="pestanaProbar" class="activa">Probar</button>
+    <button id="pestanaAprender">Aprender</button>
+  </div>
+
+  <div class="leccion" id="panelLeccion" hidden>
+    <div class="cabecera">
+      <h2 id="lecTitulo"></h2>
+      <span class="cuenta" id="lecCuenta"></span>
+      <div class="puntos" id="lecPuntos"></div>
+    </div>
+    <div id="lecCuerpo"></div>
+    <p class="tarea"><strong>Tu turno:</strong> <span id="lecTarea"></span></p>
+  </div>
+
+  <div class="barra" id="barraProbar">
+    <select id="ejemplos" aria-label="Elegir un ejemplo"></select>
+    <button class="correr" id="correr" disabled>Cargando…</button>
+    <button id="parar" hidden>Parar</button>
+    <button id="compartir">Compartir</button>
+    <span class="avisoCopia" id="avisoCopia" hidden></span>
+  </div>
+
+  <div class="barra" id="barraAprender" hidden>
+    <button id="lecAnterior">Anterior</button>
+    <button id="lecSiguiente">Siguiente</button>
+    <button class="correr" id="comprobar" disabled>Comprobar</button>
+    <button id="llevarme" title="Para seguir el curso en otro ordenador o en el móvil">Llevarme el progreso</button>
+    <span class="avisoCopia" id="avisoProgreso" hidden></span>
+  </div>
+
+  <div class="rejilla">
+    <div class="caja">
+      <label for="programa">Tu programa</label>
+      <textarea id="programa" spellcheck="false" autocomplete="off"></textarea>
+      <div class="caja" id="cajaRespuestas">
+        <label for="entradas" style="margin-top:14px">
+          Respuestas para <code>pregunta</code>, una por línea
+        </label>
+        <textarea id="entradas" spellcheck="false" autocomplete="off"></textarea>
+        <p class="pista">
+          Para <code>pregunta</code>, que espera a una línea entera. Las teclas
+          sueltas de <code>tecla</code> se pulsan mientras el programa corre.
+        </p>
+      </div>
+    </div>
+
+    <div class="caja">
+      <label for="salida">Resultado</label>
+      <pre class="salida" id="salida"><span class="aviso">Pulsa «Ejecutar» para empezar.</span></pre>
+      <div id="lienzo" hidden></div>
+      <p class="pista">Atajo: <strong>Ctrl + Enter</strong></p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Fal es libre, con licencia MIT · hecho por
+  <a href="https://github.com/NissanBoss">NissanBoss</a>
+</footer>
+
+<script>
+const EJEMPLOS = [
+  {
+    nombre: "Hola mundo",
+    codigo: `escribe "Hola mundo"
+
+nombre es "Ana"
+edad es 25
+escribe "Me llamo " mas nombre mas " y tengo " mas edad mas " anios"
+
+si edad es mayor que 18
+    escribe "Soy mayor de edad"
+si no
+    escribe "Soy menor de edad"
+fin
+
+repite 3 veces
+    escribe "Que facil es esto"
+fin`,
+    entradas: ""
+  },
+  {
+    nombre: "Dibujar con la tortuga",
+    codigo: `# La tortuga es un lápiz que se arrastra por la
+# pantalla. "camina" la mueve hacia donde mira y
+# "gira" la tuerce a la derecha.
+
+color de "azul"
+repite 4 veces
+    camina de 80
+    gira de 90
+fin
+
+gira de 90
+levanta
+camina de 170
+apoya
+
+# El mismo bucle de siempre, pero dibujando.
+color de "rojo"
+repite 36 veces
+    camina de 100
+    gira de 170
+fin`,
+    entradas: ""
+  },
+  {
+    nombre: "Un juego: muévete con las flechas",
+    codigo: `# "tecla" dice qué tecla acabas de pulsar, o texto
+# vacío si ninguna. No espera a nadie: por eso esto
+# es un juego y no un cuestionario.
+#
+# Pulsa las flechas. Escape para salir.
+
+ANCHO es 20
+ALTO es 10
+fila es 5
+columna es 10
+jugando es verdadero
+
+funcion pinta con f y c
+    limpia
+    escribe "Flechas para moverte. Escape para salir."
+    borde es "+" mas (repetido con "-" y ANCHO) mas "+"
+    escribe borde
+    para cada y desde 1 hasta ALTO
+        linea es "|"
+        para cada x desde 1 hasta ANCHO
+            si y es f y x es c
+                linea es linea mas "O"
+            si no
+                linea es linea mas " "
+            fin
+        fin
+        escribe linea mas "|"
+    fin
+    escribe borde
+fin
+
+pinta con fila y columna
+
+mientras jugando
+    t es tecla
+    si t es "escape"
+        jugando es falso
+    si no si t es "arriba" o t es "w"
+        si fila es mayor que 1
+            fila es fila menos 1
+        fin
+        pinta con fila y columna
+    si no si t es "abajo" o t es "s"
+        si fila es menor que ALTO
+            fila es fila mas 1
+        fin
+        pinta con fila y columna
+    si no si t es "izquierda" o t es "a"
+        si columna es mayor que 1
+            columna es columna menos 1
+        fin
+        pinta con fila y columna
+    si no si t es "derecha" o t es "d"
+        si columna es menor que ANCHO
+            columna es columna mas 1
+        fin
+        pinta con fila y columna
+    fin
+    espera de 0.03
+fin
+
+escribe "Hasta luego."`,
+    entradas: ""
+  },
+  {
+    // El unico que no lleva el codigo aqui dentro. Es el mismo archivo que
+    // viene en la descarga, y copiarlo seria tener dos serpientes que se van
+    // separando sin que nadie se entere. Se baja al elegirlo.
+    nombre: "Un juego: la serpiente",
+    archivo: "ejemplos/snake.fal",
+    entradas: ""
+  },
+  {
+    nombre: "Los decimales salen exactos",
+    codigo: `# Esta cuenta la fallan Python, JavaScript y Java.
+# Fal la hace bien.
+
+escribe 0.1 mas 0.2
+escribe (0.1 mas 0.2) es 0.3
+
+escribe ""
+escribe "Tres cafes a 1.10:"
+escribe 1.10 por 3
+
+escribe ""
+escribe "Una cuenta que no acaba nunca:"
+escribe 1 entre 3`,
+    entradas: ""
+  },
+  {
+    nombre: "Listas y bucles",
+    codigo: `notas es lista con 7 y 4 y 9 y 6 y 10
+
+escribe "Notas:      " mas notas
+escribe "Ordenadas:  " mas ordena de notas
+escribe "Media:      " mas promedio de notas
+escribe "La mejor:   " mas maximo de notas
+
+aprobadas es lista vacia
+para cada n en notas
+    si n es mayor o igual que 5
+        agrega n a aprobadas
+    fin
+fin
+escribe "Aprobadas:  " mas aprobadas
+
+escribe ""
+escribe "Tabla del 7:"
+para cada n desde 1 hasta 10
+    escribe "  7 por " mas n mas " es " mas 7 por n
+fin`,
+    entradas: ""
+  },
+  {
+    nombre: "Objetos y herencia",
+    codigo: `tipo Animal con nombre
+    funcion habla
+        devuelve nombre de mi mas " hace algo"
+    fin
+fin
+
+tipo Perro hereda de Animal
+    funcion habla
+        devuelve nombre de mi mas " dice guau"
+    fin
+fin
+
+tipo Gato hereda de Animal
+    funcion habla
+        devuelve nombre de mi mas " dice miau"
+    fin
+fin
+
+animales es lista con (nuevo Perro con "Toby") y (nuevo Gato con "Lola") y (nuevo Animal con "Bicho")
+
+para cada a en animales
+    escribe habla de a
+fin`,
+    entradas: ""
+  },
+  {
+    nombre: "Un juego: adivina el numero",
+    codigo: `semilla de 7
+secreto es azar entre 1 y 100
+intentos es 0
+acertado es falso
+
+escribe "Estoy pensando un numero del 1 al 100."
+
+mientras no acertado
+    respuesta es pregunta "Tu numero:"
+    intento es numero de respuesta
+    intentos es intentos mas 1
+
+    si intento es mayor que secreto
+        escribe "  Demasiado alto."
+    si no si intento es menor que secreto
+        escribe "  Demasiado bajo."
+    si no
+        escribe "  Acertaste en " mas intentos mas " intentos."
+        acertado es verdadero
+    fin
+fin`,
+    entradas: "50\n75\n88\n82\n85\n87"
+  },
+  {
+    nombre: "Los errores te enseñan",
+    codigo: `# Fal no te suelta un error en inglés: te dice
+# dónde, por dónde pasó, y cómo se arregla.
+
+nombre es "Ana"
+escribe nombree`,
+    entradas: ""
+  },
+  {
+    nombre: "Funciones que reciben funciones",
+    codigo: `numeros es rango de 10
+
+funcion cuadrado con n
+    devuelve n por n
+fin
+
+funcion es_par con n
+    devuelve n resto 2 es 0
+fin
+
+escribe "Numeros:   " mas numeros
+escribe "Cuadrados: " mas (mapa con numeros y funcion cuadrado)
+escribe "Pares:     " mas (filtra con numeros y funcion es_par)
+escribe "Suma:      " mas suma de numeros
+
+# Una funcion que recuerda donde nacio
+funcion contador_desde con inicio
+    cuenta es inicio
+    devuelve funcion
+        comparte cuenta
+        cuenta es cuenta mas 1
+        devuelve cuenta
+    fin
+fin
+
+siguiente es contador_desde con 100
+escribe ""
+escribe siguiente
+escribe siguiente
+escribe siguiente`,
+    entradas: ""
+  }
+];
+
+const LECCIONES = [
+  {
+    titulo: "Escribir en pantalla",
+    cuerpo: `<p>Para que un programa diga algo se usa <code>escribe</code>, y el texto
+      va entre comillas.</p>
+      <pre>escribe "Buenos días"</pre>`,
+    tarea: 'Haz que el programa escriba exactamente <code>Hola mundo</code>.',
+    inicial: "",
+    espera: "Hola mundo"
+  },
+  {
+    titulo: "Guardar un valor",
+    cuerpo: `<p>Una variable es una caja con nombre. Se llena con <code>es</code>.</p>
+      <pre>ciudad es "Madrid"
+escribe ciudad</pre>
+      <p>Fíjate que al escribir la variable no lleva comillas: si las pusieras,
+      escribiría la palabra <code>ciudad</code> en vez de lo que hay dentro.</p>`,
+    tarea: 'Guarda <code>"Sevilla"</code> en una variable llamada <code>ciudad</code> y escríbela.',
+    inicial: "",
+    espera: "Sevilla"
+  },
+  {
+    titulo: "Juntar textos",
+    cuerpo: `<p>La palabra <code>mas</code> une cosas. Sirve para sumar números y
+      también para pegar textos.</p>
+      <pre>ciudad es "Madrid"
+escribe "Vivo en " mas ciudad     # Vivo en Madrid</pre>
+      <p>Ojo al espacio dentro de las comillas: sin él saldría <code>Vivo enMadrid</code>.</p>`,
+    tarea: 'Guarda <code>"Bilbao"</code> en una variable <code>ciudad</code> y escribe <code>Vivo en Bilbao</code>.',
+    inicial: "",
+    espera: "Vivo en Bilbao"
+  },
+  {
+    titulo: "Hacer cuentas",
+    cuerpo: `<p>Las cuentas se escriben con palabras, como en clase de mates:</p>
+      <pre>escribe 3 mas 4      # 7
+escribe 10 menos 4   # 6
+escribe 3 por 4      # 12
+escribe 10 entre 2   # 5</pre>
+      <p>Eso de <code>#</code> es un comentario: el programa lo ignora por completo.
+      Aquí lo uso para enseñarte lo que sale por pantalla, pero no hace falta que
+      lo escribas.</p>`,
+    tarea: 'Escribe el resultado de multiplicar 7 por 6.',
+    inicial: "",
+    espera: "42",
+    debeUsar: ["por"]
+  },
+  {
+    titulo: "Decidir",
+    cuerpo: `<p>Con <code>si</code> el programa elige. El bloque se cierra con
+      <code>fin</code>.</p>
+      <pre>nota es 3
+si nota es mayor o igual que 5
+    escribe "Aprobado"
+si no
+    escribe "Suspenso"
+fin</pre>
+      <p>Con esa nota saldría <code>Suspenso</code>.</p>`,
+    tarea: 'Guarda un <code>8</code> en una variable <code>nota</code>. Escribe <code>Aprobado</code> si llega a 5, y <code>Suspenso</code> si no.',
+    inicial: "",
+    espera: "Aprobado",
+    debeUsar: ["si"]
+  },
+  {
+    titulo: "Repetir",
+    cuerpo: `<p>Para hacer algo varias veces está <code>repite</code>.</p>
+      <pre>repite 5 veces
+    escribe "Allá voy"
+fin</pre>
+      <p>Eso escribe <code>Allá voy</code> cinco veces seguidas.</p>`,
+    tarea: 'Escribe <code>Hola</code> tres veces, usando <code>repite</code>.',
+    inicial: "",
+    espera: "Hola\nHola\nHola",
+    debeUsar: ["repite"]
+  },
+  {
+    titulo: "Contar",
+    cuerpo: `<p>Cuando necesitas saber por qué número vas, se usa
+      <code>para cada</code>:</p>
+      <pre>para cada n desde 1 hasta 3
+    escribe n
+fin</pre>
+      <p>La variable <code>n</code> va valiendo 1, luego 2, luego 3, y se escribe
+      cada uno.</p>`,
+    tarea: 'Escribe los números del 1 al 5, uno por línea.',
+    inicial: "",
+    espera: "1\n2\n3\n4\n5",
+    debeUsar: ["para"]
+  },
+  {
+    titulo: "Listas",
+    cuerpo: `<p>Una lista guarda varias cosas de golpe.</p>
+      <pre>colores es lista con "rojo" y "verde"
+escribe largo de colores        # 2
+escribe elemento 1 de colores   # rojo</pre>
+      <p>Se cuenta desde el 1, como en la vida real.</p>`,
+    tarea: 'Haz una lista <code>colores</code> con rojo, verde y azul. Escribe cuántos hay y luego el segundo.',
+    inicial: "",
+    espera: "3\nverde"
+  },
+  {
+    titulo: "Funciones",
+    cuerpo: `<p>Una función es un trozo de programa con nombre, para no repetirlo.</p>
+      <pre>funcion saluda con nombre
+    devuelve "Hola " mas nombre
+fin
+
+escribe saluda con "Ana"     # Hola Ana</pre>
+      <p><code>devuelve</code> es lo que la función entrega cuando termina.</p>`,
+    tarea: 'Haz otra función llamada <code>despide</code> que devuelva <code>Adiós </code> y el nombre, y escribe la despedida de Ana.',
+    inicial: "",
+    espera: "Adiós Ana",
+    debeUsar: ["funcion", "devuelve"]
+  },
+  {
+    titulo: "Reto final",
+    cuerpo: `<p>Ya tienes todas las piezas. Este junta un contador con una variable
+      que va creciendo.</p>
+      <pre>total es 0
+para cada n desde 1 hasta 3
+    total es total mas n
+fin
+escribe total          # 6</pre>
+      <p>Ha sumado 1, luego 2, luego 3.</p>`,
+    tarea: 'Haz lo mismo pero sumando del 1 al 10, y escribe el resultado.',
+    inicial: "",
+    espera: "55",
+    debeUsar: ["para"]
+  }
+];
+
+const $programa = document.getElementById("programa");
+const $entradas = document.getElementById("entradas");
+const $salida   = document.getElementById("salida");
+const $correr   = document.getElementById("correr");
+const $ejemplos = document.getElementById("ejemplos");
+const $parar    = document.getElementById("parar");
+const $lienzo   = document.getElementById("lienzo");
+
+EJEMPLOS.forEach((e, i) => {
+  const o = document.createElement("option");
+  o.value = i;
+  o.textContent = e.nombre;
+  $ejemplos.appendChild(o);
+});
+
+function ponerPrograma(codigo, entradas) {
+  $programa.value = codigo;
+  $entradas.value = entradas || "";
+  $salida.innerHTML = '<span class="aviso">Pulsa «Ejecutar» para empezar.</span>';
+  guardarPrograma();
+}
+
+async function cargar(i) {
+  const e = EJEMPLOS[i];
+  if (!e.archivo) {
+    ponerPrograma(e.codigo, e.entradas);
+    return;
+  }
+  // Los que viven en un archivo aparte se bajan la primera vez y se quedan
+  // en memoria, para no volver a pedirlos al cambiar de ejemplo y volver.
+  if (e.codigo === undefined) {
+    ponerPrograma("# Bajando " + e.archivo + "…", "");
+    try {
+      const r = await fetch(e.archivo);
+      if (!r.ok) throw new Error("el servidor contesto " + r.status);
+      e.codigo = await r.text();
+    } catch (err) {
+      ponerPrograma("# No pude bajar " + e.archivo + ": " + err.message + "\n" +
+        "# Lo tienes en la descarga, dentro de la carpeta ejemplos.", "");
+      return;
+    }
+  }
+  ponerPrograma(e.codigo, e.entradas);
+}
+$ejemplos.addEventListener("change", () => cargar(+$ejemplos.value));
+
+// Guardar lo que escribes
+//
+// Se guarda segun se escribe. Antes bastaba con recargar sin querer, darle
+// a atras, o que se cerrara la pestaña, para perderlo todo: en un sitio
+// donde la gente viene justo a probar cosas, eso es lo peor que puede pasar.
+const LLAVE_PROGRAMA = "fal_programa";
+
+function guardarPrograma() {
+  // En las lecciones el cuadro es del ejercicio, no del programa de nadie.
+  if (modoAprender) return;
+  try {
+    localStorage.setItem(LLAVE_PROGRAMA, JSON.stringify({
+      programa: $programa.value,
+      entradas: $entradas.value
+    }));
+  } catch (e) {
+    // Sin sitio, o en una ventana privada. Se sigue pudiendo programar.
+  }
+}
+
+function recuperarPrograma() {
+  try {
+    const guardado = JSON.parse(localStorage.getItem(LLAVE_PROGRAMA) || "null");
+    if (!guardado || !guardado.programa || !guardado.programa.trim()) return false;
+    $programa.value = guardado.programa;
+    $entradas.value = guardado.entradas || "";
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+$programa.addEventListener("input", guardarPrograma);
+$entradas.addEventListener("input", guardarPrograma);
+// En el curso el cuadro es del ejercicio, y se guarda aparte, por leccion.
+$programa.addEventListener("input", () => guardarBorrador());
+
+// Compartir con un enlace
+//
+// El programa entero viaja dentro de la direccion, detras de la almohadilla.
+// Nadie tiene que guardar nada en ningun servidor, y por eso esto funciona
+// en GitHub Pages tal cual, sin mover una linea de infraestructura.
+function aTextoDeEnlace(texto) {
+  const bytes = new TextEncoder().encode(texto);
+  let binario = "";
+  for (const b of bytes) binario += String.fromCharCode(b);
+  // base64 de la variante que no lleva ni + ni /, que en una direccion dan
+  // problemas. El relleno con = tampoco hace falta.
+  return btoa(binario).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function deTextoDeEnlace(texto) {
+  let b64 = texto.replace(/-/g, "+").replace(/_/g, "/");
+  while (b64.length % 4) b64 += "=";
+  const binario = atob(b64);
+  return new TextDecoder().decode(Uint8Array.from(binario, c => c.charCodeAt(0)));
+}
+
+function cargarDelEnlace() {
+  const trozo = location.hash.replace(/^#/, "");
+  if (!trozo.startsWith("p=")) return false;
+  try {
+    const partes = new URLSearchParams(trozo);
+    ponerPrograma(
+      deTextoDeEnlace(partes.get("p")),
+      partes.get("e") ? deTextoDeEnlace(partes.get("e")) : "");
+    return true;
+  } catch (e) {
+    return false; // enlace cortado o estropeado al pegarlo
+  }
+}
+
+const $compartir = document.getElementById("compartir");
+const $avisoCopia = document.getElementById("avisoCopia");
+let relojAviso = null;
+
+function avisarCopia(texto) {
+  $avisoCopia.textContent = texto;
+  $avisoCopia.hidden = false;
+  clearTimeout(relojAviso);
+  relojAviso = setTimeout(() => { $avisoCopia.hidden = true; }, 5000);
+}
+
+$compartir.addEventListener("click", async () => {
+  if (!$programa.value.trim()) {
+    avisarCopia("Escribe algo primero.");
+    return;
+  }
+  let enlace = location.origin + location.pathname + "#p=" + aTextoDeEnlace($programa.value);
+  if ($entradas.value.trim()) enlace += "&e=" + aTextoDeEnlace($entradas.value);
+  history.replaceState(null, "", enlace);
+  try {
+    await navigator.clipboard.writeText(enlace);
+    avisarCopia("Enlace copiado. Pegalo donde quieras.");
+  } catch (e) {
+    // Sin permiso para el portapapeles queda en la barra de direcciones,
+    // que es de donde se copia a mano de toda la vida.
+    avisarCopia("Enlace listo arriba, en la barra de direcciones.");
+  }
+});
+
+function escapar(t) {
+  return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// El interprete vive en un worker. Aqui solo se le manda el programa y se
+// va pintando lo que conteste, que puede llegar en muchos trozos.
+
+let trabajador = null;
+let corriendo = false;
+let alTerminar = null;
+let acumulada = "";
+
+function crearTrabajador() {
+  trabajador = new Worker("trabajador.js");
+  trabajador.onmessage = ev => {
+    const m = ev.data || {};
+    if (m.tipo === "listo") {
+      $correr.disabled = false;
+      $correr.textContent = "Ejecutar";
+      $comprobar.disabled = false;
+    } else if (m.tipo === "salida") {
+      pintarTrozo(m.texto);
+    } else if (m.tipo === "fin") {
+      // Se vuelca ya, sin esperar al fotograma: justo debajo se lee
+      // "acumulada" para corregir la leccion, y tiene que estar entera.
+      volcarPendiente();
+      const avisar = alTerminar;
+      pararInterfaz();
+      if (m.dibujo) {
+        $lienzo.innerHTML = m.dibujo;
+        $lienzo.hidden = false;
+      }
+      if (avisar) avisar({ salida: acumulada, error: m.error || "" });
+      // Un programa que solo dibuja no escribe nada, y dejar el panel de
+      // texto vacio ocupando media pantalla encima del dibujo solo estorba.
+      // Se mira al final, cuando ya esta puesto todo, incluido el error.
+      $salida.hidden = !$lienzo.hidden && !$salida.textContent.trim();
+    }
+  };
+  trabajador.onerror = e => {
+    olvidarPendiente();
+    $salida.innerHTML = '<span class="error">No pude cargar el lenguaje: ' +
+      escapar(e.message || String(e)) + "</span>";
+    pararInterfaz();
+  };
+}
+
+// pintarTrozo añade texto segun llega, en vez de rehacer el panel entero.
+// Si el programa borro la pantalla, aqui se borra de verdad: eso es lo que
+// permite repintar un tablero en el sitio.
+// pintarTrozo no pinta: apunta. Lo que va llegando se junta y se vuelca de
+// una vez, como mucho una por fotograma del navegador.
+//
+// Antes cada trozo tocaba el DOM por su cuenta, y un tablero del Snake son
+// 31 trozos: el panel se borraba, se quedaba en blanco a la vista, y se
+// rellenaba linea a linea durante unos 9 ms mientras el navegador iba
+// pintando los pasos intermedios. Eso es exactamente lo que se veia como
+// parpadeo. Asi el fotograma entero entra de golpe y no hay estado a medias
+// que se pueda llegar a ver.
+let pendiente = "";
+let volcadoPedido = false;
+let relojVolcado = null;
+
+function pintarTrozo(texto) {
+  pendiente += texto;
+  if (volcadoPedido) return;
+  volcadoPedido = true;
+  // requestAnimationFrame es lo que alinea el volcado con el repintado del
+  // navegador, y por eso quita el parpadeo. Pero no se dispara con la
+  // pestaña de fondo ni en visores que no componen fotogramas, y ahi la
+  // salida se quedaria congelada hasta el final. El temporizador es el
+  // seguro: gana el que llegue antes y el otro se encuentra el trabajo
+  // hecho.
+  requestAnimationFrame(volcarPendiente);
+  relojVolcado = setTimeout(volcarPendiente, 50);
+}
+
+function volcarPendiente() {
+  if (!volcadoPedido) return; // se adelanto el otro aviso
+  volcadoPedido = false;
+  clearTimeout(relojVolcado);
+  if (!pendiente) return;
+  let texto = pendiente;
+  pendiente = "";
+
+  // Si en lo que llego hubo un borrado de pantalla, solo cuenta lo de
+  // despues del ultimo: los fotogramas anteriores ya no se van a ver.
+  const borrado = texto.lastIndexOf("\x1b[2J");
+  const limpiar = borrado >= 0;
+  if (limpiar) {
+    texto = texto.slice(borrado);
+    acumulada = "";
+  }
+  texto = texto.replace(/\x1b\[[0-9;]*[A-Za-z]/g, "");
+  acumulada += texto;
+
+  if (limpiar) {
+    // Un unico cambio: el panel no llega a verse vacio en ningun momento.
+    $salida.textContent = texto;
+  } else if (texto) {
+    $salida.appendChild(document.createTextNode(texto));
+  } else {
+    return;
+  }
+  $salida.scrollTop = $salida.scrollHeight;
+}
+
+// olvidarPendiente se usa cuando alguien va a escribir en el panel por su
+// cuenta. Sin esto, un volcado ya pedido caeria encima despues y le pisaria
+// el mensaje.
+function olvidarPendiente() {
+  pendiente = "";
+}
+
+function pararInterfaz() {
+  corriendo = false;
+  alTerminar = null;
+  $correr.disabled = false;
+  $correr.textContent = "Ejecutar";
+  $comprobar.disabled = false;
+  $parar.hidden = true;
+}
+
+function correrPrograma(programa, respuestas, avisar) {
+  if (corriendo || $correr.disabled) return;
+  corriendo = true;
+  alTerminar = avisar;
+  acumulada = "";
+  olvidarPendiente(); // lo que quedara de la vez anterior ya no vale
+  $salida.textContent = "";
+  $salida.hidden = false; // pudo quedar oculto si lo anterior solo dibujaba
+  $lienzo.hidden = true;
+  $lienzo.innerHTML = "";
+  $correr.disabled = true;
+  $correr.textContent = "Ejecutando…";
+  $comprobar.disabled = true;
+  $parar.hidden = false;
+  // Para que las teclas del juego no acaben escritas en el programa.
+  $programa.blur();
+  trabajador.postMessage({ tipo: "correr", programa, respuestas });
+}
+
+// Cortar por las bravas es la unica forma de parar un bucle sin fin. El
+// worker se tira y se levanta otro, que tarda lo que tarde en cargar.
+function parar() {
+  if (!corriendo) return;
+  trabajador.terminate();
+  pintarTrozo("\n(parado)\n");
+  pararInterfaz();
+  $correr.disabled = true;
+  $correr.textContent = "Cargando…";
+  $comprobar.disabled = true;
+  crearTrabajador();
+}
+
+function ejecutar() {
+  correrPrograma($programa.value, $entradas.value, r => {
+    if (r.error) {
+      const s = document.createElement("span");
+      s.className = "error";
+      s.textContent = r.error;
+      $salida.appendChild(s);
+    } else if (!acumulada.trim() && $lienzo.hidden) {
+      $salida.innerHTML = '<span class="aviso">(el programa no escribio nada)</span>';
+    }
+  });
+}
+
+$correr.addEventListener("click", ejecutar);
+
+// Como se llama cada tecla dentro de Fal. Las que no son una letra llevan
+// nombre en castellano, para poder escribir  si t es "arriba".
+const NOMBRES_TECLA = {
+  ArrowUp: "arriba", ArrowDown: "abajo",
+  ArrowLeft: "izquierda", ArrowRight: "derecha",
+  Escape: "escape", Enter: "intro", " ": "espacio"
+};
+
+function nombreDeTecla(e) {
+  if (NOMBRES_TECLA[e.key]) return NOMBRES_TECLA[e.key];
+  return e.key.length === 1 ? e.key.toLowerCase() : "";
+}
+
+document.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+    e.preventDefault();
+    modoAprender ? comprobarLeccion() : ejecutar();
+    return;
+  }
+  if (!corriendo || e.ctrlKey || e.metaKey || e.altKey) return;
+  const t = nombreDeTecla(e);
+  if (!t) return;
+  // Sin esto, las flechas y el espacio mueven la pagina mientras juegas.
+  if (e.key.startsWith("Arrow") || e.key === " ") e.preventDefault();
+  trabajador.postMessage({ tipo: "tecla", tecla: t });
+});
+
+// Modo lecciones. Es opcional: quien entra solo a trastear ni se entera.
+const $pestanaProbar = document.getElementById("pestanaProbar");
+const $pestanaAprender = document.getElementById("pestanaAprender");
+const $panelLeccion = document.getElementById("panelLeccion");
+const $barraProbar = document.getElementById("barraProbar");
+const $barraAprender = document.getElementById("barraAprender");
+const $comprobar = document.getElementById("comprobar");
+const $cajaRespuestas = document.getElementById("cajaRespuestas");
+
+let modoAprender = false;
+let actual = 0;
+let hechas = new Set();
+// Lo que el alumno lleve escrito en cada ejercicio, guardado por numero de
+// leccion. Antes solo se recordaba que lecciones estaban hechas, asi que
+// quien cerraba la pestaña a medias volvia a encontrarse el cuadro vacio y
+// tenia que reescribir lo que ya llevaba. Eso es lo que hace que la gente
+// no vuelva al dia siguiente.
+let borradores = {};
+
+const LLAVE_LECCIONES = "fal_lecciones";
+const LLAVE_CURSO = "fal_curso";
+
+try {
+  hechas = new Set(JSON.parse(localStorage.getItem(LLAVE_LECCIONES) || "[]"));
+  const curso = JSON.parse(localStorage.getItem(LLAVE_CURSO) || "null");
+  if (curso) {
+    borradores = curso.borradores || {};
+    if (Number.isInteger(curso.actual)) actual = curso.actual;
+  }
+} catch (e) {}
+
+function guardarProgreso() {
+  try {
+    localStorage.setItem(LLAVE_LECCIONES, JSON.stringify([...hechas]));
+    localStorage.setItem(LLAVE_CURSO, JSON.stringify({
+      actual: actual,
+      borradores: borradores
+    }));
+  } catch (e) {
+    // Sin sitio, o en una ventana privada. Se sigue pudiendo estudiar, solo
+    // que sin memoria, y el aviso de abajo lo dice en vez de callarselo.
+    avisarSinMemoria();
+  }
+}
+
+// Guardar el ejercicio segun se escribe, igual que ya se hacia con el
+// programa del modo libre.
+function guardarBorrador() {
+  if (!modoAprender) return;
+  borradores[actual] = $programa.value;
+  guardarProgreso();
+}
+
+let yaAvisado = false;
+function avisarSinMemoria() {
+  if (yaAvisado) return;
+  yaAvisado = true;
+  const aviso = document.getElementById("avisoProgreso");
+  if (!aviso) return;
+  aviso.textContent = "Este navegador no deja guardar nada, asi que el progreso no se recordara.";
+  aviso.hidden = false;
+}
+
+// Llevarse el curso a otro sitio, sin cuenta y sin servidor.
+//
+// El progreso cabe en un texto corto, asi que viaja en el propio texto en
+// lugar de en una base de datos de alguien. Quien quiera seguir en el movil
+// se copia esto y lo pega alli. No hay nada que registrar, no hay contraseña
+// que perder y no hay ningun correo guardado en ninguna parte.
+const MARCA_PROGRESO = "FAL1-";
+
+function progresoATexto() {
+  const datos = { h: [...hechas].sort((a, b) => a - b), a: actual };
+  return MARCA_PROGRESO + aTextoDeEnlace(JSON.stringify(datos));
+}
+
+function textoAProgreso(texto) {
+  texto = (texto || "").trim();
+  if (!texto.startsWith(MARCA_PROGRESO)) return false;
+  try {
+    const datos = JSON.parse(deTextoDeEnlace(texto.slice(MARCA_PROGRESO.length)));
+    if (!datos || !Array.isArray(datos.h)) return false;
+    // Se suma a lo que ya hubiera en este navegador en vez de sustituirlo.
+    // Pegar el codigo del movil no puede borrar lo que llevas en el
+    // ordenador: eso seria perder trabajo por usar una funcion pensada para
+    // no perderlo.
+    datos.h.forEach((i) => {
+      if (Number.isInteger(i) && i >= 0 && i < LECCIONES.length) hechas.add(i);
+    });
+    if (Number.isInteger(datos.a) && datos.a >= 0 && datos.a < LECCIONES.length) {
+      actual = datos.a;
+    }
+    guardarProgreso();
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function pintarLeccion() {
+  const l = LECCIONES[actual];
+  document.getElementById("lecTitulo").textContent = l.titulo;
+  document.getElementById("lecCuenta").textContent =
+    "Lección " + (actual + 1) + " de " + LECCIONES.length;
+  document.getElementById("lecCuerpo").innerHTML = l.cuerpo;
+  document.getElementById("lecTarea").innerHTML = l.tarea;
+
+  const puntos = document.getElementById("lecPuntos");
+  puntos.innerHTML = "";
+  LECCIONES.forEach((_, i) => {
+    const p = document.createElement("span");
+    if (hechas.has(i)) p.classList.add("hecha");
+    if (i === actual) p.classList.add("actual");
+    p.title = "Leccion " + (i + 1);
+    p.style.cursor = "pointer";
+    p.onclick = () => { actual = i; pintarLeccion(); };
+    puntos.appendChild(p);
+  });
+
+  // Lo que llevaras escrito manda sobre el punto de partida del ejercicio.
+  // Volver al dia siguiente y encontrarte tu propio intento a medias es la
+  // diferencia entre seguir el curso y empezarlo otra vez.
+  const guardado = borradores[actual];
+  $programa.value = typeof guardado === "string" && guardado !== "" ? guardado : (l.inicial || "");
+  $salida.innerHTML = '<span class="aviso">Escribe tu solución y pulsa «Comprobar».</span>';
+  guardarProgreso();
+  document.getElementById("lecAnterior").disabled = actual === 0;
+  document.getElementById("lecSiguiente").disabled = actual === LECCIONES.length - 1;
+}
+
+function cambiarModo(aprender) {
+  modoAprender = aprender;
+  $pestanaAprender.classList.toggle("activa", aprender);
+  $pestanaProbar.classList.toggle("activa", !aprender);
+  $panelLeccion.hidden = !aprender;
+  $barraAprender.hidden = !aprender;
+  $barraProbar.hidden = aprender;
+  $cajaRespuestas.hidden = aprender;
+  // Al volver de las lecciones se recupera lo que estabas escribiendo. Antes
+  // se recargaba el ejemplo elegido y tu programa se perdia por el camino.
+  if (aprender) pintarLeccion();
+  else if (!recuperarPrograma()) cargar(+$ejemplos.value);
+}
+
+$pestanaProbar.addEventListener("click", () => cambiarModo(false));
+$pestanaAprender.addEventListener("click", () => cambiarModo(true));
+document.getElementById("lecAnterior").addEventListener("click", () => {
+  if (actual > 0) { actual--; pintarLeccion(); }
+});
+document.getElementById("lecSiguiente").addEventListener("click", () => {
+  if (actual < LECCIONES.length - 1) { actual++; pintarLeccion(); }
+});
+
+// Llevarse el curso a otro aparato. Pulsando una vez copia tu codigo de
+// progreso; pulsando otra vez pide uno y lo mete. Sin cuenta, sin correo y
+// sin nada guardado fuera de tu propio navegador.
+document.getElementById("llevarme").addEventListener("click", async () => {
+  const aviso = document.getElementById("avisoProgreso");
+  const codigo = progresoATexto();
+  let copiado = false;
+  try {
+    await navigator.clipboard.writeText(codigo);
+    copiado = true;
+  } catch (e) {
+    // Sin permiso para el portapapeles, que pasa en bastantes navegadores
+    // si la pagina no tiene el foco. El codigo se enseña para copiarlo a
+    // mano en vez de dejar al alumno sin salida.
+  }
+  const pegado = prompt(
+    copiado
+      ? "Copiado. Pega este código en el otro aparato.\n\nY si ya traes uno de otro sitio, pégalo aquí y acepta:"
+      : "Copia este código y guárdalo. Para traer otro, bórralo y pega el tuyo:",
+    codigo
+  );
+  if (pegado === null || pegado.trim() === codigo) return;
+  if (textoAProgreso(pegado)) {
+    pintarLeccion();
+    aviso.textContent = "Progreso recuperado: " + hechas.size + " de " + LECCIONES.length + " lecciones.";
+  } else {
+    aviso.textContent = "Ese código no vale. Tiene que empezar por " + MARCA_PROGRESO;
+  }
+  aviso.hidden = false;
+  setTimeout(() => { aviso.hidden = true; }, 6000);
+});
+
+// Se comparan las salidas sin distinguir espacios de sobra ni mayusculas.
+function igualan(a, b) {
+  const limpia = t => t.trim().split("\n").map(l => l.trim()).join("\n").toLowerCase();
+  return limpia(a) === limpia(b);
+}
+
+function comprobarLeccion() {
+  const l = LECCIONES[actual];
+  const codigo = $programa.value;
+
+  if (l.debeUsar) {
+    // Sin quitar las tildes, quien escriba "función" (que Fal acepta) se
+    // comeria un "hace falta usar funcion" que no hay quien entienda.
+    const sinTildes = t => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const usadas = sinTildes(codigo.toLowerCase()).match(/[a-zñ_]+/g) || [];
+    const falta = l.debeUsar.find(pal => !usadas.includes(sinTildes(pal)));
+    if (falta) {
+      $salida.innerHTML = '<span class="casi">Para esta leccion hace falta usar <b>' +
+        falta + "</b>. Vuelve a mirar el ejemplo de arriba.</span>";
+      return;
+    }
+  }
+
+  correrPrograma(codigo, "", r => {
+    const cola = (clase, texto) => {
+      const s = document.createElement("span");
+      s.className = clase;
+      s.textContent = texto;
+      $salida.appendChild(s);
+    };
+
+    if (r.error) {
+      cola("error", r.error);
+      cola("casi", "\nEl programa tiene un fallo. El error de arriba te dice donde.");
+      return;
+    }
+
+    if (igualan(r.salida, l.espera)) {
+      hechas.add(actual);
+      guardarProgreso();
+      const quedan = LECCIONES.length - hechas.size;
+      cola("bien", "\nCorrecto. " + (quedan === 0 ?
+        "Has terminado las diez, enhorabuena." : "Te quedan " + quedan + "."));
+      pintarPuntos();
+      return;
+    }
+
+    if (!r.salida) $salida.textContent = "(no escribio nada)";
+    cola("casi", "\nCasi. Debería salir:\n" + l.espera);
+  });
+}
+
+function pintarPuntos() {
+  const puntos = document.getElementById("lecPuntos");
+  [...puntos.children].forEach((p, i) => p.classList.toggle("hecha", hechas.has(i)));
+}
+
+$comprobar.addEventListener("click", comprobarLeccion);
+
+$parar.addEventListener("click", parar);
+
+// Al abrir manda el enlace, si viene con un programa dentro; si no, lo que
+// quedo escrito la ultima vez; y si tampoco hay nada, el primer ejemplo.
+// Va al final porque necesita que este ya montado todo lo de arriba.
+if (!cargarDelEnlace() && !recuperarPrograma()) cargar(0);
+
+crearTrabajador();
+</script>
+</body>
+</html>
