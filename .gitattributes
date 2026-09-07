@@ -28,3 +28,7 @@
 ejemplos/*.fal linguist-documentation=false
 pruebas/*.fal linguist-documentation=false
 docs/*.gif -linguist-detectable
+
+# El dominio de la pagina. GitHub lo lee tal cual, y con un retorno de
+# carro de Windows al final no reconoce el nombre.
+docs/CNAME text eol=lf
