@@ -184,6 +184,8 @@ code { font-family: var(--mono); font-size: .92em; }
     <button id="lecAnterior">Anterior</button>
     <button id="lecSiguiente">Siguiente</button>
     <button class="correr" id="comprobar" disabled>Comprobar</button>
+    <button id="llevarme" title="Para seguir el curso en otro ordenador o en el móvil">Llevarme el progreso</button>
+    <span class="avisoCopia" id="avisoProgreso" hidden></span>
   </div>
 
   <div class="rejilla">
@@ -685,6 +687,8 @@ function recuperarPrograma() {
 
 $programa.addEventListener("input", guardarPrograma);
 $entradas.addEventListener("input", guardarPrograma);
+// En el curso el cuadro es del ejercicio, y se guarda aparte, por leccion.
+$programa.addEventListener("input", () => guardarBorrador());
 
 // Compartir con un enlace
 //
@@ -959,15 +963,91 @@ const $cajaRespuestas = document.getElementById("cajaRespuestas");
 let modoAprender = false;
 let actual = 0;
 let hechas = new Set();
+// Lo que el alumno lleve escrito en cada ejercicio, guardado por numero de
+// leccion. Antes solo se recordaba que lecciones estaban hechas, asi que
+// quien cerraba la pestaña a medias volvia a encontrarse el cuadro vacio y
+// tenia que reescribir lo que ya llevaba. Eso es lo que hace que la gente
+// no vuelva al dia siguiente.
+let borradores = {};
+
+const LLAVE_LECCIONES = "fal_lecciones";
+const LLAVE_CURSO = "fal_curso";
 
 try {
-  hechas = new Set(JSON.parse(localStorage.getItem("fal_lecciones") || "[]"));
+  hechas = new Set(JSON.parse(localStorage.getItem(LLAVE_LECCIONES) || "[]"));
+  const curso = JSON.parse(localStorage.getItem(LLAVE_CURSO) || "null");
+  if (curso) {
+    borradores = curso.borradores || {};
+    if (Number.isInteger(curso.actual)) actual = curso.actual;
+  }
 } catch (e) {}
 
 function guardarProgreso() {
   try {
-    localStorage.setItem("fal_lecciones", JSON.stringify([...hechas]));
-  } catch (e) {}
+    localStorage.setItem(LLAVE_LECCIONES, JSON.stringify([...hechas]));
+    localStorage.setItem(LLAVE_CURSO, JSON.stringify({
+      actual: actual,
+      borradores: borradores
+    }));
+  } catch (e) {
+    // Sin sitio, o en una ventana privada. Se sigue pudiendo estudiar, solo
+    // que sin memoria, y el aviso de abajo lo dice en vez de callarselo.
+    avisarSinMemoria();
+  }
+}
+
+// Guardar el ejercicio segun se escribe, igual que ya se hacia con el
+// programa del modo libre.
+function guardarBorrador() {
+  if (!modoAprender) return;
+  borradores[actual] = $programa.value;
+  guardarProgreso();
+}
+
+let yaAvisado = false;
+function avisarSinMemoria() {
+  if (yaAvisado) return;
+  yaAvisado = true;
+  const aviso = document.getElementById("avisoProgreso");
+  if (!aviso) return;
+  aviso.textContent = "Este navegador no deja guardar nada, asi que el progreso no se recordara.";
+  aviso.hidden = false;
+}
+
+// Llevarse el curso a otro sitio, sin cuenta y sin servidor.
+//
+// El progreso cabe en un texto corto, asi que viaja en el propio texto en
+// lugar de en una base de datos de alguien. Quien quiera seguir en el movil
+// se copia esto y lo pega alli. No hay nada que registrar, no hay contraseña
+// que perder y no hay ningun correo guardado en ninguna parte.
+const MARCA_PROGRESO = "FAL1-";
+
+function progresoATexto() {
+  const datos = { h: [...hechas].sort((a, b) => a - b), a: actual };
+  return MARCA_PROGRESO + aTextoDeEnlace(JSON.stringify(datos));
+}
+
+function textoAProgreso(texto) {
+  texto = (texto || "").trim();
+  if (!texto.startsWith(MARCA_PROGRESO)) return false;
+  try {
+    const datos = JSON.parse(deTextoDeEnlace(texto.slice(MARCA_PROGRESO.length)));
+    if (!datos || !Array.isArray(datos.h)) return false;
+    // Se suma a lo que ya hubiera en este navegador en vez de sustituirlo.
+    // Pegar el codigo del movil no puede borrar lo que llevas en el
+    // ordenador: eso seria perder trabajo por usar una funcion pensada para
+    // no perderlo.
+    datos.h.forEach((i) => {
+      if (Number.isInteger(i) && i >= 0 && i < LECCIONES.length) hechas.add(i);
+    });
+    if (Number.isInteger(datos.a) && datos.a >= 0 && datos.a < LECCIONES.length) {
+      actual = datos.a;
+    }
+    guardarProgreso();
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 function pintarLeccion() {
@@ -990,8 +1070,13 @@ function pintarLeccion() {
     puntos.appendChild(p);
   });
 
-  $programa.value = l.inicial || "";
+  // Lo que llevaras escrito manda sobre el punto de partida del ejercicio.
+  // Volver al dia siguiente y encontrarte tu propio intento a medias es la
+  // diferencia entre seguir el curso y empezarlo otra vez.
+  const guardado = borradores[actual];
+  $programa.value = typeof guardado === "string" && guardado !== "" ? guardado : (l.inicial || "");
   $salida.innerHTML = '<span class="aviso">Escribe tu solución y pulsa «Comprobar».</span>';
+  guardarProgreso();
   document.getElementById("lecAnterior").disabled = actual === 0;
   document.getElementById("lecSiguiente").disabled = actual === LECCIONES.length - 1;
 }
@@ -1017,6 +1102,38 @@ document.getElementById("lecAnterior").addEventListener("click", () => {
 });
 document.getElementById("lecSiguiente").addEventListener("click", () => {
   if (actual < LECCIONES.length - 1) { actual++; pintarLeccion(); }
+});
+
+// Llevarse el curso a otro aparato. Pulsando una vez copia tu codigo de
+// progreso; pulsando otra vez pide uno y lo mete. Sin cuenta, sin correo y
+// sin nada guardado fuera de tu propio navegador.
+document.getElementById("llevarme").addEventListener("click", async () => {
+  const aviso = document.getElementById("avisoProgreso");
+  const codigo = progresoATexto();
+  let copiado = false;
+  try {
+    await navigator.clipboard.writeText(codigo);
+    copiado = true;
+  } catch (e) {
+    // Sin permiso para el portapapeles, que pasa en bastantes navegadores
+    // si la pagina no tiene el foco. El codigo se enseña para copiarlo a
+    // mano en vez de dejar al alumno sin salida.
+  }
+  const pegado = prompt(
+    copiado
+      ? "Copiado. Pega este código en el otro aparato.\n\nY si ya traes uno de otro sitio, pégalo aquí y acepta:"
+      : "Copia este código y guárdalo. Para traer otro, bórralo y pega el tuyo:",
+    codigo
+  );
+  if (pegado === null || pegado.trim() === codigo) return;
+  if (textoAProgreso(pegado)) {
+    pintarLeccion();
+    aviso.textContent = "Progreso recuperado: " + hechas.size + " de " + LECCIONES.length + " lecciones.";
+  } else {
+    aviso.textContent = "Ese código no vale. Tiene que empezar por " + MARCA_PROGRESO;
+  }
+  aviso.hidden = false;
+  setTimeout(() => { aviso.hidden = true; }, 6000);
 });
 
 // Se comparan las salidas sin distinguir espacios de sobra ni mayusculas.
