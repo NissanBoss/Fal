@@ -16,6 +16,7 @@ Lo que cuesta, dicho por los autores: en cuanto una expresión crece, escribirla
 
 - [Manual completo](https://fal-lang.org/manual.html): todo el lenguaje, de las variables a las clausuras. Las 42 palabras reservadas, las 93 funciones de la biblioteca, los objetos, los errores, los archivos y la tabla de equivalencias con Python y JavaScript.
 - [Portada](https://fal-lang.org/): qué es Fal, para quién, las ocho reglas de diseño y lo que cuestan.
+- [Vídeo de 48 segundos](https://fal-lang.org/que-es-fal.mp4): para qué existe Fal, qué resuelve y qué no. Está en la portada, con voz.
 
 ## Probarlo y aprenderlo
 

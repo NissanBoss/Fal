@@ -224,6 +224,29 @@ footer { border-top: 1px solid var(--borde); padding: 30px 0 44px; font-size: 14
 footer .centro { display: flex; gap: 26px; flex-wrap: wrap; align-items: baseline; }
 footer a { color: var(--suave); }
 footer .lejos { margin-left: auto; }
+
+/* El video de "que es Fal". Va justo despues de la portada, que es donde
+   alguien que acaba de llegar decide si se queda.
+
+   NO se reproduce solo, y es a proposito: lleva voz. Un video que se pone a
+   hablar en cuanto abres una pagina se cierra antes de la segunda frase.
+   Y preload=metadata para que quien no le de al play no se descargue dos
+   megas por si acaso. */
+.video-que-es { border-top: 1px solid var(--borde); background: var(--codigo-fondo); }
+.video-que-es .centro { padding-top: 44px; padding-bottom: 52px; }
+.video-que-es h2 { margin-bottom: 6px; }
+.video-que-es .sumario { margin-bottom: 22px; }
+.video-que-es video {
+  /* height auto y aspect-ratio, las dos. Los atributos width y height del
+     HTML estan para que el hueco ya tenga su tamaño antes de que cargue
+     nada y la pagina no pegue un salto, pero sin esto de aqui la caja se
+     queda con los 1080 de alto y el video sale flotando en medio de dos
+     franjas blancas. */
+  width: 100%; max-width: 860px; height: auto; aspect-ratio: 16 / 9;
+  display: block; border-radius: 12px;
+  border: 1px solid var(--borde); background: var(--caja);
+}
+.video-que-es .debajo { font-size: 14.5px; color: var(--suave); margin-top: 12px; }
 </style>
 </head>
 <body>
@@ -272,6 +295,24 @@ rueda <span class="pal">es</span> <span class="pal">nuevo</span> Circulo <span c
     </div>
   </div>
 </header>
+
+<section class="video-que-es">
+  <div class="centro">
+    <h2>Qué es Fal, en cuarenta y ocho segundos</h2>
+    <p class="sumario">
+      Para qué existe, qué resuelve y qué no. Con voz, así que sube el volumen.
+    </p>
+    <video controls preload="metadata" poster="/que-es-fal.jpg"
+           width="1920" height="1080">
+      <source src="/que-es-fal.mp4" type="video/mp4">
+      Tu navegador no puede reproducir el vídeo.
+      <a href="/que-es-fal.mp4">Descárgalo aquí</a>.
+    </video>
+    <p class="debajo">
+      Si prefieres leerlo, está todo escrito más abajo.
+    </p>
+  </div>
+</section>
 
 <section>
   <div class="centro">
