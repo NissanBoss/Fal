@@ -232,10 +232,9 @@ footer .lejos { margin-left: auto; }
    hablar en cuanto abres una pagina se cierra antes de la segunda frase.
    Y preload=metadata para que quien no le de al play no se descargue dos
    megas por si acaso. */
-.video-que-es { border-top: 1px solid var(--borde); background: var(--codigo-fondo); }
-.video-que-es .centro { padding-top: 44px; padding-bottom: 52px; }
-.video-que-es h2 { margin-bottom: 6px; }
-.video-que-es .sumario { margin-bottom: 22px; }
+/* Sin fondo propio ni borde propio: la regla de section ya pone la linea
+   de arriba y el espaciado, y ninguna otra seccion de esta pagina lleva
+   color. Poner uno aqui hacia que este trozo pareciera de otra web. */
 .video-que-es video {
   /* height auto y aspect-ratio, las dos. Los atributos width y height del
      HTML estan para que el hueco ya tenga su tamaño antes de que cargue
