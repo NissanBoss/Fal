@@ -1,0 +1,33 @@
+# Fal
+
+> Un lenguaje de programación completo escrito íntegramente en español y sin un solo símbolo: 42 palabras, 93 funciones, y todo se lee en voz alta. Se reparte como un único ejecutable sin dependencias, y el mismo intérprete compila a WebAssembly para poder probarlo en el navegador.
+
+Fal existe para un hueco concreto: entre los lenguajes de bloques que se arrastran y un lenguaje de adultos no hay nada, y ese salto se lleva por delante a mucha gente que habría seguido programando. El pseudocódigo de clase enseña la lógica pero no abre un archivo ni monta un juego. Fal se lee casi como ese pseudocódigo y por debajo tiene objetos con herencia, clausuras, módulos, archivos, JSON, fechas, expresiones regulares e internet.
+
+Cómo se escribe, en tres líneas:
+
+- `si edad es mayor que 18` en lugar de `if (edad > 18) {`
+- `3 mas 4 por 5` en lugar de `3 + 4 * 5`
+- Los bloques cierran con `fin`. No hay `;` ni `{}` ni `==` ni `+`.
+
+Lo que cuesta, dicho por los autores: en cuanto una expresión crece, escribirla con palabras es más largo y más ruidoso que con símbolos, y esos símbolos son la convención en el resto del mundo. Fal está pensado para dejarlo atrás, no para quedarse, y por eso el manual acaba con una tabla que traduce cada cosa a Python y JavaScript.
+
+## Documentación
+
+- [Manual completo](https://fal-lang.org/manual.html): todo el lenguaje, de las variables a las clausuras. Las 42 palabras reservadas, las 93 funciones de la biblioteca, los objetos, los errores, los archivos y la tabla de equivalencias con Python y JavaScript.
+- [Portada](https://fal-lang.org/): qué es Fal, para quién, las ocho reglas de diseño y lo que cuestan.
+
+## Probarlo y aprenderlo
+
+- [Probar en el navegador](https://fal-lang.org/probar.html): el intérprete corre entero dentro de la página, compilado a WebAssembly. No se manda nada a ningún servidor.
+- [Academia](https://aprende.fal-lang.org): un curso de 32 lecciones en 7 módulos, con ejercicios que se corrigen solos.
+
+## Código
+
+- [Repositorio](https://github.com/NissanBoss/Fal): el intérprete, escrito en Go sin una sola dependencia externa.
+- [Descargas](https://github.com/NissanBoss/Fal/releases): un ejecutable por sistema, para Windows, Mac y Linux.
+
+## Opcional
+
+- [Extensión de VS Code](https://github.com/NissanBoss/Fal/tree/main/editor): coloreado de sintaxis.
+- Licencia MIT. El lenguaje y todo lo que hay alrededor son software libre.

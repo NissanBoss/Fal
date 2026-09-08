@@ -63,6 +63,28 @@ jobs:
             exit 1
           fi
 
+      # El sitemap lleva la fecha del último commit que tocó cada página, no
+      # la de hoy. Generarlo con la fecha del despliegue le diría al buscador
+      # que el manual cambió cada vez que se toca cualquier otra cosa, y eso
+      # es justo lo que hace que dejen de fiarse del sitemap.
+      - name: Hacer el sitemap
+        run: |
+          fecha() { git log -1 --format=%cs -- "$1" 2>/dev/null || date -I; }
+          {
+            echo '<?xml version="1.0" encoding="UTF-8"?>'
+            echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+            for par in "/:docs/index.html:1.0" \
+                       "/manual.html:MANUAL.md:0.9" \
+                       "/probar.html:docs/probar.html:0.8"; do
+              ruta="${par%%:*}"; resto="${par#*:}"
+              archivo="${resto%%:*}"; peso="${resto#*:}"
+              printf '  <url><loc>https://fal-lang.org%s</loc><lastmod>%s</lastmod><priority>%s</priority></url>\n' \
+                "$ruta" "$(fecha "$archivo")" "$peso"
+            done
+            echo '</urlset>'
+          } > docs/sitemap.xml
+          cat docs/sitemap.xml
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3

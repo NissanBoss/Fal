@@ -1,0 +1,11 @@
+# Todo el sitio es público y se puede leer entero, personas y máquinas.
+#
+# No hay reglas que bloqueen a los rastreadores de las inteligencias
+# artificiales, y es a propósito: el problema de Fal hoy no es que lo copien,
+# es que nadie sabe que existe. Un lenguaje de programación quiere que lo
+# aprendan, y para eso hay que dejarse leer.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://fal-lang.org/sitemap.xml
