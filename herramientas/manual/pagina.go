@@ -52,6 +52,18 @@ func envolver(cuerpo string, indice []seccion) string {
   }
 }
 * { box-sizing: border-box; }
+
+/* Las barras de desplazamiento vienen del sistema y en modo oscuro salen
+   blancas, que canta muchisimo en una pagina con un indice lateral. */
+* { scrollbar-width: thin; scrollbar-color: var(--borde) transparent; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--borde); border-radius: 6px; border: 3px solid var(--papel);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--suave); }
+::-webkit-scrollbar-corner { background: transparent; }
+
 body { margin: 0; background: var(--papel); color: var(--tinta); font: 17px/1.65 var(--sans); }
 a { color: var(--azul); }
 h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; line-height: 1.25; }
@@ -90,7 +102,7 @@ main h1:first-child { margin-top: 4px; }
 main h2 { font-size: 23px; margin: 30px 0 8px; }
 main h3 { font-size: 18.5px; margin: 24px 0 6px; }
 main h4 { font-size: 16.5px; margin: 20px 0 6px; font-family: var(--sans); }
-main p { max-width: 40em; }
+main p { max-width: 40em; text-wrap: pretty; }
 main ul, main ol { max-width: 40em; }
 main li { margin: 4px 0; }
 main hr { border: 0; border-top: 1px solid var(--borde); margin: 34px 0; }

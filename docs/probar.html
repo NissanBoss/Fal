@@ -6,33 +6,53 @@
 <title>Probar Fal en el navegador</title>
 <meta name="description" content="Fal es un lenguaje de programación en español, sin símbolos raros. Pruébalo aquí mismo, en el navegador.">
 <style>
+/* La misma paleta y las mismas fuentes que el resto del sitio: papel y
+   tinta, claro por defecto y oscuro solo si lo pide el sistema. Antes esta
+   página iba por libre con un tema oscuro azulado y se notaba el salto al
+   llegar desde la portada. */
 :root {
-  --fondo: #14161a;
-  --panel: #1c1f26;
-  --borde: #2a2f3a;
-  --texto: #e6e8ec;
-  --suave: #9aa3b2;
-  --acento: #5ac8fa;
-  --verde: #7ee787;
-  --rojo: #ff7b72;
+  --fondo: #fbfaf7;
+  --panel: #ffffff;
+  --borde: #e2ded4;
+  --texto: #1a1a18;
+  --suave: #5f5c55;
+  --acento: #1c4f8b;
+  --tierra: #9c4420;
+  --verde: #216e3f;
+  --rojo: #9c4420;
+  --hueco: #f6f4ef;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
   --mono: ui-monospace, "Cascadia Code", "Consolas", "SF Mono", monospace;
 }
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
   :root {
-    --fondo: #f6f7f9; --panel: #fff; --borde: #dfe3e8;
-    --texto: #1a1d23; --suave: #5c6672; --acento: #0969da;
-    --verde: #116329; --rojo: #cf222e;
+    --fondo: #16171a; --panel: #1d1f23; --borde: #30323a;
+    --texto: #e8e6e1; --suave: #a2a099; --acento: #79b0e4;
+    --tierra: #e0865c; --verde: #6fca92; --rojo: #e0865c;
+    --hueco: #1a1c20;
   }
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
+
+/* Las barras de desplazamiento vienen del sistema y salen blancas, que es lo
+   primero que se ve y lo único que desentona. */
+* { scrollbar-width: thin; scrollbar-color: var(--borde) transparent; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--borde); border-radius: 6px; border: 3px solid var(--panel);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--suave); }
+::-webkit-scrollbar-corner { background: transparent; }
+
 body {
   margin: 0; background: var(--fondo); color: var(--texto);
-  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 header { text-align: center; padding: 40px 20px 24px; }
-h1 { margin: 0; font-size: 40px; letter-spacing: -0.5px; }
-h1 span { color: var(--acento); }
+h1 { margin: 0; font-size: 40px; font-family: var(--serif); font-weight: 600; }
+h1 span { color: var(--tierra); }
 .lema { margin: 8px auto 0; max-width: 620px; color: var(--suave); }
 .enlaces { margin-top: 16px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 .enlaces a {
@@ -53,7 +73,7 @@ select, button {
 select { flex: 1; min-width: 200px; }
 .avisoCopia { font-size: 14px; color: var(--acento); }
 button.correr {
-  background: var(--acento); border-color: var(--acento); color: #06121c;
+  background: var(--acento); border-color: var(--acento); color: var(--fondo);
   font-weight: 600; cursor: pointer; min-width: 130px;
 }
 button.correr:hover:not(:disabled) { filter: brightness(1.12); }
@@ -88,50 +108,6 @@ pre.salida .aviso { color: var(--suave); }
 #lienzo svg { max-width: 100%; height: auto; }
 .pista { font-size: 13px; color: var(--suave); margin-top: 6px; }
 
-.pestanas { display: flex; gap: 6px; margin-bottom: 16px; }
-.pestanas button {
-  cursor: pointer; padding: 9px 20px; font-size: 15px;
-  background: transparent; border: 1px solid transparent; color: var(--suave);
-}
-.pestanas button.activa {
-  background: var(--panel); border-color: var(--borde); color: var(--texto);
-  font-weight: 600;
-}
-.pestanas button:hover:not(.activa) { color: var(--texto); }
-
-.leccion {
-  background: var(--panel); border: 1px solid var(--borde);
-  border-radius: 10px; padding: 18px 20px; margin-bottom: 14px;
-}
-.leccion .cabecera {
-  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-.leccion h2 { margin: 0; font-size: 19px; }
-.leccion .cuenta { font-size: 13px; color: var(--suave); }
-.leccion p { margin: 0 0 10px; }
-.leccion pre {
-  font-family: var(--mono); font-size: 13.5px; background: var(--fondo);
-  border: 1px solid var(--borde); border-radius: 8px; padding: 10px 12px;
-  margin: 0 0 10px; overflow-x: auto;
-}
-.tarea {
-  border-left: 3px solid var(--acento); padding: 2px 0 2px 12px;
-  margin: 12px 0 0;
-}
-.tarea strong { color: var(--acento); }
-
-.puntos { display: flex; gap: 5px; margin-left: auto; }
-.puntos span {
-  width: 9px; height: 9px; border-radius: 50%;
-  background: var(--borde); display: block;
-}
-.puntos span.hecha { background: var(--verde); }
-.puntos span.actual { box-shadow: 0 0 0 2px var(--acento); }
-
-.bien { color: var(--verde); font-weight: 600; }
-.casi { color: var(--suave); }
-
 footer {
   text-align: center; color: var(--suave); font-size: 14px;
   padding: 30px 20px 50px; border-top: 1px solid var(--borde);
@@ -159,35 +135,12 @@ code { font-family: var(--mono); font-size: .92em; }
 </header>
 
 <main>
-  <div class="pestanas">
-    <button id="pestanaProbar" class="activa">Probar</button>
-    <button id="pestanaAprender">Aprender</button>
-  </div>
-
-  <div class="leccion" id="panelLeccion" hidden>
-    <div class="cabecera">
-      <h2 id="lecTitulo"></h2>
-      <span class="cuenta" id="lecCuenta"></span>
-      <div class="puntos" id="lecPuntos"></div>
-    </div>
-    <div id="lecCuerpo"></div>
-    <p class="tarea"><strong>Tu turno:</strong> <span id="lecTarea"></span></p>
-  </div>
-
   <div class="barra" id="barraProbar">
     <select id="ejemplos" aria-label="Elegir un ejemplo"></select>
     <button class="correr" id="correr" disabled>Cargando…</button>
     <button id="parar" hidden>Parar</button>
     <button id="compartir">Compartir</button>
     <span class="avisoCopia" id="avisoCopia" hidden></span>
-  </div>
-
-  <div class="barra" id="barraAprender" hidden>
-    <button id="lecAnterior">Anterior</button>
-    <button id="lecSiguiente">Siguiente</button>
-    <button class="correr" id="comprobar" disabled>Comprobar</button>
-    <button id="llevarme" title="Para seguir el curso en otro ordenador o en el móvil">Llevarme el progreso</button>
-    <span class="avisoCopia" id="avisoProgreso" hidden></span>
   </div>
 
   <div class="rejilla">
@@ -478,136 +431,6 @@ escribe siguiente`,
   }
 ];
 
-const LECCIONES = [
-  {
-    titulo: "Escribir en pantalla",
-    cuerpo: `<p>Para que un programa diga algo se usa <code>escribe</code>, y el texto
-      va entre comillas.</p>
-      <pre>escribe "Buenos días"</pre>`,
-    tarea: 'Haz que el programa escriba exactamente <code>Hola mundo</code>.',
-    inicial: "",
-    espera: "Hola mundo"
-  },
-  {
-    titulo: "Guardar un valor",
-    cuerpo: `<p>Una variable es una caja con nombre. Se llena con <code>es</code>.</p>
-      <pre>ciudad es "Madrid"
-escribe ciudad</pre>
-      <p>Fíjate que al escribir la variable no lleva comillas: si las pusieras,
-      escribiría la palabra <code>ciudad</code> en vez de lo que hay dentro.</p>`,
-    tarea: 'Guarda <code>"Sevilla"</code> en una variable llamada <code>ciudad</code> y escríbela.',
-    inicial: "",
-    espera: "Sevilla"
-  },
-  {
-    titulo: "Juntar textos",
-    cuerpo: `<p>La palabra <code>mas</code> une cosas. Sirve para sumar números y
-      también para pegar textos.</p>
-      <pre>ciudad es "Madrid"
-escribe "Vivo en " mas ciudad     # Vivo en Madrid</pre>
-      <p>Ojo al espacio dentro de las comillas: sin él saldría <code>Vivo enMadrid</code>.</p>`,
-    tarea: 'Guarda <code>"Bilbao"</code> en una variable <code>ciudad</code> y escribe <code>Vivo en Bilbao</code>.',
-    inicial: "",
-    espera: "Vivo en Bilbao"
-  },
-  {
-    titulo: "Hacer cuentas",
-    cuerpo: `<p>Las cuentas se escriben con palabras, como en clase de mates:</p>
-      <pre>escribe 3 mas 4      # 7
-escribe 10 menos 4   # 6
-escribe 3 por 4      # 12
-escribe 10 entre 2   # 5</pre>
-      <p>Eso de <code>#</code> es un comentario: el programa lo ignora por completo.
-      Aquí lo uso para enseñarte lo que sale por pantalla, pero no hace falta que
-      lo escribas.</p>`,
-    tarea: 'Escribe el resultado de multiplicar 7 por 6.',
-    inicial: "",
-    espera: "42",
-    debeUsar: ["por"]
-  },
-  {
-    titulo: "Decidir",
-    cuerpo: `<p>Con <code>si</code> el programa elige. El bloque se cierra con
-      <code>fin</code>.</p>
-      <pre>nota es 3
-si nota es mayor o igual que 5
-    escribe "Aprobado"
-si no
-    escribe "Suspenso"
-fin</pre>
-      <p>Con esa nota saldría <code>Suspenso</code>.</p>`,
-    tarea: 'Guarda un <code>8</code> en una variable <code>nota</code>. Escribe <code>Aprobado</code> si llega a 5, y <code>Suspenso</code> si no.',
-    inicial: "",
-    espera: "Aprobado",
-    debeUsar: ["si"]
-  },
-  {
-    titulo: "Repetir",
-    cuerpo: `<p>Para hacer algo varias veces está <code>repite</code>.</p>
-      <pre>repite 5 veces
-    escribe "Allá voy"
-fin</pre>
-      <p>Eso escribe <code>Allá voy</code> cinco veces seguidas.</p>`,
-    tarea: 'Escribe <code>Hola</code> tres veces, usando <code>repite</code>.',
-    inicial: "",
-    espera: "Hola\nHola\nHola",
-    debeUsar: ["repite"]
-  },
-  {
-    titulo: "Contar",
-    cuerpo: `<p>Cuando necesitas saber por qué número vas, se usa
-      <code>para cada</code>:</p>
-      <pre>para cada n desde 1 hasta 3
-    escribe n
-fin</pre>
-      <p>La variable <code>n</code> va valiendo 1, luego 2, luego 3, y se escribe
-      cada uno.</p>`,
-    tarea: 'Escribe los números del 1 al 5, uno por línea.',
-    inicial: "",
-    espera: "1\n2\n3\n4\n5",
-    debeUsar: ["para"]
-  },
-  {
-    titulo: "Listas",
-    cuerpo: `<p>Una lista guarda varias cosas de golpe.</p>
-      <pre>colores es lista con "rojo" y "verde"
-escribe largo de colores        # 2
-escribe elemento 1 de colores   # rojo</pre>
-      <p>Se cuenta desde el 1, como en la vida real.</p>`,
-    tarea: 'Haz una lista <code>colores</code> con rojo, verde y azul. Escribe cuántos hay y luego el segundo.',
-    inicial: "",
-    espera: "3\nverde"
-  },
-  {
-    titulo: "Funciones",
-    cuerpo: `<p>Una función es un trozo de programa con nombre, para no repetirlo.</p>
-      <pre>funcion saluda con nombre
-    devuelve "Hola " mas nombre
-fin
-
-escribe saluda con "Ana"     # Hola Ana</pre>
-      <p><code>devuelve</code> es lo que la función entrega cuando termina.</p>`,
-    tarea: 'Haz otra función llamada <code>despide</code> que devuelva <code>Adiós </code> y el nombre, y escribe la despedida de Ana.',
-    inicial: "",
-    espera: "Adiós Ana",
-    debeUsar: ["funcion", "devuelve"]
-  },
-  {
-    titulo: "Reto final",
-    cuerpo: `<p>Ya tienes todas las piezas. Este junta un contador con una variable
-      que va creciendo.</p>
-      <pre>total es 0
-para cada n desde 1 hasta 3
-    total es total mas n
-fin
-escribe total          # 6</pre>
-      <p>Ha sumado 1, luego 2, luego 3.</p>`,
-    tarea: 'Haz lo mismo pero sumando del 1 al 10, y escribe el resultado.',
-    inicial: "",
-    espera: "55",
-    debeUsar: ["para"]
-  }
-];
 
 const $programa = document.getElementById("programa");
 const $entradas = document.getElementById("entradas");
@@ -663,8 +486,6 @@ $ejemplos.addEventListener("change", () => cargar(+$ejemplos.value));
 const LLAVE_PROGRAMA = "fal_programa";
 
 function guardarPrograma() {
-  // En las lecciones el cuadro es del ejercicio, no del programa de nadie.
-  if (modoAprender) return;
   try {
     localStorage.setItem(LLAVE_PROGRAMA, JSON.stringify({
       programa: $programa.value,
@@ -689,8 +510,6 @@ function recuperarPrograma() {
 
 $programa.addEventListener("input", guardarPrograma);
 $entradas.addEventListener("input", guardarPrograma);
-// En el curso el cuadro es del ejercicio, y se guarda aparte, por leccion.
-$programa.addEventListener("input", () => guardarBorrador());
 
 // Compartir con un enlace
 //
@@ -775,7 +594,6 @@ function crearTrabajador() {
     if (m.tipo === "listo") {
       $correr.disabled = false;
       $correr.textContent = "Ejecutar";
-      $comprobar.disabled = false;
     } else if (m.tipo === "salida") {
       pintarTrozo(m.texto);
     } else if (m.tipo === "fin") {
@@ -875,7 +693,6 @@ function pararInterfaz() {
   alTerminar = null;
   $correr.disabled = false;
   $correr.textContent = "Ejecutar";
-  $comprobar.disabled = false;
   $parar.hidden = true;
 }
 
@@ -891,7 +708,6 @@ function correrPrograma(programa, respuestas, avisar) {
   $lienzo.innerHTML = "";
   $correr.disabled = true;
   $correr.textContent = "Ejecutando…";
-  $comprobar.disabled = true;
   $parar.hidden = false;
   // Para que las teclas del juego no acaben escritas en el programa.
   $programa.blur();
@@ -907,7 +723,6 @@ function parar() {
   pararInterfaz();
   $correr.disabled = true;
   $correr.textContent = "Cargando…";
-  $comprobar.disabled = true;
   crearTrabajador();
 }
 
@@ -942,7 +757,7 @@ function nombreDeTecla(e) {
 document.addEventListener("keydown", e => {
   if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
     e.preventDefault();
-    modoAprender ? comprobarLeccion() : ejecutar();
+    ejecutar();
     return;
   }
   if (!corriendo || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -953,249 +768,6 @@ document.addEventListener("keydown", e => {
   trabajador.postMessage({ tipo: "tecla", tecla: t });
 });
 
-// Modo lecciones. Es opcional: quien entra solo a trastear ni se entera.
-const $pestanaProbar = document.getElementById("pestanaProbar");
-const $pestanaAprender = document.getElementById("pestanaAprender");
-const $panelLeccion = document.getElementById("panelLeccion");
-const $barraProbar = document.getElementById("barraProbar");
-const $barraAprender = document.getElementById("barraAprender");
-const $comprobar = document.getElementById("comprobar");
-const $cajaRespuestas = document.getElementById("cajaRespuestas");
-
-let modoAprender = false;
-let actual = 0;
-let hechas = new Set();
-// Lo que el alumno lleve escrito en cada ejercicio, guardado por numero de
-// leccion. Antes solo se recordaba que lecciones estaban hechas, asi que
-// quien cerraba la pestaña a medias volvia a encontrarse el cuadro vacio y
-// tenia que reescribir lo que ya llevaba. Eso es lo que hace que la gente
-// no vuelva al dia siguiente.
-let borradores = {};
-
-const LLAVE_LECCIONES = "fal_lecciones";
-const LLAVE_CURSO = "fal_curso";
-
-try {
-  hechas = new Set(JSON.parse(localStorage.getItem(LLAVE_LECCIONES) || "[]"));
-  const curso = JSON.parse(localStorage.getItem(LLAVE_CURSO) || "null");
-  if (curso) {
-    borradores = curso.borradores || {};
-    if (Number.isInteger(curso.actual)) actual = curso.actual;
-  }
-} catch (e) {}
-
-function guardarProgreso() {
-  try {
-    localStorage.setItem(LLAVE_LECCIONES, JSON.stringify([...hechas]));
-    localStorage.setItem(LLAVE_CURSO, JSON.stringify({
-      actual: actual,
-      borradores: borradores
-    }));
-  } catch (e) {
-    // Sin sitio, o en una ventana privada. Se sigue pudiendo estudiar, solo
-    // que sin memoria, y el aviso de abajo lo dice en vez de callarselo.
-    avisarSinMemoria();
-  }
-}
-
-// Guardar el ejercicio segun se escribe, igual que ya se hacia con el
-// programa del modo libre.
-function guardarBorrador() {
-  if (!modoAprender) return;
-  borradores[actual] = $programa.value;
-  guardarProgreso();
-}
-
-let yaAvisado = false;
-function avisarSinMemoria() {
-  if (yaAvisado) return;
-  yaAvisado = true;
-  const aviso = document.getElementById("avisoProgreso");
-  if (!aviso) return;
-  aviso.textContent = "Este navegador no deja guardar nada, asi que el progreso no se recordara.";
-  aviso.hidden = false;
-}
-
-// Llevarse el curso a otro sitio, sin cuenta y sin servidor.
-//
-// El progreso cabe en un texto corto, asi que viaja en el propio texto en
-// lugar de en una base de datos de alguien. Quien quiera seguir en el movil
-// se copia esto y lo pega alli. No hay nada que registrar, no hay contraseña
-// que perder y no hay ningun correo guardado en ninguna parte.
-const MARCA_PROGRESO = "FAL1-";
-
-function progresoATexto() {
-  const datos = { h: [...hechas].sort((a, b) => a - b), a: actual };
-  return MARCA_PROGRESO + aTextoDeEnlace(JSON.stringify(datos));
-}
-
-function textoAProgreso(texto) {
-  texto = (texto || "").trim();
-  if (!texto.startsWith(MARCA_PROGRESO)) return false;
-  try {
-    const datos = JSON.parse(deTextoDeEnlace(texto.slice(MARCA_PROGRESO.length)));
-    if (!datos || !Array.isArray(datos.h)) return false;
-    // Se suma a lo que ya hubiera en este navegador en vez de sustituirlo.
-    // Pegar el codigo del movil no puede borrar lo que llevas en el
-    // ordenador: eso seria perder trabajo por usar una funcion pensada para
-    // no perderlo.
-    datos.h.forEach((i) => {
-      if (Number.isInteger(i) && i >= 0 && i < LECCIONES.length) hechas.add(i);
-    });
-    if (Number.isInteger(datos.a) && datos.a >= 0 && datos.a < LECCIONES.length) {
-      actual = datos.a;
-    }
-    guardarProgreso();
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-function pintarLeccion() {
-  const l = LECCIONES[actual];
-  document.getElementById("lecTitulo").textContent = l.titulo;
-  document.getElementById("lecCuenta").textContent =
-    "Lección " + (actual + 1) + " de " + LECCIONES.length;
-  document.getElementById("lecCuerpo").innerHTML = l.cuerpo;
-  document.getElementById("lecTarea").innerHTML = l.tarea;
-
-  const puntos = document.getElementById("lecPuntos");
-  puntos.innerHTML = "";
-  LECCIONES.forEach((_, i) => {
-    const p = document.createElement("span");
-    if (hechas.has(i)) p.classList.add("hecha");
-    if (i === actual) p.classList.add("actual");
-    p.title = "Leccion " + (i + 1);
-    p.style.cursor = "pointer";
-    p.onclick = () => { actual = i; pintarLeccion(); };
-    puntos.appendChild(p);
-  });
-
-  // Lo que llevaras escrito manda sobre el punto de partida del ejercicio.
-  // Volver al dia siguiente y encontrarte tu propio intento a medias es la
-  // diferencia entre seguir el curso y empezarlo otra vez.
-  const guardado = borradores[actual];
-  $programa.value = typeof guardado === "string" && guardado !== "" ? guardado : (l.inicial || "");
-  $salida.innerHTML = '<span class="aviso">Escribe tu solución y pulsa «Comprobar».</span>';
-  guardarProgreso();
-  document.getElementById("lecAnterior").disabled = actual === 0;
-  document.getElementById("lecSiguiente").disabled = actual === LECCIONES.length - 1;
-}
-
-function cambiarModo(aprender) {
-  modoAprender = aprender;
-  $pestanaAprender.classList.toggle("activa", aprender);
-  $pestanaProbar.classList.toggle("activa", !aprender);
-  $panelLeccion.hidden = !aprender;
-  $barraAprender.hidden = !aprender;
-  $barraProbar.hidden = aprender;
-  $cajaRespuestas.hidden = aprender;
-  // Al volver de las lecciones se recupera lo que estabas escribiendo. Antes
-  // se recargaba el ejemplo elegido y tu programa se perdia por el camino.
-  if (aprender) pintarLeccion();
-  else if (!recuperarPrograma()) cargar(+$ejemplos.value);
-}
-
-$pestanaProbar.addEventListener("click", () => cambiarModo(false));
-$pestanaAprender.addEventListener("click", () => cambiarModo(true));
-document.getElementById("lecAnterior").addEventListener("click", () => {
-  if (actual > 0) { actual--; pintarLeccion(); }
-});
-document.getElementById("lecSiguiente").addEventListener("click", () => {
-  if (actual < LECCIONES.length - 1) { actual++; pintarLeccion(); }
-});
-
-// Llevarse el curso a otro aparato. Pulsando una vez copia tu codigo de
-// progreso; pulsando otra vez pide uno y lo mete. Sin cuenta, sin correo y
-// sin nada guardado fuera de tu propio navegador.
-document.getElementById("llevarme").addEventListener("click", async () => {
-  const aviso = document.getElementById("avisoProgreso");
-  const codigo = progresoATexto();
-  let copiado = false;
-  try {
-    await navigator.clipboard.writeText(codigo);
-    copiado = true;
-  } catch (e) {
-    // Sin permiso para el portapapeles, que pasa en bastantes navegadores
-    // si la pagina no tiene el foco. El codigo se enseña para copiarlo a
-    // mano en vez de dejar al alumno sin salida.
-  }
-  const pegado = prompt(
-    copiado
-      ? "Copiado. Pega este código en el otro aparato.\n\nY si ya traes uno de otro sitio, pégalo aquí y acepta:"
-      : "Copia este código y guárdalo. Para traer otro, bórralo y pega el tuyo:",
-    codigo
-  );
-  if (pegado === null || pegado.trim() === codigo) return;
-  if (textoAProgreso(pegado)) {
-    pintarLeccion();
-    aviso.textContent = "Progreso recuperado: " + hechas.size + " de " + LECCIONES.length + " lecciones.";
-  } else {
-    aviso.textContent = "Ese código no vale. Tiene que empezar por " + MARCA_PROGRESO;
-  }
-  aviso.hidden = false;
-  setTimeout(() => { aviso.hidden = true; }, 6000);
-});
-
-// Se comparan las salidas sin distinguir espacios de sobra ni mayusculas.
-function igualan(a, b) {
-  const limpia = t => t.trim().split("\n").map(l => l.trim()).join("\n").toLowerCase();
-  return limpia(a) === limpia(b);
-}
-
-function comprobarLeccion() {
-  const l = LECCIONES[actual];
-  const codigo = $programa.value;
-
-  if (l.debeUsar) {
-    // Sin quitar las tildes, quien escriba "función" (que Fal acepta) se
-    // comeria un "hace falta usar funcion" que no hay quien entienda.
-    const sinTildes = t => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const usadas = sinTildes(codigo.toLowerCase()).match(/[a-zñ_]+/g) || [];
-    const falta = l.debeUsar.find(pal => !usadas.includes(sinTildes(pal)));
-    if (falta) {
-      $salida.innerHTML = '<span class="casi">Para esta leccion hace falta usar <b>' +
-        falta + "</b>. Vuelve a mirar el ejemplo de arriba.</span>";
-      return;
-    }
-  }
-
-  correrPrograma(codigo, "", r => {
-    const cola = (clase, texto) => {
-      const s = document.createElement("span");
-      s.className = clase;
-      s.textContent = texto;
-      $salida.appendChild(s);
-    };
-
-    if (r.error) {
-      cola("error", r.error);
-      cola("casi", "\nEl programa tiene un fallo. El error de arriba te dice donde.");
-      return;
-    }
-
-    if (igualan(r.salida, l.espera)) {
-      hechas.add(actual);
-      guardarProgreso();
-      const quedan = LECCIONES.length - hechas.size;
-      cola("bien", "\nCorrecto. " + (quedan === 0 ?
-        "Has terminado las diez, enhorabuena." : "Te quedan " + quedan + "."));
-      pintarPuntos();
-      return;
-    }
-
-    if (!r.salida) $salida.textContent = "(no escribio nada)";
-    cola("casi", "\nCasi. Debería salir:\n" + l.espera);
-  });
-}
-
-function pintarPuntos() {
-  const puntos = document.getElementById("lecPuntos");
-  [...puntos.children].forEach((p, i) => p.classList.toggle("hecha", hechas.has(i)));
-}
-
-$comprobar.addEventListener("click", comprobarLeccion);
 
 $parar.addEventListener("click", parar);
 

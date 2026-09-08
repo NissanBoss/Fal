@@ -74,6 +74,18 @@
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
+
+/* Las barras de desplazamiento vienen del sistema y en una página oscura
+   salen blancas, que es lo primero que se ve y lo único que desentona. */
+* { scrollbar-width: thin; scrollbar-color: var(--borde) transparent; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--borde); border-radius: 6px;
+  border: 3px solid var(--papel);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--suave); }
+::-webkit-scrollbar-corner { background: transparent; }
 body {
   margin: 0;
   background: var(--papel);
@@ -144,8 +156,11 @@ pre .com { color: var(--suave); font-style: italic; }
 /* Secciones */
 section { padding: 52px 0; border-top: 1px solid var(--borde); }
 section h2 { font-size: 28px; margin: 0 0 6px; }
-section .sumario { color: var(--suave); margin: 0 0 26px; max-width: 34em; }
-section p { max-width: 36em; }
+/* balance reparte las líneas para que la última no se quede con una sola
+   palabra colgando, que es lo que pasaba en "antes de empezar". */
+section .sumario { color: var(--suave); margin: 0 0 26px; max-width: 34em; text-wrap: balance; }
+section p { max-width: 36em; text-wrap: pretty; }
+h1, h2, h3 { text-wrap: balance; }
 
 /* El hueco */
 .escalera { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--borde); border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; margin-bottom: 24px; }
