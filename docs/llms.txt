@@ -21,7 +21,7 @@ Lo que cuesta, dicho por los autores: en cuanto una expresión crece, escribirla
 
 - [Probar en el navegador](https://fal-lang.org/probar.html): el intérprete corre entero dentro de la página, compilado a WebAssembly. No se manda nada a ningún servidor.
 - [Academia](https://aprende.fal-lang.org): un curso de 32 lecciones en 7 módulos, con ejercicios que se corrigen solos.
-- [Foro](https://aprende.fal-lang.org/foro.html): dudas del curso, cosas hechas con Fal e ideas para el lenguaje. Leerlo no pide cuenta; escribir pide haber terminado el primer módulo.
+- [Foro](https://foro.fal-lang.org/): dudas del curso, cosas hechas con Fal e ideas para el lenguaje. Leerlo no pide cuenta; escribir pide haber terminado el primer módulo.
 
 ## Código
 
