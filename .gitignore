@@ -30,3 +30,4 @@ ejemplos/*.svg
 
 # El paquete de la extension se genera, no se guarda.
 editor/vscode-fal/*.vsix
+docs/manual.html

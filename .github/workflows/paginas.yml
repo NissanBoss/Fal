@@ -47,6 +47,22 @@ jobs:
           cp ejemplos/*.fal docs/ejemplos/
           ls -lh docs/ docs/ejemplos/
 
+      # El manual se fabrica desde MANUAL.md en cada publicacion, para que no
+      # haya dos copias del mismo texto separandose poco a poco. El conversor
+      # esta en herramientas/manual y no usa ninguna libreria, igual que el
+      # resto del proyecto.
+      - name: Hacer la pagina del manual
+        run: |
+          go run ./herramientas/manual MANUAL.md docs/manual.html
+          test -s docs/manual.html
+          # Si el conversor deja markdown sin convertir, es que ha dejado de
+          # entender algo que el manual usa, y eso se ve en la pagina.
+          if grep -qE '^\| |^\*\*|^```' docs/manual.html; then
+            echo "el manual tiene markdown sin convertir:"
+            grep -nE '^\| |^\*\*|^```' docs/manual.html | head
+            exit 1
+          fi
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
