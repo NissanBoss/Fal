@@ -1,0 +1,59 @@
+/* El estilo de las tres paginas legales. Compartido en un archivo aparte y
+   no repetido dentro de cada una, porque son tres y algun dia habra que
+   cambiarles algo a la vez.
+
+   Estas paginas no llevan ni un script, asi que su politica de contenidos
+   es la mas cerrada que se puede escribir: script-src none. Va a mano en
+   cada archivo, no hace falta calcular ningun hash. */
+
+:root {
+  --papel: #fbfaf7; --caja: #ffffff; --tinta: #1a1a18; --suave: #5f5c55;
+  --borde: #e2ded4; --azul: #1c4f8b; --tierra: #9c4420;
+  --codigo-fondo: #f6f4ef;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --papel: #16171a; --caja: #1d1f23; --tinta: #e8e6e1; --suave: #a2a099;
+    --borde: #30323a; --azul: #79b0e4; --tierra: #e0865c; --codigo-fondo: #1a1c20;
+  }
+}
+* { box-sizing: border-box; }
+* { scrollbar-width: thin; scrollbar-color: var(--borde) transparent; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 6px; border: 3px solid var(--papel); }
+
+body { margin: 0; background: var(--papel); color: var(--tinta); font: 16px/1.65 var(--sans); }
+h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.25; text-wrap: balance; }
+h1 { font-size: 31px; margin: 0 0 6px; }
+h2 { font-size: 21px; margin: 34px 0 10px; }
+h3 { font-size: 17px; margin: 22px 0 6px; font-family: var(--sans); }
+a { color: var(--azul); }
+p, li { max-width: 42em; text-wrap: pretty; }
+code { font-family: var(--mono); background: var(--codigo-fondo); border: 1px solid var(--borde); border-radius: 4px; padding: 1px 5px; font-size: .87em; }
+
+nav { border-bottom: 1px solid var(--borde); background: var(--papel); }
+nav .centro { display: flex; align-items: center; gap: 16px; height: 56px; }
+.marca { font-family: var(--serif); font-size: 20px; font-weight: 600; color: var(--tinta); text-decoration: none; }
+.marca span { color: var(--tierra); }
+.migas { color: var(--suave); font-size: 15px; }
+.centro { max-width: 840px; margin: 0 auto; padding: 0 22px; }
+
+main { padding: 30px 22px 70px; }
+.fecha { color: var(--suave); font-size: 14px; margin: 0 0 30px; }
+table { border-collapse: collapse; width: 100%; max-width: 42em; margin: 14px 0; font-size: 14.5px; }
+th, td { border: 1px solid var(--borde); padding: 8px 11px; text-align: left; vertical-align: top; }
+th { background: var(--codigo-fondo); font-weight: 600; }
+.caja {
+  border: 1px solid var(--borde); border-left: 3px solid var(--tierra);
+  border-radius: 0 8px 8px 0; background: var(--caja);
+  padding: 14px 17px; margin: 22px 0; max-width: 42em;
+}
+.caja b { display: block; margin-bottom: 4px; }
+.caja p:last-child { margin-bottom: 0; }
+footer { border-top: 1px solid var(--borde); padding: 26px 0 44px; font-size: 14.5px; color: var(--suave); }
+footer .centro { display: flex; gap: 22px; flex-wrap: wrap; align-items: baseline; }
+footer a { color: var(--suave); }

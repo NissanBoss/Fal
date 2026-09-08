@@ -32,3 +32,4 @@ Lo que cuesta, dicho por los autores: en cuanto una expresión crece, escribirla
 
 - [Extensión de VS Code](https://github.com/NissanBoss/Fal/tree/main/editor): coloreado de sintaxis.
 - Licencia MIT. El lenguaje y todo lo que hay alrededor son software libre.
+- [Aviso legal](https://fal-lang.org/aviso-legal.html), [privacidad](https://fal-lang.org/privacidad.html) y [cookies](https://fal-lang.org/cookies.html). Resumen: no se pide correo, no se guarda la IP, no hay analitica ni rastreo, y la unica cookie es la de sesion.

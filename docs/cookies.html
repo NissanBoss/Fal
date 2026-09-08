@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Política de cookies · Fal</title>
+<meta name="description" content="Fal usa una sola cookie, la de sesión, y solo si te haces una cuenta. Por eso no hay ventana de aceptar cookies.">
+<link rel="canonical" href="https://fal-lang.org/cookies.html">
+<link rel="stylesheet" href="/legal.css">
+</head>
+<body>
+
+<nav>
+  <div class="centro">
+    <a class="marca" href="/">Fal<span>.</span></a>
+    <span class="migas">Política de cookies</span>
+  </div>
+</nav>
+
+<main class="centro">
+<h1>Política de cookies</h1>
+<p class="fecha">Última actualización: 8 de septiembre de 2026</p>
+
+<div class="caja">
+  <b>Por qué no te sale la ventanita esa</b>
+  <p>Habrás notado que aquí no aparece ningún cartel pidiéndote que aceptes
+  cookies. No es un descuido ni una ilegalidad: es que <b>no hay ninguna
+  cookie que aceptar</b>. La ley solo obliga a pedir permiso para las que no
+  son imprescindibles, y aquí no se usa ninguna de esas.</p>
+</div>
+
+<h2>1. Qué es una cookie</h2>
+<p>Un archivo diminuto que una web le pide al navegador que guarde y le
+devuelva en la siguiente visita. Sirven para cosas necesarias, como recordar
+que has entrado en tu cuenta, y para cosas que no lo son, como seguirte de
+página en página para saber qué te interesa y venderlo.</p>
+
+<h2>2. La única cookie de este sitio</h2>
+<table>
+  <tr><th>Nombre</th><th>Qué guarda</th><th>Cuánto dura</th><th>Quién la pone</th></tr>
+  <tr>
+    <td><code>sesion</code></td>
+    <td>Un número aleatorio, y nada más. No lleva tu nombre, ni tu
+    contraseña, ni nada legible. Sirve para que el servidor sepa que la
+    persona que pide la siguiente página es la misma que entró.</td>
+    <td>180 días, o hasta que cierres sesión</td>
+    <td>Fal (propia)</td>
+  </tr>
+</table>
+
+<p>Solo se pone <b>si te haces una cuenta y entras</b>. Si vienes a leer el
+manual, a probar el lenguaje o a leer el foro, no se te pone ninguna cookie
+en absoluto.</p>
+
+<h3>Cómo está puesta</h3>
+<ul>
+  <li><code>HttpOnly</code>: ningún script de la página puede leerla, ni
+  siquiera los míos. Así, si alguien consiguiera colar código en la web, no
+  podría robar tu sesión.</li>
+  <li><code>Secure</code>: solo viaja por conexión cifrada. Nunca sale en
+  claro.</li>
+  <li><code>SameSite=Lax</code>: no se manda cuando otra web te trae hasta
+  aquí a hacer algo, que es como funcionan los ataques de petición
+  falsificada.</li>
+</ul>
+
+<p>Y en el servidor no se guarda ni siquiera ese número: se guarda un
+resumen suyo. Si alguien se llevara la base de datos, no podría fabricarse
+una cookie válida con lo que hay dentro.</p>
+
+<h2>3. Es una cookie técnica, y eso importa</h2>
+<p>El artículo 22.2 de la Ley 34/2002 obliga a pedir consentimiento para las
+cookies, salvo para las estrictamente necesarias para prestar un servicio
+que el usuario ha pedido expresamente.</p>
+<p>Mantener la sesión abierta de alguien que acaba de entrar en su cuenta es
+el ejemplo de manual de esa excepción: <b>tú pides entrar, y sin esa cookie
+no se puede entrar</b>. Por eso no hay cartel, y por eso no lo habrá.</p>
+
+<h2>4. Lo que se guarda en tu navegador y no es una cookie</h2>
+<p>Hay dos cosas que sí se guardan en tu propio ordenador, en el almacén
+local del navegador. No son cookies, nunca se mandan a ningún servidor, y no
+salen de tu máquina:</p>
+<table>
+  <tr><th>Dónde</th><th>Qué</th><th>Por qué</th></tr>
+  <tr>
+    <td>La academia</td>
+    <td>Tu progreso del curso y el código que llevas escrito en cada
+    ejercicio.</td>
+    <td>Para que puedas seguir el curso <b>sin cuenta</b> y no perderlo todo
+    al cerrar la pestaña.</td>
+  </tr>
+  <tr>
+    <td>La página de probar</td>
+    <td>El último programa que escribiste ahí.</td>
+    <td>Para que siga estando cuando vuelvas.</td>
+  </tr>
+</table>
+<p>Puedes borrar las dos cosas vaciando los datos del sitio en tu navegador,
+igual que borrarías cookies.</p>
+
+<h2>5. Lo que este sitio no tiene</h2>
+<p>Es más corto contarlo así:</p>
+<ul>
+  <li>Ninguna cookie de terceros.</li>
+  <li>Google Analytics ni ninguna otra herramienta de medición.</li>
+  <li>Píxeles de Facebook, de Google, ni de nadie.</li>
+  <li>Botones de redes sociales que te sigan la pista.</li>
+  <li>Publicidad, ni propia ni de nadie.</li>
+  <li>Fuentes ni scripts cargados desde otro servidor. Todo lo que ejecuta
+  esta web está alojado aquí mismo, y la política de contenidos del sitio
+  prohíbe expresamente cargar nada de fuera.</li>
+</ul>
+
+<h2>6. Cómo controlarlas de todas formas</h2>
+<p>Todos los navegadores permiten ver, bloquear y borrar cookies desde sus
+ajustes. Si bloqueas la de este sitio, todo seguirá funcionando salvo una
+cosa: no podrás mantener la sesión abierta, así que el curso no recordará
+por dónde vas entre dispositivos y no podrás escribir en el foro.</p>
+
+<p>Puedes leer también la <a href="/privacidad.html">política de
+privacidad</a>, que cuenta qué se guarda en el servidor.</p>
+</main>
+
+<footer>
+  <div class="centro">
+    <a href="/">Portada</a>
+    <a href="/aviso-legal.html">Aviso legal</a>
+    <a href="/privacidad.html">Privacidad</a>
+    <a href="/cookies.html">Cookies</a>
+  </div>
+</footer>
+
+</body>
+</html>
