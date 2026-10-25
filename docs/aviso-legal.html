@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aviso legal · Fal</title>
 <meta name="description" content="Qué es Fal, quién lo mantiene, con qué licencia se publica y bajo qué condiciones se usa.">
@@ -10,22 +10,39 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="/legal.css">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16171a" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="comun.css">
+<link rel="stylesheet" href="legal.css">
 </head>
 <body>
 
-<nav>
-  <div class="centro">
-    <a class="marca" href="/">Fal<span>.</span></a>
-    <span class="migas">Aviso legal</span>
+<nav class="sitio">
+  <div class="centro fila">
+    <a class="marca" href="./">Fal<span>.</span></a>
+    <div class="enlaces">
+      <a href="probar.html">Probar</a>
+      <a href="https://aprende.fal-lang.org/">Aprender</a>
+      <a href="https://foro.fal-lang.org/">Foro</a>
+      <a class="opcional" href="manual.html">Manual</a>
+      <a class="opcional" href="https://github.com/NissanBoss/Fal">Código</a>
+    </div>
   </div>
 </nav>
 
-<main class="centro">
-<h1>Aviso legal</h1>
-<p class="fecha">Última actualización: 8 de septiembre de 2026</p>
+<main class="centro legal">
+  <header class="cabeza">
+    <nav class="pestanas" aria-label="Páginas legales">
+      <a href="aviso-legal.html" aria-current="page">Aviso legal</a>
+      <a href="privacidad.html">Privacidad</a>
+      <a href="cookies.html">Cookies</a>
+    </nav>
+    <h1>Aviso legal</h1>
+    <p class="fecha">Última actualización: 25 de octubre de 2026</p>
+  </header>
 
-<h2>1. Qué es esto</h2>
+  <article class="texto">
+<h2 id="que-es-esto">1. Qué es esto</h2>
 <p>Fal es un lenguaje de programación con las palabras en español, y este
 sitio es su casa: la documentación, un sitio donde probarlo sin instalar
 nada, un curso gratuito y un foro.</p>
@@ -34,7 +51,7 @@ detrás. No se vende nada, no hay publicidad, no hay patrocinadores y no hay
 enlaces de afiliado. Todo lo que hay aquí se puede usar sin pagar y sin
 registrarse.</p>
 
-<h2>2. Quién lo mantiene y cómo contactar</h2>
+<h2 id="quien-lo-mantiene-y-como-contactar">2. Quién lo mantiene y cómo contactar</h2>
 <p>El sitio lo mantiene una persona física a título particular, sin
 actividad profesional ni mercantil asociada al mismo.</p>
 <p>El canal de contacto para cualquier asunto, incluidos los legales, es el
@@ -43,7 +60,7 @@ correo <code>nissanbusiness@duck.com</code>, y se atiende en castellano.</p>
 <a href="https://github.com/NissanBoss/Fal/issues">repositorio del
 proyecto</a>, que es donde ocurre el desarrollo.</p>
 
-<h2>3. Direcciones que forman parte del sitio</h2>
+<h2 id="direcciones-que-forman-parte-del-sitio">3. Direcciones que forman parte del sitio</h2>
 <table>
   <tr><th>Dirección</th><th>Qué es</th></tr>
   <tr><td><code>fal-lang.org</code></td><td>La portada, el manual y la página de probar.</td></tr>
@@ -52,7 +69,7 @@ proyecto</a>, que es donde ocurre el desarrollo.</p>
   <tr><td><code>api.fal-lang.org</code></td><td>El servidor de cuentas. No es una página que se visite.</td></tr>
 </table>
 
-<h2>4. Con qué licencia</h2>
+<h2 id="con-que-licencia">4. Con qué licencia</h2>
 <p>El intérprete de Fal y su código fuente se publican con
 <b>licencia MIT</b>, cuyo texto completo está en el
 <a href="https://github.com/NissanBoss/Fal/blob/main/LICENSE">repositorio</a>.
@@ -61,11 +78,16 @@ comerciales, conservando el aviso de copyright.</p>
 <p>Los textos del curso y del manual son del autor del proyecto. Puedes
 citarlos y enlazarlos con libertad; para copiarlos enteros en otro sitio,
 escribe y hablamos.</p>
+<p>Las letras de la web son Newsreader e IBM Plex Mono, publicadas con la
+licencia SIL Open Font License, cuyo texto va junto a los archivos de las
+fuentes. Los nombres de otros lenguajes que aparecen en la portada son
+marcas de sus dueños y se citan solo para nombrarlos: Fal no tiene relación
+con ninguno.</p>
 <p>Lo que escriben las personas en el foro es de quien lo escribe. Al
 publicarlo aquí concedes permiso para mostrarlo en el foro, y nada más: no
 se cede a nadie ni se usa para otra cosa.</p>
 
-<h2>5. Condiciones de uso</h2>
+<h2 id="condiciones-de-uso">5. Condiciones de uso</h2>
 <p>Usar este sitio es gratis y no exige aceptar nada. Si te haces una cuenta
 para el curso o el foro, se aplican estas cuatro reglas, que son las
 mínimas:</p>
@@ -77,11 +99,23 @@ mínimas:</p>
   <li>Escribe en el foro para ayudar o para que te ayuden, que es para lo
   que está.</li>
 </ul>
-<p>Quien modera el foro puede cerrar temas y retirar mensajes que incumplan
-lo anterior, y en casos graves cerrar la cuenta. Si crees que se ha hecho
-mal, escribe al correo de arriba.</p>
+<h2 id="como-se-modera-y-como-avisar-de-algo">6. Cómo se modera y cómo avisar de algo</h2>
+<p>Los mensajes del foro se publican al momento: nadie los revisa antes, y
+no hay ningún programa que los filtre o los puntúe. Lo que se modera se
+modera a mano, por personas.</p>
+<p><b>Para avisar de un mensaje</b> que sea ilegal o que incumpla las reglas
+de arriba, cada mensaje tiene un enlace «Avisar» que abre un correo ya
+preparado con la dirección del mensaje. No hace falta tener cuenta. También
+vale escribir a <code>nissanbusiness@duck.com</code> con el enlace y
+contando qué pasa. Los avisos se leen y se contestan lo antes posible.</p>
+<p>Quien modera puede retirar mensajes y temas, y cerrar temas para que no
+se responda más. En casos graves se puede cerrar la cuenta. Un mensaje
+retirado deja un hueco que dice que ahí había algo.</p>
+<p>Como no tenemos tu correo, no hay forma de avisarte cuando se retira algo
+tuyo. Si pasa y quieres saber por qué, o crees que se ha hecho mal, escribe
+al correo de arriba y se te explica y se revisa.</p>
 
-<h2>6. Qué no se garantiza</h2>
+<h2 id="que-no-se-garantiza">7. Qué no se garantiza</h2>
 <p>Esto es importante y prefiero decirlo claro:</p>
 <div class="caja">
   <b>El servicio se ofrece tal cual, sin garantía de ninguna clase.</b>
@@ -92,47 +126,70 @@ mal, escribe al correo de arriba.</p>
 <p>En concreto, no se garantiza que el sitio esté siempre disponible ni
 libre de errores, que el intérprete de Fal esté libre de fallos, ni que los
 datos de tu cuenta sobrevivan a un problema técnico. <b>Si tu progreso del
-curso te importa, guárdate tu propio código.</b></p>
+curso te importa, guárdate una copia:</b> en la academia, pulsando tu
+nombre, «Descargar mis datos» te da todo en un archivo.</p>
 <p>Dentro de lo que la ley permite, no se asume responsabilidad por los
 daños que puedan derivarse del uso del sitio o del lenguaje. Esto no limita
 los derechos que la ley te reconozca como consumidor ni la responsabilidad
 por dolo o negligencia grave, que no se pueden excluir.</p>
 
-<h2>7. Enlaces a otros sitios</h2>
+<h2 id="enlaces-a-otros-sitios">8. Enlaces a otros sitios</h2>
 <p>Este sitio enlaza a sitios de terceros, como GitHub. No se controla lo
 que hay en ellos ni se responde de su contenido. Y las personas del foro
 pueden poner enlaces: si pinchas uno, estás saliendo de aquí y aplican las
 condiciones de donde llegues.</p>
 
-<h2>8. Privacidad y cookies</h2>
+<h2 id="privacidad-y-cookies">9. Privacidad y cookies</h2>
 <p>Se explican en páginas aparte, y merece la pena leerlas porque son
 bastante más cortas de lo que esperas:</p>
 <ul>
-  <li><a href="/privacidad.html">Política de privacidad</a>: qué se guarda y
-  qué no. No hay correo, ni IP, ni analítica.</li>
-  <li><a href="/cookies.html">Política de cookies</a>: hay una, es técnica,
+  <li><a href="privacidad.html">Política de privacidad</a>: qué se guarda y
+  qué no. No se pide correo, no se guarda la IP y no hay analítica.</li>
+  <li><a href="cookies.html">Política de cookies</a>: hay una, es técnica,
   y por eso no ves ningún cartel.</li>
 </ul>
 
-<h2>9. Ley aplicable</h2>
+<h2 id="ley-aplicable">10. Ley aplicable</h2>
 <p>Este aviso se rige por la ley española. Para cualquier controversia serán
 competentes los juzgados que correspondan conforme a la legislación
 aplicable, sin que ello prive al usuario consumidor del derecho a acudir a
 los de su propio domicilio.</p>
 
-<h2>10. Cambios</h2>
+<h2 id="cambios">11. Cambios</h2>
 <p>Si esto cambia, cambia la fecha de arriba. Y como el sitio entero vive en
 un repositorio público, puedes ver
 <a href="https://github.com/NissanBoss/Fal/commits/main/docs/aviso-legal.html">el
 historial de cambios de esta página</a> con la fecha exacta de cada uno.</p>
+  </article>
+
+  <aside class="al-lado">
+    <nav aria-label="En esta página">
+      <p class="versalitas">En esta página</p>
+      <ol>
+        <li><a href="#que-es-esto">Qué es esto</a></li>
+        <li><a href="#quien-lo-mantiene-y-como-contactar">Quién lo mantiene y cómo contactar</a></li>
+        <li><a href="#direcciones-que-forman-parte-del-sitio">Direcciones que forman parte del sitio</a></li>
+        <li><a href="#con-que-licencia">Con qué licencia</a></li>
+        <li><a href="#condiciones-de-uso">Condiciones de uso</a></li>
+        <li><a href="#como-se-modera-y-como-avisar-de-algo">Cómo se modera y cómo avisar de algo</a></li>
+        <li><a href="#que-no-se-garantiza">Qué no se garantiza</a></li>
+        <li><a href="#enlaces-a-otros-sitios">Enlaces a otros sitios</a></li>
+        <li><a href="#privacidad-y-cookies">Privacidad y cookies</a></li>
+        <li><a href="#ley-aplicable">Ley aplicable</a></li>
+        <li><a href="#cambios">Cambios</a></li>
+      </ol>
+    </nav>
+    <p class="contacto">¿Algo no está claro? Escribe a <code>nissanbusiness@duck.com</code></p>
+  </aside>
 </main>
 
-<footer>
+<footer class="pie">
   <div class="centro">
-    <a href="/">Portada</a>
-    <a href="/aviso-legal.html">Aviso legal</a>
-    <a href="/privacidad.html">Privacidad</a>
-    <a href="/cookies.html">Cookies</a>
+    <a href="./">Portada</a>
+    <a href="aviso-legal.html">Aviso legal</a>
+    <a href="privacidad.html">Privacidad</a>
+    <a href="cookies.html">Cookies</a>
+    <span class="lejos">Sin anuncios, sin rastreo, sin cartel de cookies.</span>
   </div>
 </footer>
 

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Política de cookies · Fal</title>
 <meta name="description" content="Fal usa una sola cookie, la de sesión, y solo si te haces una cuenta. Por eso no hay ventana de aceptar cookies.">
@@ -10,21 +10,38 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="/legal.css">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16171a" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="comun.css">
+<link rel="stylesheet" href="legal.css">
 </head>
 <body>
 
-<nav>
-  <div class="centro">
-    <a class="marca" href="/">Fal<span>.</span></a>
-    <span class="migas">Política de cookies</span>
+<nav class="sitio">
+  <div class="centro fila">
+    <a class="marca" href="./">Fal<span>.</span></a>
+    <div class="enlaces">
+      <a href="probar.html">Probar</a>
+      <a href="https://aprende.fal-lang.org/">Aprender</a>
+      <a href="https://foro.fal-lang.org/">Foro</a>
+      <a class="opcional" href="manual.html">Manual</a>
+      <a class="opcional" href="https://github.com/NissanBoss/Fal">Código</a>
+    </div>
   </div>
 </nav>
 
-<main class="centro">
-<h1>Política de cookies</h1>
-<p class="fecha">Última actualización: 8 de septiembre de 2026</p>
+<main class="centro legal">
+  <header class="cabeza">
+    <nav class="pestanas" aria-label="Páginas legales">
+      <a href="aviso-legal.html">Aviso legal</a>
+      <a href="privacidad.html">Privacidad</a>
+      <a href="cookies.html" aria-current="page">Cookies</a>
+    </nav>
+    <h1>Política de cookies</h1>
+    <p class="fecha">Última actualización: 8 de septiembre de 2026</p>
+  </header>
 
+  <article class="texto">
 <div class="caja">
   <b>Por qué no te sale la ventanita esa</b>
   <p>Habrás notado que aquí no aparece ningún cartel pidiéndote que aceptes
@@ -33,13 +50,13 @@
   son imprescindibles, y aquí no se usa ninguna de esas.</p>
 </div>
 
-<h2>1. Qué es una cookie</h2>
+<h2 id="que-es-una-cookie">1. Qué es una cookie</h2>
 <p>Un archivo diminuto que una web le pide al navegador que guarde y le
 devuelva en la siguiente visita. Sirven para cosas necesarias, como recordar
 que has entrado en tu cuenta, y para cosas que no lo son, como seguirte de
 página en página para saber qué te interesa y venderlo.</p>
 
-<h2>2. La única cookie de este sitio</h2>
+<h2 id="la-unica-cookie-de-este-sitio">2. La única cookie de este sitio</h2>
 <table>
   <tr><th>Nombre</th><th>Qué guarda</th><th>Cuánto dura</th><th>Quién la pone</th></tr>
   <tr>
@@ -72,7 +89,7 @@ en absoluto.</p>
 resumen suyo. Si alguien se llevara la base de datos, no podría fabricarse
 una cookie válida con lo que hay dentro.</p>
 
-<h2>3. Es una cookie técnica, y eso importa</h2>
+<h2 id="es-una-cookie-tecnica-y-eso-importa">3. Es una cookie técnica, y eso importa</h2>
 <p>El artículo 22.2 de la Ley 34/2002 obliga a pedir consentimiento para las
 cookies, salvo para las estrictamente necesarias para prestar un servicio
 que el usuario ha pedido expresamente.</p>
@@ -80,7 +97,7 @@ que el usuario ha pedido expresamente.</p>
 el ejemplo de manual de esa excepción: <b>tú pides entrar, y sin esa cookie
 no se puede entrar</b>. Por eso no hay cartel, y por eso no lo habrá.</p>
 
-<h2>4. Lo que se guarda en tu navegador y no es una cookie</h2>
+<h2 id="lo-que-se-guarda-en-tu-navegador-y-no-es-una-cookie">4. Lo que se guarda en tu navegador y no es una cookie</h2>
 <p>Hay dos cosas que sí se guardan en tu propio ordenador, en el almacén
 local del navegador. No son cookies, nunca se mandan a ningún servidor, y no
 salen de tu máquina:</p>
@@ -102,7 +119,7 @@ salen de tu máquina:</p>
 <p>Puedes borrar las dos cosas vaciando los datos del sitio en tu navegador,
 igual que borrarías cookies.</p>
 
-<h2>5. Lo que este sitio no tiene</h2>
+<h2 id="lo-que-este-sitio-no-tiene">5. Lo que este sitio no tiene</h2>
 <p>Es más corto contarlo así:</p>
 <ul>
   <li>Ninguna cookie de terceros.</li>
@@ -115,22 +132,39 @@ igual que borrarías cookies.</p>
   prohíbe expresamente cargar nada de fuera.</li>
 </ul>
 
-<h2>6. Cómo controlarlas de todas formas</h2>
+<h2 id="como-controlarlas-de-todas-formas">6. Cómo controlarlas de todas formas</h2>
 <p>Todos los navegadores permiten ver, bloquear y borrar cookies desde sus
 ajustes. Si bloqueas la de este sitio, todo seguirá funcionando salvo una
 cosa: no podrás mantener la sesión abierta, así que el curso no recordará
 por dónde vas entre dispositivos y no podrás escribir en el foro.</p>
 
-<p>Puedes leer también la <a href="/privacidad.html">política de
+<p>Puedes leer también la <a href="privacidad.html">política de
 privacidad</a>, que cuenta qué se guarda en el servidor.</p>
+  </article>
+
+  <aside class="al-lado">
+    <nav aria-label="En esta página">
+      <p class="versalitas">En esta página</p>
+      <ol>
+        <li><a href="#que-es-una-cookie">Qué es una cookie</a></li>
+        <li><a href="#la-unica-cookie-de-este-sitio">La única cookie de este sitio</a></li>
+        <li><a href="#es-una-cookie-tecnica-y-eso-importa">Es una cookie técnica, y eso importa</a></li>
+        <li><a href="#lo-que-se-guarda-en-tu-navegador-y-no-es-una-cookie">Lo que se guarda en tu navegador y no es una cookie</a></li>
+        <li><a href="#lo-que-este-sitio-no-tiene">Lo que este sitio no tiene</a></li>
+        <li><a href="#como-controlarlas-de-todas-formas">Cómo controlarlas de todas formas</a></li>
+      </ol>
+    </nav>
+    <p class="contacto">¿Algo no está claro? Escribe a <code>nissanbusiness@duck.com</code></p>
+  </aside>
 </main>
 
-<footer>
+<footer class="pie">
   <div class="centro">
-    <a href="/">Portada</a>
-    <a href="/aviso-legal.html">Aviso legal</a>
-    <a href="/privacidad.html">Privacidad</a>
-    <a href="/cookies.html">Cookies</a>
+    <a href="./">Portada</a>
+    <a href="aviso-legal.html">Aviso legal</a>
+    <a href="privacidad.html">Privacidad</a>
+    <a href="cookies.html">Cookies</a>
+    <span class="lejos">Sin anuncios, sin rastreo, sin cartel de cookies.</span>
   </div>
 </footer>
 

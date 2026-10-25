@@ -1,0 +1,198 @@
+/* Lo que comparten todas las páginas menos la portada, que lo lleva dentro
+   para no pedir un archivo más en la primera visita. Si cambias un color
+   aquí, cámbialo también allí: antes cada página tenía su propia copia de
+   los colores y la academia acabó con un verde que la portada no tenía. */
+
+/* Las letras se sirven desde el propio sitio y no desde Google Fonts: pedirlas
+   fuera le cuenta a un tercero quién visita la página. Las dos son OFL. */
+@font-face {
+  font-family: "Newsreader"; font-style: normal; font-weight: 200 800; font-display: swap;
+  src: url("fuentes/newsreader.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Newsreader"; font-style: italic; font-weight: 200 800; font-display: swap;
+  src: url("fuentes/newsreader-cursiva.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("fuentes/plex-mono.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono"; font-style: italic; font-weight: 400; font-display: swap;
+  src: url("fuentes/plex-mono-cursiva.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("fuentes/plex-mono-negrita.woff2") format("woff2");
+}
+
+:root {
+  --papel: #fbfaf7;
+  --caja: #ffffff;
+  --tinta: #1a1a18;
+  --suave: #5f5c55;
+  --borde: #e2ded4;
+  --azul: #1c4f8b;
+  --tierra: #9c4420;
+  --verde: #216e3f;
+  --codigo-fondo: #f6f4ef;
+  --tierra-velo: color-mix(in srgb, var(--tierra) 13%, transparent);
+  --sombra: 0 1px 0 var(--borde), 0 24px 52px -32px rgba(40, 30, 10, 0.34);
+  --serif: "Newsreader", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+  --alto-barra: 60px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --papel: #16171a;
+    --caja: #1d1f23;
+    --tinta: #e8e6e1;
+    --suave: #a2a099;
+    --borde: #30323a;
+    --azul: #79b0e4;
+    --tierra: #e0865c;
+    --verde: #6fca92;
+    --codigo-fondo: #1a1c20;
+    --sombra: 0 1px 0 var(--borde), 0 24px 52px -32px rgba(0, 0, 0, 0.75);
+  }
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--alto-barra) + 16px); }
+* { scrollbar-width: thin; scrollbar-color: var(--borde) transparent; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 6px; border: 3px solid var(--papel); }
+::-webkit-scrollbar-thumb:hover { background: var(--suave); }
+::-webkit-scrollbar-corner { background: transparent; }
+
+body { margin: 0; background: var(--papel); color: var(--tinta); font: 16px/1.6 var(--sans); }
+::selection { background: var(--tierra-velo); }
+a { color: var(--azul); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.15; text-wrap: balance; }
+code, pre, textarea, kbd { font-family: var(--mono); }
+button { font: inherit; cursor: pointer; color: inherit; }
+:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; border-radius: 3px; }
+:not(pre) > code {
+  background: var(--codigo-fondo); border: 1px solid var(--borde);
+  border-radius: 4px; padding: 1px 5px; font-size: 0.85em;
+}
+.centro { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
+@media (max-width: 520px) { .centro { padding: 0 16px; } }
+.versalitas { color: var(--suave); letter-spacing: 0.08em; font-variant-caps: all-small-caps; font-size: 14.5px; }
+.para-lectores {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+/* El código pintado, igual en todas partes. */
+.pal { color: var(--tierra); }
+.txt { color: var(--azul); }
+.com { color: var(--suave); font-style: italic; }
+
+/* La barra de arriba. La página en la que estás lleva una raya debajo del
+   nombre: con cuatro sitios que se parecen tanto, sin ella no se sabía si
+   estabas en el foro o en el curso hasta leer el título. */
+nav.sitio {
+  border-bottom: 1px solid var(--borde);
+  background: color-mix(in srgb, var(--papel) 86%, transparent);
+  -webkit-backdrop-filter: saturate(1.2) blur(10px);
+  backdrop-filter: saturate(1.2) blur(10px);
+  position: sticky; top: 0; z-index: 30;
+}
+nav.sitio .fila { display: flex; align-items: center; gap: 24px; height: var(--alto-barra); }
+nav.sitio .marca {
+  font-family: var(--serif); font-size: 25px; font-weight: 600;
+  color: var(--tinta); text-decoration: none; letter-spacing: -0.01em;
+}
+nav.sitio .marca span { color: var(--tierra); }
+nav.sitio .enlaces { display: flex; align-items: center; gap: 22px; margin-left: auto; font-size: 15px; }
+nav.sitio .enlaces a { color: var(--suave); text-decoration: none; position: relative; }
+nav.sitio .enlaces a:hover { color: var(--tinta); }
+nav.sitio .enlaces a[aria-current="page"] { color: var(--tinta); }
+nav.sitio .enlaces a[aria-current="page"]::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -19px; height: 2px;
+  background: var(--tierra); border-radius: 2px 2px 0 0;
+}
+@media (max-width: 760px) {
+  nav.sitio .fila { gap: 14px; }
+  nav.sitio .enlaces { gap: 15px; font-size: 14.5px; }
+  nav.sitio .enlaces a.opcional { display: none; }
+}
+
+.boton {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 9px 16px; border-radius: 8px; cursor: pointer; white-space: nowrap;
+  text-decoration: none; font: 500 15px/1.2 var(--sans);
+  border: 1px solid var(--azul); color: var(--azul); background: transparent;
+  transition: background-color .15s, color .15s, border-color .15s, transform .15s;
+}
+.boton:hover { background: color-mix(in srgb, var(--azul) 8%, transparent); }
+.boton:active { transform: translateY(1px); }
+.boton.lleno { background: var(--azul); color: var(--papel); }
+.boton.lleno:hover { background: color-mix(in srgb, var(--azul) 86%, var(--tinta)); }
+.boton.gris { border-color: var(--borde); color: var(--suave); }
+.boton.gris:hover { color: var(--tinta); border-color: color-mix(in srgb, var(--suave) 50%, var(--borde)); background: transparent; }
+.boton.pequeno { padding: 5px 11px; font-size: 13.5px; border-radius: 7px; }
+.boton:disabled { opacity: .5; cursor: default; transform: none; }
+.boton svg { width: 11px; height: 11px; fill: currentColor; flex: none; }
+.enlace-boton {
+  background: none; border: 0; padding: 0; color: var(--azul);
+  text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 1px;
+}
+
+/* El editor: un textarea transparente encima del código pintado, con la raya
+   roja del margen de los cuadernos de colegio entre números y texto. */
+.editor { display: flex; position: relative; --alto-linea: 23px; background: var(--caja); }
+.editor .numeros {
+  flex: none; width: 46px; padding: 16px 10px 16px 0; text-align: right;
+  color: color-mix(in srgb, var(--suave) 60%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--tierra) 35%, transparent);
+  /* El alto de línea en píxeles: con la letra más pequeña que la del código,
+     un valor relativo daba otra altura y los números se iban despegando. */
+  font: 12.5px/var(--alto-linea) var(--mono); user-select: none; white-space: pre;
+}
+.capas { position: relative; flex: 1; min-width: 0; overflow: hidden; }
+.capas pre, .capas textarea {
+  margin: 0; padding: 16px 18px; border: 0;
+  font: 14.5px/var(--alto-linea) var(--mono); tab-size: 4; white-space: pre;
+  letter-spacing: 0; word-spacing: 0;
+}
+.capas pre { width: max-content; min-width: 100%; min-height: 100%; pointer-events: none; color: var(--tinta); }
+.capas textarea {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  background: transparent; color: transparent; caret-color: var(--tinta);
+  resize: none; outline: none; overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+}
+.capas textarea::-webkit-scrollbar { display: none; }
+.capas textarea::selection { background: var(--tierra-velo); color: transparent; }
+.capas textarea::placeholder { color: var(--suave); opacity: .7; }
+
+kbd { font-size: 12px; border: 1px solid var(--borde); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; }
+@media (hover: none) { .teclas { display: none; } }
+
+/* Los dibujos de la tortuga. El grosor que trae está pensado para el tamaño
+   real; ampliado salían brochazos. */
+.dibujo { color: var(--tierra); display: grid; place-items: center; }
+.dibujo:empty { display: none; }
+.dibujo svg { display: block; width: 100%; height: auto; max-height: 300px; }
+.dibujo line, .dibujo path, .dibujo polyline { vector-effect: non-scaling-stroke; stroke-width: 1.5px; }
+
+dialog {
+  border: 1px solid var(--borde); border-radius: 14px; background: var(--caja); color: var(--tinta);
+  padding: 0; max-width: 440px; width: calc(100% - 28px); box-shadow: var(--sombra);
+}
+dialog::backdrop { background: rgba(20, 18, 14, .45); backdrop-filter: blur(2px); }
+
+footer.pie { border-top: 1px solid var(--borde); padding: 30px 0 44px; font-size: 14.5px; color: var(--suave); }
+footer.pie .centro { display: flex; gap: 22px; flex-wrap: wrap; align-items: baseline; }
+footer.pie a { color: var(--suave); }
+footer.pie a:hover { color: var(--tinta); }
+footer.pie .lejos { margin-left: auto; font: italic 17px var(--serif); }
+@media (max-width: 640px) { footer.pie .lejos { margin-left: 0; width: 100%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
