@@ -87,10 +87,18 @@ func convertir(texto string) (string, []seccion) {
 			}
 			cerrarLista()
 			cerrarTabla()
-			idioma := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(linea), "```"))
+			// "```fal probar" marca un ejemplo que corre tal cual y que la
+			// pagina puede mandar al playground. Se marca a mano porque la
+			// mayoria son trozos sueltos que fallan sin lo de alrededor, y
+			// estrenarse en el playground con un error es peor que no
+			// tener el boton. GitHub solo mira la primera palabra.
+			palabras := strings.Fields(strings.TrimPrefix(strings.TrimSpace(linea), "```"))
 			clase := ""
-			if idioma != "" {
-				clase = ` class="lenguaje-` + escapar(idioma) + `"`
+			switch {
+			case len(palabras) > 1 && palabras[1] == "probar":
+				clase = ` class="corre"`
+			case len(palabras) > 0 && palabras[0] != "fal":
+				clase = ` class="lenguaje-` + escapar(palabras[0]) + `"`
 			}
 			salida.WriteString("<pre" + clase + "><code>")
 			enCodigo = true
@@ -144,14 +152,26 @@ func convertir(texto string) (string, []seccion) {
 		// sirve para saber que lo de arriba era una cabecera.
 		if strings.HasPrefix(recortada, "|") {
 			celdas := partirFila(recortada)
-			esSeparador := true
+			// Una fila separadora lleva guiones. Sin mirar eso, una cabecera
+			// vacia ("| | |") tambien parecia separadora, se saltaba, y la
+			// primera fila de datos acababa haciendo de cabecera.
+			esSeparador := strings.Contains(recortada, "-")
+			vacia := true
 			for _, c := range celdas {
 				if strings.Trim(c, "-: ") != "" {
 					esSeparador = false
-					break
+				}
+				if c != "" {
+					vacia = false
 				}
 			}
 			if esSeparador {
+				continue
+			}
+			if !enTabla && vacia {
+				cerrarLista()
+				salida.WriteString("<table><tbody>\n")
+				enTabla = true
 				continue
 			}
 			if !enTabla {
@@ -173,13 +193,28 @@ func convertir(texto string) (string, []seccion) {
 		}
 		cerrarTabla()
 
+		// Un punto de lista puede seguir en las lineas de debajo. Sin juntarlas
+		// aqui, la segunda mitad salia como un parrafo suelto despues de la
+		// lista, y "Lo que sigue faltando" se leia partido en tres sitios.
+		punto := func(primera string) string {
+			trozos := []string{primera}
+			for i+1 < len(lineas) {
+				siguiente := strings.TrimSpace(lineas[i+1])
+				if siguiente == "" || empiezaBloque(siguiente) {
+					break
+				}
+				trozos = append(trozos, siguiente)
+				i++
+			}
+			return "<li>" + enLinea(strings.Join(trozos, " ")) + "</li>\n"
+		}
 		if m := regexp.MustCompile(`^[-*]\s+(.*)$`).FindStringSubmatch(recortada); m != nil {
 			if enLista != "ul" {
 				cerrarLista()
 				salida.WriteString("<ul>\n")
 				enLista = "ul"
 			}
-			salida.WriteString("<li>" + enLinea(m[1]) + "</li>\n")
+			salida.WriteString(punto(m[1]))
 			continue
 		}
 		if m := regexp.MustCompile(`^\d+\.\s+(.*)$`).FindStringSubmatch(recortada); m != nil {
@@ -188,7 +223,7 @@ func convertir(texto string) (string, []seccion) {
 				salida.WriteString("<ol>\n")
 				enLista = "ol"
 			}
-			salida.WriteString("<li>" + enLinea(m[1]) + "</li>\n")
+			salida.WriteString(punto(m[1]))
 			continue
 		}
 		cerrarLista()
@@ -225,11 +260,15 @@ func empiezaBloque(linea string) bool {
 	return regexp.MustCompile(`^([-*]\s+|\d+\.\s+)`).MatchString(linea)
 }
 
+// partirFila respeta "\|", que es como se escribe una barra dentro de una
+// celda. Partiendo por todas, "a \|\| b" de la tabla de Python salia
+// repartido entre tres columnas con las comillas de codigo descolgadas.
 func partirFila(linea string) []string {
 	linea = strings.TrimSuffix(strings.TrimPrefix(strings.TrimSpace(linea), "|"), "|")
+	linea = strings.ReplaceAll(linea, `\|`, "\x01")
 	trozos := strings.Split(linea, "|")
 	for i := range trozos {
-		trozos[i] = strings.TrimSpace(trozos[i])
+		trozos[i] = strings.TrimSpace(strings.ReplaceAll(trozos[i], "\x01", "|"))
 	}
 	return trozos
 }

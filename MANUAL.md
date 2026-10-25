@@ -204,7 +204,7 @@ Dentro de un bucle: `detente` lo corta, `continua` salta a la vuelta siguiente.
 
 ## Listas
 
-```
+```fal probar
 frutas es lista con "manzana" y "pera" y "uva"
 vacia es lista vacia
 
@@ -221,7 +221,7 @@ quita 3 de frutas
 
 ## Diccionarios
 
-```
+```fal probar
 edades es diccionario vacio
 elemento "ana" de edades es 25
 
@@ -255,7 +255,7 @@ agrega 9 a a
 
 # Funciones
 
-```
+```fal probar
 funcion sumar con a y b
     devuelve a mas b
 fin
@@ -347,7 +347,7 @@ te envuelve. En otros lenguajes hacen falta dos palabras (`global` y `nonlocal`)
 
 # Objetos
 
-```
+```fal probar
 tipo Perro con nombre y edad
     funcion ladra
         escribe nombre de mi mas " dice guau"
@@ -639,7 +639,7 @@ pagina es pide con url y 5        # con 5 segundos de espera máxima
 mientras arreglas algo, y poder **probar** un programa que usa azar. Sin ella, cada
 ejecución sale distinta y no hay forma de comprobar nada:
 
-```
+```fal probar
 semilla de 7
 escribe azar entre 1 y 100      # siempre sale lo mismo
 ```
@@ -708,14 +708,14 @@ Los colores son `negro`, `blanco`, `gris`, `rojo`, `naranja`, `amarillo`, `verde
 No hay palabras para retroceder ni para girar a la izquierda: se hace con un número
 negativo, que entre paréntesis porque detrás de un `de` no cabe un `menos n` suelto.
 
-```
+```fal probar
 camina de (menos 40)      # hacia atrás
 gira de (menos 90)        # a la izquierda
 ```
 
 Y aquí está la gracia: es el mismo bucle de siempre, pero dibujando.
 
-```
+```fal probar
 repite 36 veces
     camina de 100
     gira de 170
