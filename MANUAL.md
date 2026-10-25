@@ -899,5 +899,4 @@ adulto. Medido con esa vara, lo que queda por hacer es esto:
 
 - **Ver el programa avanzar paso a paso**, con las variables cambiando al lado. Eso
   sí haría falta, y no es lo mismo que un depurador con puntos de parada.
-- **Compartir lo que has hecho con un enlace**, como en Scratch.
 - **Sonido.**
