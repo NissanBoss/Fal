@@ -92,8 +92,45 @@ func emitirArranque(e *ensamblador, principal etiqueta, prueba bool) {
 		e.bytes(0x8E, segmento) // ds, es, ss, fs, gs
 	}
 	e.movSimbolo(rsp, "pila_tope", 0)
+
+	// Las 256 interrupciones a sus trampas antes de nada: desde aqui, un
+	// fallo del procesador ya se cuenta en vez de reiniciar la maquina.
+	e.movSimbolo(rsi, "idt", 0)
+	e.movSimbolo(rax, "trampas", 0)
+	e.movImm(rbx, 0)
+	cada := e.nueva()
+	e.aqui(cada)
+	emitirPuerta(e)
+	e.addImm(rax, 16)
+	e.addImm(rsi, 16)
+	e.addImm(rbx, 1)
+	e.cmpImm(rbx, 256)
+	e.jcc(siMenor, cada)
+	e.movSimbolo(rax, "idtr", 0)
+	e.bytes(0x0F, 0x01, 0x18) // lidt [rax]
+
 	e.call(principal)
 	emitirCongela(e, prueba, 0)
+}
+
+// emitirPuerta escribe en rsi la entrada de la tabla de interrupciones que
+// salta a la direccion de rax. Es una puerta de interrupcion (0x8E: entra
+// con las interrupciones cerradas) en el segmento de codigo 0x08. La
+// direccion va partida en tres trozos, que es como la quiere el procesador.
+func emitirPuerta(e *ensamblador) {
+	e.mov(rcx, rax)
+	e.andImm(rcx, 0xFFFF)
+	e.mov(rdx, rax)
+	e.shr(rdx, 16)
+	e.andImm(rdx, 0xFFFF)
+	e.shl(rdx, 48)
+	e.add(rcx, rdx)
+	e.movImm(rdx, 0x8E00<<32|0x08<<16)
+	e.add(rcx, rdx)
+	e.guarda(rsi, 0, rcx)
+	e.mov(rdx, rax)
+	e.shr(rdx, 32)
+	e.guarda(rsi, 8, rdx)
 }
 
 // emitirCongela para el procesador para siempre. En las pruebas antes avisa
@@ -117,6 +154,10 @@ func emitirGDT(e *ensamblador) {
 	e.marca("gdtr")
 	e.bytes(23, 0)
 	e.ref(4, "gdt", 0)
+	e.alinea(8)
+	e.marca("idtr")
+	e.bytes(0xFF, 0x0F) // 256 entradas de 16 bytes, menos uno
+	e.ref(8, "idt", 0)
 }
 
 // colocarBSS reparte la memoria que va a cero detras del archivo. La pila va
@@ -134,6 +175,7 @@ func colocarBSS(e *ensamblador, globales int) {
 	poner("pml4", 4096)
 	poner("pdpt", 4096)
 	poner("pd", 4096)
+	poner("idt", 4096)
 	poner("pila", tamanoPila)
 	e.simbolos["pila_suelo"] = e.simbolos["pila"] + margenPila
 	e.simbolos["pila_tope"] = pos

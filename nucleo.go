@@ -62,6 +62,9 @@ type compiladorNucleo struct {
 	rtLee     etiqueta
 	rtPon     etiqueta
 	rtLargo   etiqueta
+	// Las funciones que atienden alguna interrupcion. Cada una necesita su
+	// propia entrada, que guarda los registros y vuelve con iretq.
+	atenciones map[string]bool
 
 	// Lo de la funcion que se esta compilando.
 	lineas     []string
@@ -99,6 +102,7 @@ func compilarNucleo(fuente string, prueba bool) ([]byte, *ErrorFal) {
 		textos:    map[string]string{},
 	}
 	c.pilaRota, c.rtLugar, c.rtLee, c.rtPon, c.rtLargo = e.nueva(), e.nueva(), e.nueva(), e.nueva(), e.nueva()
+	c.atenciones = map[string]bool{}
 
 	lineasPreludio := strings.Split(preludioNucleo, "\n")
 	lineasUsuario := strings.Split(fuente, "\n")
@@ -184,6 +188,11 @@ var integradasNucleo = map[string][2]int{
 	"pon_en_puerto":   {2, 2},
 	"congela":         {0, 0},
 	"nucleo_etiqueta": {1, 1},
+
+	"atiende_interrupcion":     {2, 2},
+	"activa_interrupciones":    {0, 0},
+	"desactiva_interrupciones": {0, 0},
+	"espera_interrupcion":      {0, 0},
 }
 
 func (c *compiladorNucleo) recogerFunciones(programa []Instruccion, preludio bool) *ErrorFal {

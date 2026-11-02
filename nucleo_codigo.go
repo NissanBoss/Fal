@@ -7,7 +7,10 @@ package main
 // otra mitad va a la pila. Sale un codigo lento al lado del de gcc, pero
 // cada trozo se puede leer y comprobar por separado.
 
-import "strings"
+import (
+	"sort"
+	"strings"
+)
 
 func (c *compiladorNucleo) bloque(instrucciones []Instruccion) *ErrorFal {
 	for _, ins := range instrucciones {
@@ -777,7 +780,75 @@ func (c *compiladorNucleo) integrada(nombre string, args []Expresion, ln int) *E
 
 	case "region":
 		return c.region(args, ln)
+
+	case "atiende_interrupcion":
+		return c.atiende(args, ln)
+
+	case "activa_interrupciones":
+		e.bytes(0xFB) // sti
+	case "desactiva_interrupciones":
+		e.bytes(0xFA) // cli
+	case "espera_interrupcion":
+		// sti y hlt juntos: sti no deja entrar ninguna interrupcion hasta
+		// despues de la instruccion siguiente. Asi la que llegue justo aqui
+		// despierta al hlt en vez de colarse antes y dejarlo dormido sin
+		// nadie que lo despierte.
+		e.bytes(0xFB, 0xF4)
 	}
+	if strings.HasSuffix(nombre, "interrupciones") || nombre == "espera_interrupcion" {
+		e.movImm(rax, etiquetaNada)
+		e.movImm(rdx, 0)
+	}
+	return nil
+}
+
+// atiende pone una funcion del programa a atender una interrupcion. La
+// funcion se dice por su nombre y se resuelve al compilar: en el nucleo no
+// hay funciones guardadas en variables, pero el numero de la interrupcion
+// si puede salir de una cuenta.
+func (c *compiladorNucleo) atiende(args []Expresion, ln int) *ErrorFal {
+	e := c.e
+	nombre := ""
+	if n, es := args[1].(*ExNombre); es {
+		nombre = clave(n.Nombre)
+	}
+	f, hay := c.funciones[nombre]
+	if !hay || (f.preludio && !c.enPreludio) {
+		return nuevoError(`"atiende_interrupcion" necesita el nombre de una funcion tuya.`, ln,
+			"Por ejemplo:   atiende_interrupcion con 33 y teclado", ClaseValor)
+	}
+	if len(f.params) > 0 {
+		return nuevoError(`"`+nombre+`" no puede atender una interrupcion porque pide datos.`, ln,
+			"Una interrupcion llega sin datos. Lo que necesite, que lo lea de una global o de un puerto.",
+			ClaseValor)
+	}
+	c.atenciones[nombre] = true
+
+	if err := c.expr(args[0]); err != nil {
+		return err
+	}
+	c.exige(rax, etiquetaNumero, ln, "El numero de una interrupcion tiene que ser un numero.", "")
+	// Las 32 primeras son las excepciones del procesador. Algunas meten un
+	// codigo de error en la pila y otras no, y una funcion que no lo espera
+	// volveria a una direccion equivocada.
+	e.cmpImm(rdx, 32)
+	e.jcc(siMenor, c.panico(ln, "Las interrupciones de la 0 a la 31 son las excepciones del procesador.",
+		"Remapea el controlador de interrupciones para que las de los aparatos lleguen de la 32 en adelante."))
+	e.cmpImm(rdx, 255)
+	e.jcc(siMayor, c.panico(ln, "Solo hay 256 interrupciones, de la 0 a la 255.", ""))
+
+	// La entrada de la tabla son dos palabras. Si llegase esa misma
+	// interrupcion entre una y otra, saltaria a media direccion.
+	e.bytes(0x9C, 0xFA) // pushfq; cli
+	e.mov(rbx, rdx)
+	e.shl(rbx, 4)
+	e.movSimbolo(rsi, "idt", 0)
+	e.add(rsi, rbx)
+	e.movSimbolo(rax, "atencion:"+nombre, 0)
+	emitirPuerta(e)
+	e.bytes(0x9D) // popfq
+	e.movImm(rax, etiquetaNada)
+	e.movImm(rdx, 0)
 	return nil
 }
 
@@ -880,6 +951,27 @@ func (c *compiladorNucleo) emitirRutinas() {
 	e.movSimbolo(rsp, "pila_tope", 0)
 	c.llamarPanico("Demasiadas llamadas, una dentro de otra: se acabo la pila.",
 		"Pista: una funcion que se llama a si misma necesita un caso en el que deja de hacerlo.")
+
+	c.emitirTrampas()
+	nombres := make([]string, 0, len(c.atenciones))
+	for n := range c.atenciones {
+		nombres = append(nombres, n)
+	}
+	sort.Strings(nombres)
+	for _, n := range nombres {
+		// El codigo compilado solo usa estos siete registros, asi que
+		// guardando estos el programa interrumpido no nota nada.
+		e.marca("atencion:" + n)
+		guardados := []int{rax, rcx, rdx, rbx, rsi, rdi, rbp}
+		for _, r := range guardados {
+			e.push(r)
+		}
+		e.call(c.funciones[n].entrada)
+		for i := len(guardados) - 1; i >= 0; i-- {
+			e.pop(guardados[i])
+		}
+		e.bytes(0x48, 0xCF) // iretq
+	}
 
 	// rtLugar: coleccion en rcx/rbx y posicion en rax/rdx. Deja en rsi la
 	// direccion y en rdi el ancho. rax: 0 bien, 1 no es una coleccion, 2 la
@@ -1020,6 +1112,53 @@ func (c *compiladorNucleo) emitirRutinas() {
 	e.aqui(noTiene)
 	e.movImm(rax, 0)
 	e.ret()
+}
+
+// Las excepciones que meten en la pila un codigo de error. Las demas no, y
+// para que todas lleguen igual al aviso, a esas se les mete un 0 a mano.
+var conCodigoDeError = map[int]bool{8: true, 10: true, 11: true, 12: true, 13: true, 14: true,
+	17: true, 21: true, 29: true, 30: true}
+
+// emitirTrampas pone una entrada para cada una de las 256 interrupciones.
+// Al arrancar todas apuntan aqui, y lo que no tenga una funcion que lo
+// atienda acaba en un aviso que dice cual fue. Sin esto, una interrupcion
+// sin dueño o un fallo del procesador reiniciaban la maquina sin decir
+// nada. Cada entrada mide 16 bytes justos para que el arranque las pueda
+// recorrer sumando.
+func (c *compiladorNucleo) emitirTrampas() {
+	e := c.e
+	comun := e.nueva()
+	e.marca("trampas")
+	for v := 0; v < 256; v++ {
+		inicio := len(e.b)
+		if !conCodigoDeError[v] {
+			e.bytes(0x6A, 0x00) // push 0
+		}
+		e.bytes(0x68) // push el numero de la interrupcion
+		e.d32(uint32(v))
+		e.jmp(comun)
+		for len(e.b)-inicio < 16 {
+			e.bytes(0x90)
+		}
+	}
+
+	// En la pila: el numero, el codigo de error y la direccion donde iba.
+	// De aqui no se vuelve, asi que se empieza una pila nueva: la de antes
+	// puede ser justo lo que se rompio.
+	e.aqui(comun)
+	e.bytes(0xFA)
+	e.mov(rsi, rsp)
+	e.lee(rbx, rsi, 0)
+	e.lee(rcx, rsi, 8)
+	e.lee(rdi, rsi, 16)
+	e.bytes(0x0F, 0x20, 0xD2) // mov rdx, cr2: la direccion de un fallo de pagina
+	e.movSimbolo(rsp, "pila_tope", 0)
+	for _, r := range []int{rbx, rcx, rdi, rdx} {
+		e.push(r)
+		e.movImm(rax, etiquetaNumero)
+		e.push(rax)
+	}
+	e.call(c.funciones["nucleo_excepcion"].entrada)
 }
 
 // Los textos van detras del codigo con su largo delante, en bytes de UTF-8.

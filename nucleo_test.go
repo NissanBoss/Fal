@@ -204,6 +204,87 @@ func TestNucleoAvisa(t *testing.T) {
 	}
 }
 
+// El controlador de interrupciones con las de los aparatos de la 32 en
+// adelante, y todas tapadas menos el reloj.
+const remapeaYDejaElReloj = `
+pon_en_puerto con 32 y 17
+pon_en_puerto con 160 y 17
+pon_en_puerto con 33 y 32
+pon_en_puerto con 161 y 40
+pon_en_puerto con 33 y 4
+pon_en_puerto con 161 y 2
+pon_en_puerto con 33 y 1
+pon_en_puerto con 161 y 1
+pon_en_puerto con 33 y 254
+pon_en_puerto con 161 y 255
+`
+
+// El reloj interrumpe de verdad mientras el programa hace cuentas, y las
+// cuentas tienen que salir igual: si la entrada a la interrupcion se dejase
+// un registro sin guardar, la suma saldria mal.
+func TestNucleoInterrupciones(t *testing.T) {
+	// El reloj a unos 1000 tics por segundo (1193182 / 1193): con los 18 de
+	// fabrica la suma acababa antes del primer tic y no probaba nada.
+	programa := remapeaYDejaElReloj + `
+pon_en_puerto con 67 y 52
+pon_en_puerto con 64 y 169
+pon_en_puerto con 64 y 4
+vueltas es 0
+funcion reloj
+    comparte vueltas
+    vueltas es vueltas mas 1
+    pon_en_puerto con 32 y 32
+fin
+
+funcion suma_hasta con n
+    total es 0
+    para cada i desde 1 hasta n
+        total es total mas i
+    fin
+    devuelve total
+fin
+
+atiende_interrupcion con 32 y reloj
+activa_interrupciones
+mientras vueltas es menor que 3
+    espera_interrupcion
+fin
+antes es vueltas
+escribe suma_hasta con 2000000
+escribe vueltas es mayor que antes
+desactiva_interrupciones
+`
+	salida, reventado := arrancarEnQemu(t, programa)
+	if reventado {
+		t.Fatalf("revento:\n%s", salida)
+	}
+	if salida != "2000001000000\nverdadero\n" {
+		t.Errorf("salida distinta:\n%s", salida)
+	}
+}
+
+func TestNucleoAvisaDeInterrupciones(t *testing.T) {
+	casos := []struct{ programa, aviso string }{
+		{remapeaYDejaElReloj + "activa_interrupciones\nmientras verdadero\n    espera_interrupcion\nfin",
+			"Ha llegado la interrupcion 32 y nadie la atiende."},
+		// Sin remapear, el reloj de la BIOS llega por la 8 y el aviso tiene
+		// que reconocer la confusion.
+		{"pon_en_puerto con 33 y 254\nactiva_interrupciones\nmientras verdadero\n    espera_interrupcion\nfin",
+			"Ha llegado la interrupcion de un aparato por la 8"},
+		{"funcion f\nfin\natiende_interrupcion con 13 y f", "Las interrupciones de la 0 a la 31"},
+	}
+	for _, caso := range casos {
+		salida, reventado := arrancarEnQemu(t, caso.programa)
+		if !reventado {
+			t.Errorf("no revento; salio:\n%s", salida)
+			continue
+		}
+		if !strings.Contains(salida, caso.aviso) {
+			t.Errorf("esperaba %q en el aviso, y salio:\n%s", caso.aviso, salida)
+		}
+	}
+}
+
 // El aviso dice la linea y la copia, igual que el interprete.
 func TestNucleoAvisoConLinea(t *testing.T) {
 	salida, _ := arrancarEnQemu(t, "a es 1\nb es 0\nescribe a entre b")
@@ -226,6 +307,8 @@ func TestNucleoNoCompila(t *testing.T) {
 		{"funcion region\nfin", `Ya hay una funcion "region"`},
 		{"escribe pregunta \"hola\"", "pregunta"},
 		{"detente", "dentro de un bucle"},
+		{"atiende_interrupcion con 33 y 5", "el nombre de una funcion tuya"},
+		{"funcion f con x\nfin\natiende_interrupcion con 33 y f", "pide datos"},
 	}
 	for _, caso := range casos {
 		_, err := compilarNucleo(caso.programa, true)

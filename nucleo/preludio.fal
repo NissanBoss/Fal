@@ -85,16 +85,111 @@ funcion nucleo_textos_iguales con a y b
     devuelve verdadero
 fin
 
-# El aviso cuando algo revienta: por el puerto serie y en la pantalla, en
+# Los avisos cuando algo revienta: por el puerto serie y en la pantalla, en
 # blanco sobre rojo para que no se confunda con nada que pinte el sistema.
-funcion nucleo_panico con mensaje y donde
-    nucleo_serie con 10
-    nucleo_escribe_texto con "  X  "
-    nucleo_escribe con mensaje y verdadero
-    nucleo_serie con 10
-    nucleo_escribe_texto con "     "
-    nucleo_escribe con donde y verdadero
+# nucleo_casilla es por donde va el aviso en la pantalla.
+nucleo_casilla es 1
 
+funcion nucleo_panico con mensaje y donde
+    nucleo_rojo
+    nucleo_di con "X  "
+    nucleo_di_valor con mensaje
+    nucleo_di con "\n\n"
+    nucleo_di con donde
+    nucleo_di con "\n"
+    congela
+fin
+
+# A esta llega lo que el procesador no pudo hacer, y cualquier interrupcion
+# que nadie atiende. sitio es la direccion de la instruccion que iba a
+# ejecutar, y direccion, la que intentaba tocar si fue un fallo de pagina.
+funcion nucleo_excepcion con numero y codigo y sitio y direccion
+    nucleo_rojo
+    si numero es mayor o igual que 32
+        nucleo_di con "X  Ha llegado la interrupcion "
+        nucleo_di_valor con numero
+        nucleo_di con " y nadie la atiende.\n\n"
+        nucleo_di con "Pista: dale una funcion con atiende_interrupcion, o tapala en el controlador de interrupciones.\n"
+        congela
+    fin
+    # Es el tropiezo de siempre: al arrancar, el controlador de
+    # interrupciones manda las de los aparatos a la 8 en adelante, encima de
+    # las excepciones, y el reloj se hace pasar por un fallo doble. Un
+    # aparato no mete codigo de error, asi que en su sitio queda la
+    # direccion de vuelta, que es un numero mucho mas grande que cualquier
+    # codigo de verdad.
+    si numero es mayor o igual que 8 y numero es menor o igual que 15 y codigo es mayor que 65535
+        nucleo_di con "X  Ha llegado la interrupcion de un aparato por la "
+        nucleo_di_valor con numero
+        nucleo_di con ", que es la de una excepcion del procesador.\n\n"
+        nucleo_di con "Pista: al arrancar, el controlador de interrupciones manda las de los aparatos de la 8 a la 15. Remapealo para que lleguen de la 32 en adelante antes de activar las interrupciones.\n"
+        congela
+    fin
+    nucleo_di con "X  El procesador se ha parado: "
+    nucleo_di con (nucleo_que_excepcion con numero)
+    nucleo_di con ".\n\nIba a ejecutar lo que hay en "
+    nucleo_di_hex con sitio
+    si numero es 14
+        nucleo_di con "\ny quiso tocar la direccion "
+        nucleo_di_hex con direccion
+    fin
+    si codigo no es igual a 0
+        nucleo_di con "\nCodigo de error: "
+        nucleo_di_valor con codigo
+    fin
+    nucleo_di con "\n"
+    si numero es mayor o igual que 8 y numero es menor o igual que 15
+        nucleo_di con "\nPista: si acabas de activar las interrupciones, puede que no sea un fallo sino un aparato. Remapea el controlador de interrupciones para que las suyas lleguen de la 32 en adelante.\n"
+    fin
+    congela
+fin
+
+funcion nucleo_que_excepcion con n
+    si n es 0
+        devuelve "division entre cero"
+    si no si n es 1
+        devuelve "depuracion"
+    si no si n es 2
+        devuelve "interrupcion no enmascarable"
+    si no si n es 3
+        devuelve "punto de parada"
+    si no si n es 4
+        devuelve "desbordamiento"
+    si no si n es 5
+        devuelve "fuera de limites"
+    si no si n es 6
+        devuelve "instruccion que no existe"
+    si no si n es 7
+        devuelve "no hay coprocesador"
+    si no si n es 8
+        devuelve "fallo doble"
+    si no si n es 10
+        devuelve "segmento de tarea no valido"
+    si no si n es 11
+        devuelve "segmento que no esta"
+    si no si n es 12
+        devuelve "fallo de la pila"
+    si no si n es 13
+        devuelve "fallo general de proteccion"
+    si no si n es 14
+        devuelve "fallo de pagina"
+    si no si n es 16
+        devuelve "error de coma flotante"
+    si no si n es 17
+        devuelve "acceso sin alinear"
+    si no si n es 18
+        devuelve "fallo de la maquina"
+    si no si n es 19
+        devuelve "error de coma flotante SIMD"
+    fin
+    devuelve "excepcion reservada"
+fin
+
+# Prepara la pantalla roja. Lo primero es cerrar las interrupciones: lo
+# que estuviera atendiendolas podria pintar encima del aviso.
+funcion nucleo_rojo
+    comparte nucleo_casilla
+    desactiva_interrupciones
     para cada casilla desde 1 hasta 2000
         elemento casilla de nucleo_pantalla es 20256
     fin
@@ -102,39 +197,78 @@ funcion nucleo_panico con mensaje y donde
     # registro 0x0A del controlador de la pantalla.
     pon_en_puerto con 980 y 10
     pon_en_puerto con 981 y 32
-    sigue es nucleo_pinta con "X  " y 163
-    si (nucleo_etiqueta de mensaje) es 3
-        nucleo_pinta con mensaje y sigue
-    fin
-    nucleo_pinta con donde y 326
-    congela
+    nucleo_casilla es 163
+    nucleo_serie con 10
 fin
 
-# Pinta un texto desde una casilla y devuelve la siguiente libre. Parte las
-# lineas por las palabras y deja el mismo margen a la izquierda. Las letras
-# con tilde salen como ? porque la pantalla no habla UTF-8; los bytes de en
-# medio de una letra se saltan para que salga un ? y no dos.
-funcion nucleo_pinta con t y desde
-    p es desde
+# Una letra al puerto serie y a la pantalla. Las letras con tilde salen como
+# ? porque la pantalla no habla UTF-8; los bytes de en medio de una letra se
+# saltan para que salga un ? y no dos.
+funcion nucleo_letra con letra
+    comparte nucleo_casilla
+    nucleo_serie con letra
+    si letra es 10
+        nucleo_casilla es nucleo_baja con nucleo_casilla
+    si no si nucleo_casilla es mayor que 2000
+        nucleo_casilla es nucleo_casilla
+    si no si letra es menor que 128
+        elemento nucleo_casilla de nucleo_pantalla es 20224 mas letra
+        nucleo_casilla es nucleo_casilla mas 1
+    si no si letra es mayor o igual que 192
+        elemento nucleo_casilla de nucleo_pantalla es 20224 mas 63
+        nucleo_casilla es nucleo_casilla mas 1
+    fin
+fin
+
+# En la pantalla las lineas se parten por las palabras, con el mismo margen
+# a la izquierda. Por el puerto serie no: ahi lo parte el terminal.
+funcion nucleo_di con t
+    comparte nucleo_casilla
     i es 1
     mientras i es menor o igual que largo de t
         letra es elemento i de t
-        si letra es 10
-            p es nucleo_baja con p
-        si no si letra es 32 y ((p menos 1) resto 80) mas (nucleo_palabra con t y i mas 1) es mayor que 76
-            p es nucleo_baja con p
-        si no si p es mayor que 2000
-            devuelve p
-        si no si letra es menor que 128
-            elemento p de nucleo_pantalla es 20224 mas letra
-            p es p mas 1
-        si no si letra es mayor o igual que 192
-            elemento p de nucleo_pantalla es 20224 mas 63
-            p es p mas 1
+        si letra es 32 y ((nucleo_casilla menos 1) resto 80) mas (nucleo_palabra con t y i mas 1) es mayor que 76
+            nucleo_serie con 32
+            nucleo_casilla es nucleo_baja con nucleo_casilla
+        si no
+            nucleo_letra con letra
         fin
         i es i mas 1
     fin
-    devuelve p
+fin
+
+funcion nucleo_di_valor con valor
+    etiqueta es nucleo_etiqueta de valor
+    si etiqueta es 3
+        nucleo_di con valor
+    si no si etiqueta es 1
+        si valor es menor que 0
+            nucleo_letra con 45
+            nucleo_di_cifras con valor y 10
+        si no
+            nucleo_di_cifras con 0 menos valor y 10
+        fin
+    si no
+        nucleo_di con "(un valor que no es un texto)"
+    fin
+fin
+
+funcion nucleo_di_hex con n
+    nucleo_di con "0x"
+    nucleo_di_cifras con 0 menos n y 16
+fin
+
+# Como nucleo_cifras, en negativo, y en la base que se pida.
+funcion nucleo_di_cifras con n y base
+    si n es menor o igual que 0 menos base
+        nucleo_di_cifras con (cociente con n y base) y base
+    fin
+    cifra es 0 menos (n resto base)
+    si cifra es menor que 10
+        nucleo_letra con 48 mas cifra
+    si no
+        nucleo_letra con 55 mas cifra
+    fin
 fin
 
 funcion nucleo_baja con p

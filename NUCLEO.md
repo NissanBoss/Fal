@@ -67,8 +67,53 @@ Para la parte entera está `cociente con 7 y 2`, y para lo que sobra,
 | `lee_puerto de p` | lee un byte de un puerto de entrada y salida |
 | `pon_en_puerto con p y v` | manda un byte a un puerto |
 | `congela` | para el procesador para siempre |
+| `atiende_interrupcion con n y f` | la función `f` atiende la interrupción `n` |
+| `activa_interrupciones` | deja que lleguen |
+| `desactiva_interrupciones` | las cierra |
+| `espera_interrupcion` | duerme el procesador hasta que llegue una |
 
 Se cuenta desde el 1 y `menos 1` es el último, igual que en todo Fal.
+
+## Interrupciones
+
+Una interrupción es un aparato que avisa: una tecla pulsada, un tic del
+reloj. En vez de preguntarle al teclado sin parar si hay algo, el sistema
+duerme con `espera_interrupcion` y el procesador lo despierta cuando llega.
+
+```
+pulsadas es 0
+
+funcion teclado
+    comparte pulsadas
+    codigo es lee_puerto de 96
+    pulsadas es pulsadas mas 1
+    pon_en_puerto con 32 y 32       # "ya está" al controlador
+fin
+
+atiende_interrupcion con 33 y teclado
+activa_interrupciones
+mientras verdadero
+    espera_interrupcion
+fin
+```
+
+La función que atiende una interrupción es una función normal de Fal, sin
+datos. El compilador le pone delante una entrada que guarda los registros y
+detrás un `iretq`, así que el programa interrumpido no nota nada. Las
+pruebas lo comprueban con el reloj interrumpiendo cientos de veces a mitad de
+una suma.
+
+Lo que no hace el compilador es configurar los aparatos: remapear el
+controlador de interrupciones (el 8259), destapar las líneas y avisarle de
+que ya se atendió cada una. Eso es trabajo del sistema, y se hace con
+`pon_en_puerto`.
+
+Las interrupciones de la 0 a la 31 son las excepciones del procesador y no se
+pueden atender: si salta una, el núcleo para y dice cuál fue y dónde. Si llega
+una interrupción que nadie atiende, también lo dice, con su número. Y si un
+aparato llega por el número de una excepción, que es lo que pasa al activar
+las interrupciones sin remapear el controlador, lo reconoce y lo explica en
+vez de dejarte con un "fallo doble" que no lo es.
 
 ## La seguridad no es un añadido
 
@@ -83,15 +128,18 @@ núcleos escritos en C: leer o escribir fuera de donde se debía.
 
 Cuando algo revienta, el núcleo hace lo mismo que el intérprete: dice qué
 pasó, en qué línea y con qué texto, y da una pista. Lo manda por el puerto
-serie y lo pinta en la pantalla en blanco sobre rojo.
+serie y lo pinta en la pantalla en blanco sobre rojo. Lo mismo si el que se
+para es el procesador: un fallo de página, por ejemplo, dice qué instrucción
+iba a ejecutar y qué dirección quiso tocar.
 
 ## Lo que no hay, y por qué
 
 - **Listas, diccionarios, decimales y unir textos.** Todos necesitan pedir
   memoria mientras el programa corre, y en un núcleo eso no existe hasta que
   el propio sistema lo escribe.
-- **Interrupciones, teclado, temporizador, procesos.** Son trabajo del sistema
-  operativo, no del lenguaje.
+- **Teclado, temporizador, procesos.** Son trabajo del sistema operativo,
+  no del lenguaje. El núcleo da las interrupciones; qué hacer con ellas lo
+  decide el sistema.
 - **Más de un giga de memoria.** El arranque deja mapeado el primer giga, con
   la dirección virtual igual a la física. Una región que se salga de ahí se
   rechaza, porque tocarla haría que el procesador se reiniciase sin decir
