@@ -49,6 +49,12 @@ func arrancar(args []string) int {
 				filtro = args[2]
 			}
 			return probar(carpeta, filtro)
+		case "--nucleo", "--arranca":
+			if len(args) < 2 {
+				fmt.Fprintln(os.Stderr, "Falta el programa:   fal "+args[0]+" sistema.fal")
+				return 1
+			}
+			return compilarYArrancar(args[1], args[0] == "--arranca")
 		}
 		return ejecutarArchivo(args[0], args[1:])
 	}
@@ -77,6 +83,8 @@ func ayuda() {
   fal --version           dice que version es esta
   fal --probar [carpeta]  ejecuta el banco de pruebas
   fal --editor [carpeta]  genera el coloreado para VS Code
+  fal --nucleo sistema.fal   lo compila a una imagen que arranca sin sistema
+  fal --arranca sistema.fal  lo compila y lo arranca en QEMU
 
 Todo lo que necesitas esta dentro de este unico archivo.
 No hace falta instalar nada mas.`)

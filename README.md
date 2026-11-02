@@ -193,6 +193,8 @@ fal ejemplos/snake.fal
 - **[LEEME.md](LEEME.md)**: instalar, desinstalar y poner el color en el editor
 - **[MANUAL.md](MANUAL.md)**: el lenguaje entero, con una tabla de traducción
   desde Python y JavaScript al final
+- **[NUCLEO.md](NUCLEO.md)**: compilar un programa que arranca sin sistema
+  operativo debajo
 
 ## Compilar tú mismo
 

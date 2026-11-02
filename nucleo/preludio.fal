@@ -1,0 +1,155 @@
+# El preludio del nucleo: lo que "fal --nucleo" mete delante de tu programa.
+#
+# Esta escrito en el mismo Fal que compila, sin trucos: lo que se puede hacer
+# aqui se puede hacer en tu sistema. Solo hay una diferencia, que los nombres
+# que empiezan por nucleo_ son suyos y tu programa no los puede usar.
+#
+# "escribe" no pinta en la pantalla: manda el texto por el puerto serie, que
+# QEMU enseña en la terminal. La pantalla es tuya; el preludio solo la toca
+# para contar por que se paro todo.
+
+# La memoria de texto de la pantalla: 80 por 25 casillas de 2 bytes, la letra
+# y el color. Empieza en 0xB8000.
+nucleo_pantalla es region con 753664 y 2000 y 2
+
+funcion nucleo_serie con letra
+    # Los terminales esperan volver al principio de la linea antes de bajar.
+    si letra es 10
+        nucleo_serie con 13
+    fin
+    # El bit 5 del estado (puerto 0x3FD) dice que cabe otra letra.
+    mientras ((lee_puerto de 1021) resto 64) es menor que 32
+    fin
+    pon_en_puerto con 1016 y letra
+fin
+
+funcion nucleo_escribe_texto con t
+    para cada letra en t
+        nucleo_serie con letra
+    fin
+fin
+
+funcion nucleo_escribe_numero con n
+    si n es menor que 0
+        nucleo_serie con 45
+        nucleo_cifras con n
+    si no
+        nucleo_cifras con 0 menos n
+    fin
+fin
+
+# Va en negativo porque el numero mas pequeño no tiene opuesto: darle la
+# vuelta se saldria de los 64 bits.
+funcion nucleo_cifras con n
+    si n es menor que menos 9
+        nucleo_cifras con (cociente con n y 10)
+    fin
+    nucleo_serie con 48 menos (n resto 10)
+fin
+
+funcion nucleo_escribe con valor y salto
+    etiqueta es nucleo_etiqueta de valor
+    si etiqueta es 1
+        nucleo_escribe_numero con valor
+    si no si etiqueta es 3
+        nucleo_escribe_texto con valor
+    si no si etiqueta es 2
+        si valor
+            nucleo_escribe_texto con "verdadero"
+        si no
+            nucleo_escribe_texto con "falso"
+        fin
+    si no si etiqueta es 4
+        nucleo_escribe_texto con "una region de "
+        nucleo_escribe_numero con largo de valor
+        nucleo_escribe_texto con " elementos"
+    si no
+        nucleo_escribe_texto con "nada"
+    fin
+    si salto
+        nucleo_serie con 10
+    fin
+fin
+
+funcion nucleo_textos_iguales con a y b
+    si (largo de a) no es igual a (largo de b)
+        devuelve falso
+    fin
+    i es 1
+    mientras i es menor o igual que largo de a
+        si (elemento i de a) no es igual a (elemento i de b)
+            devuelve falso
+        fin
+        i es i mas 1
+    fin
+    devuelve verdadero
+fin
+
+# El aviso cuando algo revienta: por el puerto serie y en la pantalla, en
+# blanco sobre rojo para que no se confunda con nada que pinte el sistema.
+funcion nucleo_panico con mensaje y donde
+    nucleo_serie con 10
+    nucleo_escribe_texto con "  X  "
+    nucleo_escribe con mensaje y verdadero
+    nucleo_serie con 10
+    nucleo_escribe_texto con "     "
+    nucleo_escribe con donde y verdadero
+
+    para cada casilla desde 1 hasta 2000
+        elemento casilla de nucleo_pantalla es 20256
+    fin
+    # El cursor parpadeando encima del aviso despista: se apaga con el
+    # registro 0x0A del controlador de la pantalla.
+    pon_en_puerto con 980 y 10
+    pon_en_puerto con 981 y 32
+    sigue es nucleo_pinta con "X  " y 163
+    si (nucleo_etiqueta de mensaje) es 3
+        nucleo_pinta con mensaje y sigue
+    fin
+    nucleo_pinta con donde y 326
+    congela
+fin
+
+# Pinta un texto desde una casilla y devuelve la siguiente libre. Parte las
+# lineas por las palabras y deja el mismo margen a la izquierda. Las letras
+# con tilde salen como ? porque la pantalla no habla UTF-8; los bytes de en
+# medio de una letra se saltan para que salga un ? y no dos.
+funcion nucleo_pinta con t y desde
+    p es desde
+    i es 1
+    mientras i es menor o igual que largo de t
+        letra es elemento i de t
+        si letra es 10
+            p es nucleo_baja con p
+        si no si letra es 32 y ((p menos 1) resto 80) mas (nucleo_palabra con t y i mas 1) es mayor que 76
+            p es nucleo_baja con p
+        si no si p es mayor que 2000
+            devuelve p
+        si no si letra es menor que 128
+            elemento p de nucleo_pantalla es 20224 mas letra
+            p es p mas 1
+        si no si letra es mayor o igual que 192
+            elemento p de nucleo_pantalla es 20224 mas 63
+            p es p mas 1
+        fin
+        i es i mas 1
+    fin
+    devuelve p
+fin
+
+funcion nucleo_baja con p
+    devuelve ((cociente con (p menos 1) y 80) mas 1) por 80 mas 6
+fin
+
+# Lo que mide la palabra que empieza en la posicion i.
+funcion nucleo_palabra con t y i
+    n es 0
+    mientras i mas n es menor o igual que largo de t
+        letra es elemento i mas n de t
+        si letra es 32 o letra es 10
+            devuelve n
+        fin
+        n es n mas 1
+    fin
+    devuelve n
+fin
