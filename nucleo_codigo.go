@@ -794,6 +794,14 @@ func (c *compiladorNucleo) integrada(nombre string, args []Expresion, ln int) *E
 		// despierta al hlt en vez de colarse antes y dejarlo dormido sin
 		// nadie que lo despierte.
 		e.bytes(0xFB, 0xF4)
+
+	case "datos_de_arranque":
+		e.movSimbolo(rdx, "datos_arranque", 0)
+		e.lee(rdx, rdx, 0)
+		e.movImm(rax, etiquetaNumero)
+	case "final_del_nucleo":
+		e.movSimbolo(rdx, "fin_nucleo", 0)
+		e.movImm(rax, etiquetaNumero)
 	}
 	if strings.HasSuffix(nombre, "interrupciones") || nombre == "espera_interrupcion" {
 		e.movImm(rax, etiquetaNada)

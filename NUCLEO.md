@@ -71,8 +71,35 @@ Para la parte entera está `cociente con 7 y 2`, y para lo que sobra,
 | `activa_interrupciones` | deja que lleguen |
 | `desactiva_interrupciones` | las cierra |
 | `espera_interrupcion` | duerme el procesador hasta que llegue una |
+| `datos_de_arranque` | dónde dejó el cargador sus datos, o 0 si no hay |
+| `final_del_nucleo` | la primera dirección libre después del programa, en un múltiplo de 4096 |
 
 Se cuenta desde el 1 y `menos 1` es el último, igual que en todo Fal.
+
+## La memoria que hay
+
+El núcleo no reparte memoria: eso lo decide el sistema. Lo que da es lo que
+hace falta para saber cuánta hay y qué parte está ya ocupada.
+
+`datos_de_arranque` es la dirección de la [información multiboot](https://www.gnu.org/software/grub/manual/multiboot/multiboot.html#Boot-information-format)
+que dejan QEMU y GRUB, y se lee con una región como todo lo demás. Ahí está
+el mapa de la memoria: qué trozos son RAM libre y cuáles son de la BIOS o de
+los aparatos.
+
+```
+info es region con datos_de_arranque y 13 y 4
+mapa es elemento 13 de info
+fin_mapa es mapa mas elemento 12 de info
+mientras mapa es menor que fin_mapa
+    entrada es region con mapa y 6 y 4
+    # desde: elemento 2, cuanto: elemento 4, tipo (1 es libre): elemento 6
+    mapa es mapa mas 4 mas elemento 1 de entrada
+fin
+```
+
+`final_del_nucleo` dice dónde acaba lo que ocupa el programa: el código, sus
+tablas, la pila y las variables. De ahí para arriba, lo que el mapa diga que
+está libre es del sistema.
 
 ## Interrupciones
 
@@ -136,7 +163,8 @@ iba a ejecutar y qué dirección quiso tocar.
 
 - **Listas, diccionarios, decimales y unir textos.** Todos necesitan pedir
   memoria mientras el programa corre, y en un núcleo eso no existe hasta que
-  el propio sistema lo escribe.
+  el propio sistema lo escribe. El núcleo dice cuánta hay y dónde; el
+  repartidor es del sistema.
 - **Teclado, temporizador, procesos.** Son trabajo del sistema operativo,
   no del lenguaje. El núcleo da las interrupciones; qué hacer con ellas lo
   decide el sistema.

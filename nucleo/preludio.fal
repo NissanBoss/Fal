@@ -201,23 +201,80 @@ funcion nucleo_rojo
     nucleo_serie con 10
 fin
 
-# Una letra al puerto serie y a la pantalla. Las letras con tilde salen como
-# ? porque la pantalla no habla UTF-8; los bytes de en medio de una letra se
-# saltan para que salga un ? y no dos.
+# Una letra al puerto serie y a la pantalla. La pantalla no habla UTF-8 sino
+# la pagina de codigos 437 de IBM, donde una letra con tilde es un byte y no
+# dos: se guarda el primero y se traduce al llegar el segundo. Los avisos
+# salian con "p?gina", y un aviso en castellano tiene que poder leerse.
+nucleo_a_medias es 0
+
 funcion nucleo_letra con letra
-    comparte nucleo_casilla
+    comparte nucleo_casilla y nucleo_a_medias
     nucleo_serie con letra
     si letra es 10
         nucleo_casilla es nucleo_baja con nucleo_casilla
     si no si nucleo_casilla es mayor que 2000
         nucleo_casilla es nucleo_casilla
     si no si letra es menor que 128
-        elemento nucleo_casilla de nucleo_pantalla es 20224 mas letra
-        nucleo_casilla es nucleo_casilla mas 1
+        nucleo_pon con letra
     si no si letra es mayor o igual que 192
-        elemento nucleo_casilla de nucleo_pantalla es 20224 mas 63
-        nucleo_casilla es nucleo_casilla mas 1
+        nucleo_a_medias es letra
+    si no si nucleo_a_medias no es igual a 0
+        nucleo_pon con (nucleo_437 con nucleo_a_medias y letra)
+        nucleo_a_medias es 0
     fin
+fin
+
+funcion nucleo_pon con letra
+    comparte nucleo_casilla
+    elemento nucleo_casilla de nucleo_pantalla es 20224 mas letra
+    nucleo_casilla es nucleo_casilla mas 1
+fin
+
+# Lo que tiene la 437 de lo que se escribe en castellano. Las mayusculas con
+# tilde no estan, salvo la E: salen sin ella. Lo demas, ?.
+funcion nucleo_437 con primero y segundo
+    si primero es 195
+        si segundo es 161
+            devuelve 160
+        si no si segundo es 169
+            devuelve 130
+        si no si segundo es 173
+            devuelve 161
+        si no si segundo es 179
+            devuelve 162
+        si no si segundo es 186
+            devuelve 163
+        si no si segundo es 177
+            devuelve 164
+        si no si segundo es 145
+            devuelve 165
+        si no si segundo es 188
+            devuelve 129
+        si no si segundo es 156
+            devuelve 154
+        si no si segundo es 137
+            devuelve 144
+        si no si segundo es 129
+            devuelve 65
+        si no si segundo es 141
+            devuelve 73
+        si no si segundo es 147
+            devuelve 79
+        si no si segundo es 154
+            devuelve 85
+        fin
+    si no si primero es 194
+        si segundo es 191
+            devuelve 168
+        si no si segundo es 161
+            devuelve 173
+        si no si segundo es 171
+            devuelve 174
+        si no si segundo es 187
+            devuelve 175
+        fin
+    fin
+    devuelve 63
 fin
 
 # En la pantalla las lineas se parten por las palabras, con el mismo margen

@@ -185,6 +185,7 @@ func TestNucleoAvisa(t *testing.T) {
 		{"escribe 7 entre 0", "No se puede dividir entre cero."},
 		{"funcion sin_fin con n\n    devuelve sin_fin con n mas 1\nfin\nsin_fin con 1", "se acabo la pila"},
 		{"falla \"el disco no responde\"", "el disco no responde"},
+		{"falla \"esa página ya está libre\"", "esa página ya está libre"},
 		{"r es region con 1048576 y 4\nelemento 1 de r es 300", "Ese numero no cabe"},
 		{"escribe 1 mas \"uno\"", `"mas" necesita dos numeros, y el segundo no lo es.`},
 		{"si 3\nfin", "Una condicion tiene que dar verdadero o falso."},
@@ -282,6 +283,37 @@ func TestNucleoAvisaDeInterrupciones(t *testing.T) {
 		if !strings.Contains(salida, caso.aviso) {
 			t.Errorf("esperaba %q en el aviso, y salio:\n%s", caso.aviso, salida)
 		}
+	}
+}
+
+// Lo que deja el cargador se lee igual que la pantalla, con una region. El
+// mapa de memoria va en entradas de 24 bytes, cada una con su largo delante,
+// y QEMU por defecto da 128 megas.
+func TestNucleoDatosDeArranque(t *testing.T) {
+	programa := `
+info es region con datos_de_arranque y 13 y 4
+escribe ((elemento 1 de info) resto 128) es mayor o igual que 64
+mapa es elemento 13 de info
+fin_mapa es mapa mas elemento 12 de info
+libre es 0
+mientras mapa es menor que fin_mapa
+    entrada es region con mapa y 6 y 4
+    si elemento 6 de entrada es 1
+        libre es libre mas elemento 4 de entrada
+    fin
+    mapa es mapa mas 4 mas elemento 1 de entrada
+fin
+megas es cociente con libre y 1048576
+escribe megas es mayor o igual que 126 y megas es menor o igual que 128
+escribe (final_del_nucleo resto 4096) es 0
+escribe final_del_nucleo es mayor que 1048576
+`
+	salida, reventado := arrancarEnQemu(t, programa)
+	if reventado {
+		t.Fatalf("revento:\n%s", salida)
+	}
+	if salida != "verdadero\nverdadero\nverdadero\nverdadero\n" {
+		t.Errorf("salida distinta:\n%s", salida)
 	}
 }
 

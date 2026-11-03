@@ -39,6 +39,13 @@ func emitirArranque(e *ensamblador, principal etiqueta, prueba bool) {
 	e.bytes(0xBC) // mov esp, pila_tope
 	e.ref(4, "pila_tope", 0)
 
+	// El cargador deja en ebx donde estan sus datos (cuanta memoria hay y
+	// donde), y en eax su firma. Sin firma, ebx es lo que hubiera y no se
+	// puede leer como una direccion.
+	e.bytes(0x3D, 0x02, 0xB0, 0xAD, 0x2B) // cmp eax, 0x2BADB002
+	e.bytes(0x74, 0x02)                   // je +2
+	e.bytes(0x31, 0xDB)                   // xor ebx, ebx
+
 	// La BIOS deja basura en la memoria. Hay que limpiarla aunque QEMU y
 	// GRUB ya la entreguen a cero, porque las tablas y las globales cuentan
 	// con empezar a cero y no todos los cargadores lo garantizan.
@@ -48,6 +55,8 @@ func emitirArranque(e *ensamblador, principal etiqueta, prueba bool) {
 	e.ref(4, "palabras_bss", 0) // mov ecx, palabras
 	e.bytes(0x31, 0xC0)         // xor eax, eax
 	e.bytes(0xF3, 0xAB)         // rep stosd
+	e.bytes(0x89, 0x1D)
+	e.ref(4, "datos_arranque", 0) // mov [datos_arranque], ebx
 
 	e.bytes(0xB8)
 	e.ref(4, "pdpt", 3) // mov eax, pdpt | presente | escribible
@@ -180,7 +189,9 @@ func colocarBSS(e *ensamblador, globales int) {
 	e.simbolos["pila_suelo"] = e.simbolos["pila"] + margenPila
 	e.simbolos["pila_tope"] = pos
 	poner("globales", int64(16*globales))
+	poner("datos_arranque", 8)
 	e.simbolos["fin_bss"] = pos
+	e.simbolos["fin_nucleo"] = (pos + 4095) &^ 4095
 	e.simbolos["palabras_bss"] = (pos - e.simbolos["inicio_bss"]) / 4
 	e.simbolos["cabecera"] = cargaEn
 }

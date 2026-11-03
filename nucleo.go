@@ -193,6 +193,9 @@ var integradasNucleo = map[string][2]int{
 	"activa_interrupciones":    {0, 0},
 	"desactiva_interrupciones": {0, 0},
 	"espera_interrupcion":      {0, 0},
+
+	"datos_de_arranque": {0, 0},
+	"final_del_nucleo":  {0, 0},
 }
 
 func (c *compiladorNucleo) recogerFunciones(programa []Instruccion, preludio bool) *ErrorFal {
