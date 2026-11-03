@@ -73,6 +73,9 @@ Para la parte entera está `cociente con 7 y 2`, y para lo que sobra,
 | `espera_interrupcion` | duerme el procesador hasta que llegue una |
 | `datos_de_arranque` | dónde dejó el cargador sus datos, o 0 si no hay |
 | `final_del_nucleo` | la primera dirección libre después del programa, en un múltiplo de 4096 |
+| `inicio_del_codigo`, `final_del_codigo` | dónde está el código del programa (con sus textos) |
+| `hay_no_ejecutar` | si el procesador sabe prohibir que se ejecute una página |
+| `usa_tablas con d` | pasa a usar las tablas de páginas que empiezan en `d` |
 
 Se cuenta desde el 1 y `menos 1` es el último, igual que en todo Fal.
 
@@ -100,6 +103,25 @@ fin
 `final_del_nucleo` dice dónde acaba lo que ocupa el programa: el código, sus
 tablas, la pila y las variables. De ahí para arriba, lo que el mapa diga que
 está libre es del sistema.
+
+## Proteger la memoria
+
+Las tablas de páginas del arranque dejan todo el primer giga para leer,
+escribir y ejecutar. El sistema puede montar las suyas, con los permisos que
+quiera para cada página de 4 KB, y pasar a usarlas con `usa_tablas`. Lo
+normal es:
+
+- el código, entre `inicio_del_codigo` y `final_del_codigo`, de solo lectura;
+- todo lo demás, sin poder ejecutarse (el bit 63 de cada entrada, si
+  `hay_no_ejecutar`);
+- la página 0, sin poner, para que tocar la dirección 0 pare el sistema.
+
+El arranque ya deja encendido lo necesario para que el procesador lo haga
+cumplir también al propio núcleo, que si no se salta las páginas de solo
+lectura. Y cuando algo choca con un permiso, el aviso lo dice con palabras:
+"quiso escribir en 0x100000, que es de solo lectura". Las pruebas montan unas
+tablas así y comprueban las dos cosas: que el programa sigue igual y que lo
+prohibido acaba en ese aviso.
 
 ## Interrupciones
 

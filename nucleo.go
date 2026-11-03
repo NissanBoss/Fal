@@ -196,6 +196,10 @@ var integradasNucleo = map[string][2]int{
 
 	"datos_de_arranque": {0, 0},
 	"final_del_nucleo":  {0, 0},
+	"inicio_del_codigo": {0, 0},
+	"final_del_codigo":  {0, 0},
+	"hay_no_ejecutar":   {0, 0},
+	"usa_tablas":        {1, 1},
 }
 
 func (c *compiladorNucleo) recogerFunciones(programa []Instruccion, preludio bool) *ErrorFal {

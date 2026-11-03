@@ -78,16 +78,31 @@ func emitirArranque(e *ensamblador, principal etiqueta, prueba bool) {
 
 	e.bytes(0xB8)
 	e.ref(4, "pml4", 0)
-	e.bytes(0x0F, 0x22, 0xD8)             // mov cr3, eax
-	e.bytes(0x0F, 0x20, 0xE0)             // mov eax, cr4
-	e.bytes(0x83, 0xC8, 0x20)             // or eax, PAE
-	e.bytes(0x0F, 0x22, 0xE0)             // mov cr4, eax
-	e.bytes(0xB9, 0x80, 0x00, 0x00, 0xC0) // mov ecx, EFER
-	e.bytes(0x0F, 0x32)                   // rdmsr
-	e.bytes(0x0D, 0x00, 0x01, 0x00, 0x00) // or eax, modo largo
-	e.bytes(0x0F, 0x30)                   // wrmsr
-	e.bytes(0x0F, 0x20, 0xC0)             // mov eax, cr0
-	e.bytes(0x0D, 0x01, 0x00, 0x00, 0x80) // or eax, paginacion | modo protegido
+	e.bytes(0x0F, 0x22, 0xD8) // mov cr3, eax
+	e.bytes(0x0F, 0x20, 0xE0) // mov eax, cr4
+	e.bytes(0x83, 0xC8, 0x20) // or eax, PAE
+	e.bytes(0x0F, 0x22, 0xE0) // mov cr4, eax
+	// Se enciende el bit que prohibe ejecutar una pagina si el procesador lo
+	// tiene: con el apagado, una tabla que lo use es una tabla invalida. Las
+	// del arranque no lo usan; es para las que monte el sistema.
+	e.bytes(0xB8, 0x01, 0x00, 0x00, 0x80)       // mov eax, 0x80000001
+	e.bytes(0x0F, 0xA2)                         // cpuid
+	e.bytes(0x89, 0xD6)                         // mov esi, edx
+	e.bytes(0xB9, 0x80, 0x00, 0x00, 0xC0)       // mov ecx, EFER
+	e.bytes(0x0F, 0x32)                         // rdmsr
+	e.bytes(0x0D, 0x00, 0x01, 0x00, 0x00)       // or eax, modo largo
+	e.bytes(0xF7, 0xC6, 0x00, 0x00, 0x10, 0x00) // test esi, NX
+	e.bytes(0x74, 0x0C)                         // jz +12
+	e.bytes(0x0D, 0x00, 0x08, 0x00, 0x00)       // or eax, NX
+	e.bytes(0xC6, 0x05)
+	e.ref(4, "hay_nx", 0)
+	e.bytes(1)                // mov byte [hay_nx], 1
+	e.bytes(0x0F, 0x30)       // wrmsr
+	e.bytes(0x0F, 0x20, 0xC0) // mov eax, cr0
+	// Paginacion y modo protegido, y que el nucleo tambien respete las
+	// paginas de solo lectura (WP): sin ese bit, el procesador solo se las
+	// hace respetar a los programas.
+	e.bytes(0x0D, 0x01, 0x00, 0x01, 0x80) // or eax, 0x80010001
 	e.bytes(0x0F, 0x22, 0xC0)             // mov cr0, eax
 	e.bytes(0x0F, 0x01, 0x15)
 	e.ref(4, "gdtr", 0) // lgdt [gdtr]
@@ -158,8 +173,11 @@ func emitirGDT(e *ensamblador) {
 	e.alinea(8)
 	e.marca("gdt")
 	e.d64(0)
-	e.d64(0x00AF9A000000FFFF) // codigo de 64 bits
-	e.d64(0x00CF92000000FFFF) // datos
+	// Con el bit de "usado" ya puesto: el procesador lo escribe la primera
+	// vez que carga cada uno, y si el sistema deja este trozo de solo
+	// lectura, esa escritura seria un fallo de pagina.
+	e.d64(0x00AF9B000000FFFF) // codigo de 64 bits
+	e.d64(0x00CF93000000FFFF) // datos
 	e.marca("gdtr")
 	e.bytes(23, 0)
 	e.ref(4, "gdt", 0)
@@ -190,6 +208,7 @@ func colocarBSS(e *ensamblador, globales int) {
 	e.simbolos["pila_tope"] = pos
 	poner("globales", int64(16*globales))
 	poner("datos_arranque", 8)
+	poner("hay_nx", 8)
 	e.simbolos["fin_bss"] = pos
 	e.simbolos["fin_nucleo"] = (pos + 4095) &^ 4095
 	e.simbolos["palabras_bss"] = (pos - e.simbolos["inicio_bss"]) / 4

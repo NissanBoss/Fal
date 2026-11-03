@@ -802,6 +802,36 @@ func (c *compiladorNucleo) integrada(nombre string, args []Expresion, ln int) *E
 	case "final_del_nucleo":
 		e.movSimbolo(rdx, "fin_nucleo", 0)
 		e.movImm(rax, etiquetaNumero)
+	case "inicio_del_codigo":
+		e.movSimbolo(rdx, "cabecera", 0)
+		e.movImm(rax, etiquetaNumero)
+	case "final_del_codigo":
+		// Hasta donde empieza lo que va a cero: codigo, textos y la GDT.
+		// Nada de eso se escribe mientras el programa corre.
+		e.movSimbolo(rdx, "inicio_bss", 0)
+		e.movImm(rax, etiquetaNumero)
+	case "hay_no_ejecutar":
+		e.movSimbolo(rdx, "hay_nx", 0)
+		e.lee(rdx, rdx, 0)
+		e.movImm(rax, etiquetaBooleano)
+
+	case "usa_tablas":
+		if err := c.expr(args[0]); err != nil {
+			return err
+		}
+		c.exige(rax, etiquetaNumero, ln, `"usa_tablas" necesita la direccion de la tabla de arriba del todo.`, "")
+		mal := c.panico(ln, "Las tablas de paginas empiezan en un multiplo de 4096, dentro del primer giga.", "")
+		e.mov(rcx, rdx)
+		e.andImm(rcx, 4095)
+		e.cmpImm(rcx, 0)
+		e.jcc(siDistinto, mal)
+		e.cmpImm(rdx, 0)
+		e.jcc(siMenor, mal)
+		e.cmpImm(rdx, memoriaVisible)
+		e.jcc(siMayorOIgual, mal)
+		e.bytes(0x0F, 0x22, 0xDA) // mov cr3, rdx
+		e.movImm(rax, etiquetaNada)
+		e.movImm(rdx, 0)
 	}
 	if strings.HasSuffix(nombre, "interrupciones") || nombre == "espera_interrupcion" {
 		e.movImm(rax, etiquetaNada)

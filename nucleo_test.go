@@ -317,6 +317,60 @@ escribe final_del_nucleo es mayor que 1048576
 	}
 }
 
+// Unas tablas como las que montaria un sistema: el primer mega con paginas
+// de 4 KB, la 0 sin poner, el codigo de solo lectura y todo lo demas sin
+// poder ejecutarse. Despues de usa_tablas el programa tiene que seguir igual,
+// y lo prohibido tiene que acabar en el aviso que explica que paso.
+const tablasProtegidas = `
+PAGINA es 4096
+NX es 0 menos 9223372036854775807 menos 1
+base es 8388608
+pml4 es region con base y 512 y 8
+pdpt es region con base mas PAGINA y 512 y 8
+pd es region con base mas 2 por PAGINA y 512 y 8
+pt es region con base mas 3 por PAGINA y 512 y 8
+para cada i desde 1 hasta 512
+    elemento i de pml4 es 0
+    elemento i de pdpt es 0
+fin
+elemento 1 de pml4 es base mas PAGINA mas 3
+elemento 1 de pdpt es base mas 2 por PAGINA mas 3
+elemento 1 de pd es base mas 3 por PAGINA mas 3
+para cada t desde 2 hasta 512
+    elemento t de pd es (t menos 1) por 2097152 mas 131 mas NX
+fin
+elemento 1 de pt es 0
+para cada i desde 2 hasta 512
+    d es (i menos 1) por PAGINA
+    si d es mayor o igual que inicio_del_codigo y d es menor que final_del_codigo
+        elemento i de pt es d mas 1
+    si no
+        elemento i de pt es d mas 3 mas NX
+    fin
+fin
+escribe hay_no_ejecutar
+usa_tablas con base
+codigo es region con inicio_del_codigo y 4 y 4
+escribe (elemento 1 de codigo) es 464367618
+`
+
+func TestNucleoMemoriaProtegida(t *testing.T) {
+	salida, reventado := arrancarEnQemu(t, tablasProtegidas+"escribe \"sigue\"")
+	if reventado || salida != "verdadero\nverdadero\nsigue\n" {
+		t.Fatalf("con las tablas puestas no sigue igual (reventado %v):\n%s", reventado, salida)
+	}
+	casos := []struct{ programa, aviso string }{
+		{"elemento 1 de codigo es 0", "que es de solo lectura."},
+		{"cero es region con 0 y 1\nescribe elemento 1 de cero", "que no existe."},
+	}
+	for _, caso := range casos {
+		salida, reventado := arrancarEnQemu(t, tablasProtegidas+caso.programa)
+		if !reventado || !strings.Contains(salida, caso.aviso) {
+			t.Errorf("%q: esperaba %q en el aviso, y salio:\n%s", caso.programa, caso.aviso, salida)
+		}
+	}
+}
+
 // El aviso dice la linea y la copia, igual que el interprete.
 func TestNucleoAvisoConLinea(t *testing.T) {
 	salida, _ := arrancarEnQemu(t, "a es 1\nb es 0\nescribe a entre b")

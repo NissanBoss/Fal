@@ -130,18 +130,42 @@ funcion nucleo_excepcion con numero y codigo y sitio y direccion
     nucleo_di con ".\n\nIba a ejecutar lo que hay en "
     nucleo_di_hex con sitio
     si numero es 14
-        nucleo_di con "\ny quiso tocar la direccion "
-        nucleo_di_hex con direccion
-    fin
-    si codigo no es igual a 0
+        nucleo_por_que_pagina con codigo y direccion
+    si no si codigo no es igual a 0
         nucleo_di con "\nCodigo de error: "
         nucleo_di_valor con codigo
     fin
     nucleo_di con "\n"
-    si numero es mayor o igual que 8 y numero es menor o igual que 15
+    # El fallo de pagina ya se explica solo: con su codigo no se confunde
+    # con un aparato.
+    si numero es mayor o igual que 8 y numero es menor o igual que 15 y numero no es igual a 14
         nucleo_di con "\nPista: si acabas de activar las interrupciones, puede que no sea un fallo sino un aparato. Remapea el controlador de interrupciones para que las suyas lleguen de la 32 en adelante.\n"
     fin
     congela
+fin
+
+# Un fallo de pagina dice en su codigo que paso: el bit 0, si la pagina
+# existia (y entonces fue por permisos); el 1, si era una escritura; el 4, si
+# iba a ejecutarla. Con las tablas que monta el sistema, esto es lo que
+# cuenta que el procesador ha parado algo que no debia pasar.
+funcion nucleo_por_que_pagina con codigo y direccion
+    si (codigo resto 2) es 0
+        nucleo_di con "\ny quiso tocar la direccion "
+        nucleo_di_hex con direccion
+        nucleo_di con ", que no existe."
+    si no si ((cociente con codigo y 16) resto 2) es 1
+        nucleo_di con "\ny quiso ejecutar lo que hay en "
+        nucleo_di_hex con direccion
+        nucleo_di con ", que no es codigo: son datos, y los datos no se ejecutan."
+    si no si ((cociente con codigo y 2) resto 2) es 1
+        nucleo_di con "\ny quiso escribir en "
+        nucleo_di_hex con direccion
+        nucleo_di con ", que es de solo lectura."
+    si no
+        nucleo_di con "\ny quiso leer "
+        nucleo_di_hex con direccion
+        nucleo_di con ", y no tiene permiso."
+    fin
 fin
 
 funcion nucleo_que_excepcion con n
