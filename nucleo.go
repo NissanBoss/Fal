@@ -26,6 +26,9 @@ import (
 //go:embed nucleo/preludio.fal
 var preludioNucleo string
 
+//go:embed nucleo/programa.fal
+var preludioPrograma string
+
 const (
 	etiquetaNada = iota
 	etiquetaNumero
@@ -65,6 +68,14 @@ type compiladorNucleo struct {
 	// Las funciones que atienden alguna interrupcion. Cada una necesita su
 	// propia entrada, que guarda los registros y vuelve con iretq.
 	atenciones map[string]bool
+	// Lo mismo para los fallos de los programas: cada una, con sus tres datos.
+	fallos map[string]bool
+
+	programa bool
+	leer     func(ruta string) (string, error)
+	// Los programas que el sistema lleva dentro, ya compilados.
+	incluidos map[string]int
+	imagenes  [][]byte
 
 	// Lo de la funcion que se esta compilando.
 	lineas     []string
@@ -81,30 +92,50 @@ type compiladorNucleo struct {
 	marco [2]int
 }
 
-// compilarNucleo devuelve la imagen lista para arrancar. Con prueba, al
-// terminar o al reventar avisa a QEMU para que se cierre.
+// opcionesNucleo: con prueba, al terminar o al reventar avisa a QEMU para que
+// se cierre. Con programa, sale un programa suelto para que lo cargue un
+// sistema, en vez de una imagen que arranca. leer es como se llega a los
+// archivos de incluye_programa, que en la web no existen.
+type opcionesNucleo struct {
+	prueba   bool
+	programa bool
+	leer     func(ruta string) (string, error)
+}
+
+// compilarNucleo devuelve la imagen lista para arrancar.
 func compilarNucleo(fuente string, prueba bool) ([]byte, *ErrorFal) {
+	return compilarImagen(fuente, opcionesNucleo{prueba: prueba})
+}
+
+func compilarImagen(fuente string, op opcionesNucleo) ([]byte, *ErrorFal) {
 	usuario, err := armarFuente(fuente)
 	if err != nil {
 		return nil, err
 	}
-	preludio, err := armarFuente(preludioNucleo)
+	textoPreludio := preludioNucleo
+	base := int64(cargaEn)
+	if op.programa {
+		textoPreludio, base = preludioPrograma, cargaPrograma
+	}
+	preludio, err := armarFuente(textoPreludio)
 	if err != nil {
 		err.Mensaje = "El preludio del nucleo no compila: " + err.Mensaje
 		return nil, err
 	}
 
-	e := nuevoEnsamblador()
+	e := nuevoEnsamblador(base)
 	c := &compiladorNucleo{
-		e: e, prueba: prueba,
+		e: e, prueba: op.prueba, programa: op.programa, leer: op.leer,
 		funciones: map[string]*funcionNucleo{},
 		globales:  map[string]int{},
 		textos:    map[string]string{},
+		incluidos: map[string]int{},
+		fallos:    map[string]bool{},
 	}
 	c.pilaRota, c.rtLugar, c.rtLee, c.rtPon, c.rtLargo = e.nueva(), e.nueva(), e.nueva(), e.nueva(), e.nueva()
 	c.atenciones = map[string]bool{}
 
-	lineasPreludio := strings.Split(preludioNucleo, "\n")
+	lineasPreludio := strings.Split(textoPreludio, "\n")
 	lineasUsuario := strings.Split(fuente, "\n")
 	if err := c.recogerFunciones(preludio, true); err != nil {
 		return nil, err
@@ -120,8 +151,13 @@ func compilarNucleo(fuente string, prueba bool) ([]byte, *ErrorFal) {
 	}
 
 	principal := e.nueva()
-	emitirCabecera(e)
-	emitirArranque(e, principal, prueba)
+	if op.programa {
+		emitirCabeceraPrograma(e)
+		emitirEntradaPrograma(e, principal)
+	} else {
+		emitirCabecera(e)
+		emitirArranque(e, principal, op.prueba)
+	}
 
 	// El programa de arriba es una funcion mas, sin parametros, en la que
 	// los nombres son globales. Primero va el preludio, que prepara lo que
@@ -151,8 +187,13 @@ func compilarNucleo(fuente string, prueba bool) ([]byte, *ErrorFal) {
 
 	c.emitirRutinas()
 	c.emitirTextos()
-	emitirGDT(e)
-	colocarBSS(e, len(c.globales))
+	if op.programa {
+		colocarBSSPrograma(e, len(c.globales))
+	} else {
+		c.emitirImagenes()
+		emitirGDT(e)
+		colocarBSS(e, len(c.globales))
+	}
 	if falta := e.resolver(); falta != "" {
 		return nil, nuevoError("Fallo del compilador del nucleo: no encuentro "+falta+".", 0,
 			"Esto no es culpa de tu programa. Avisa en el foro con el programa que lo provoca.", ClasePrograma)
@@ -200,6 +241,24 @@ var integradasNucleo = map[string][2]int{
 	"final_del_codigo":  {0, 0},
 	"hay_no_ejecutar":   {0, 0},
 	"usa_tablas":        {1, 1},
+
+	"contexto":         {0, 0},
+	"pon_contexto":     {1, 1},
+	"pila_de_entrada":  {1, 1},
+	"atiende_llamadas": {1, 1},
+	"atiende_fallos":   {1, 1},
+	"llama_al_sistema": {1, 3},
+	"incluye_programa": {1, 1},
+}
+
+// Lo que no tiene sentido en un programa porque habla de cosas que solo
+// existen en el nucleo. El resto de lo privilegiado (los puertos, cli, hlt,
+// usa_tablas) si compila: lo para el procesador, que es quien manda. Pararlo
+// aqui no protegeria nada, porque un programa no tiene por que venir de este
+// compilador.
+var soloEnElNucleo = map[string]bool{
+	"atiende_interrupcion": true, "contexto": true, "pon_contexto": true, "pila_de_entrada": true,
+	"atiende_llamadas": true, "atiende_fallos": true, "incluye_programa": true,
 }
 
 func (c *compiladorNucleo) recogerFunciones(programa []Instruccion, preludio bool) *ErrorFal {
@@ -335,7 +394,9 @@ func (c *compiladorNucleo) empezarFuncion() {
 	// Sin esto, una funcion que se llama a si misma sin parar bajaria la
 	// pila hasta pisar las tablas de paginas, y el procesador se reiniciaria
 	// sin decir nada.
-	e.movSimbolo(rcx, "pila_suelo", 0)
+	// El suelo esta en memoria porque cambia: quien atiende una interrupcion
+	// corre en otra pila.
+	e.leeAbs(rcx, "suelo")
 	e.cmp(rsp, rcx)
 	e.jcc(siDebajo, c.pilaRota)
 

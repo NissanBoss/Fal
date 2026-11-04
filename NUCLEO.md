@@ -76,6 +76,13 @@ Para la parte entera está `cociente con 7 y 2`, y para lo que sobra,
 | `inicio_del_codigo`, `final_del_codigo` | dónde está el código del programa (con sus textos) |
 | `hay_no_ejecutar` | si el procesador sabe prohibir que se ejecute una página |
 | `usa_tablas con d` | pasa a usar las tablas de páginas que empiezan en `d` |
+| `incluye_programa de "ruta"` | compila otro `.fal` como programa y lo mete en la imagen |
+| `atiende_llamadas con f` | `f` atiende las llamadas al sistema de los programas |
+| `atiende_fallos con f` | `f` atiende lo que rompan los programas |
+| `llama_al_sistema con n y a y b` | desde un programa: pide algo al sistema |
+| `contexto` | dónde está guardado lo que se acaba de interrumpir |
+| `pon_contexto con d` | al salir de la interrupción, sigue por otro contexto |
+| `pila_de_entrada con d` | la pila a la que salta el procesador al entrar desde un programa |
 
 Se cuenta desde el 1 y `menos 1` es el último, igual que en todo Fal.
 
@@ -164,6 +171,101 @@ aparato llega por el número de una excepción, que es lo que pasa al activar
 las interrupciones sin remapear el controlador, lo reconoce y lo explica en
 vez de dejarte con un "fallo doble" que no lo es.
 
+## Programas sin permisos
+
+El procesador tiene cuatro anillos, y usa dos: el núcleo va en el 0 y los
+programas, en el 3. En el anillo 3 no se puede tocar un puerto, cerrar las
+interrupciones, parar la máquina ni cambiar de tablas de páginas. No es que el
+compilador no deje: esas instrucciones existen y compilan, y es el procesador
+quien las para. Tiene que ser así, porque un programa no tiene por qué haber
+salido de este compilador.
+
+### Compilar un programa
+
+```
+sumador es incluye_programa de "programas/sumador.fal"
+```
+
+Compila el archivo aparte, para que viva en la dirección `0x30000000`, y mete
+el resultado en la imagen. Devuelve una región de palabras de 8 bytes con el
+programa entero. La ruta se cuenta desde la carpeta del sistema, tiene que ir
+escrita entre comillas porque se resuelve al compilar, y un fallo dentro del
+programa se avisa con su archivo y su línea.
+
+Un programa lleva delante cuatro palabras:
+
+| Palabra | Es |
+|---|---|
+| 1 | la firma, `20071938299543878` ("FALPROG") |
+| 2 | dónde empieza |
+| 3 | cuántos bytes ocupa el archivo: código y textos, de solo lectura |
+| 4 | cuánta memoria necesita en total: el resto es su pila y sus variables, a cero |
+
+Cargarlo es trabajo del sistema: pedir páginas, copiar el archivo y montarle
+unas tablas donde solo lo suyo lleve el bit de usuario (el 4).
+
+### Entrar y salir
+
+Cada vez que entra una interrupción, el compilador guarda los quince registros
+y deja la dirección en `contexto`: 20 palabras, de abajo arriba r15 a r8, rdi,
+rsi, rbp, rbx, rdx, rcx, rax, y luego rip, cs, rflags, rsp y ss. Se leen y se
+cambian con una región:
+
+```
+marco es region con contexto y 20 y 8
+```
+
+Al salir, el procesador sigue por lo que diga `contexto`, sea o no lo que
+entró. Con eso, cambiar de tarea es una línea, y empezar un programa nuevo es
+escribir un contexto a mano y ponerlo:
+
+| Palabra | Valor |
+|---|---|
+| 16 (rip) | la palabra 2 del programa |
+| 17 (cs) | 27: el segmento de código, en el anillo 3 |
+| 18 (rflags) | 514: con las interrupciones abiertas |
+| 20 (ss) | 35: el segmento de datos, en el anillo 3 |
+
+Cada programa necesita una página propia para entrar: con `pila_de_entrada`
+se le dice al procesador dónde acaba, y el contexto de un programa recién
+hecho va 160 bytes por debajo. La función que atiende la interrupción no corre
+ahí sino en una pila aparte, una sola para todo el sistema, como en seL4: las
+interrupciones están cerradas mientras dura y nada la pisa.
+
+### Llamadas al sistema
+
+Un programa pide cosas con `llama_al_sistema con n y a y b`, que da rax, rdi y
+rsi en las palabras 15, 9 y 10 del contexto y devuelve lo que el sistema deje
+en la 15. Es un `int 0x80`, la única puerta que el anillo 3 puede cruzar. Hay
+dos llamadas fijas, porque las usa el propio lenguaje:
+
+- la 0 es salir con el código `a`: es lo que hace un programa al acabar o al
+  reventar;
+- la 1 manda el byte `a`: es lo que hace `escribe`.
+
+Va byte a byte a propósito: así el sistema no tiene que leer memoria de un
+programa, y una dirección que viene de fuera es lo primero que se usa para
+engañar a un núcleo. El resto de las llamadas las decide el sistema.
+
+Todo lo que llega en una llamada es hostil. Si el sistema suma un número que le
+pasa un programa sin mirarlo, el programa puede hacerle desbordar la cuenta y
+pararlo entero: mira cada dato antes de usarlo.
+
+### Cuando un programa rompe algo
+
+```
+funcion al_fallar con numero y codigo y direccion
+    ...
+fin
+
+atiende_fallos con al_fallar
+```
+
+Lo que rompa un programa llega ahí en vez de a la pantalla roja: el número de
+la excepción, su código de error y, si fue un fallo de página, la dirección. Se
+cierra el programa y el resto sigue. Lo que rompa el núcleo sigue siendo un
+aviso en rojo: eso sí que no tiene arreglo.
+
 ## La seguridad no es un añadido
 
 Cada valor lleva su tipo pegado y todas las operaciones lo miran antes de
@@ -188,15 +290,19 @@ iba a ejecutar y qué dirección quiso tocar.
   el propio sistema lo escribe. El núcleo dice cuánta hay y dónde; el
   repartidor es del sistema.
 - **Teclado, temporizador, procesos.** Son trabajo del sistema operativo,
-  no del lenguaje. El núcleo da las interrupciones; qué hacer con ellas lo
-  decide el sistema.
+  no del lenguaje. El núcleo da las interrupciones y el cambio de contexto;
+  a quién le toca lo decide el sistema.
+- **`syscall` y `sysret`.** Las llamadas van por `int 0x80`, que es más lento y
+  mucho más difícil de hacer mal: `sysret` tiene un agujero conocido si la
+  dirección de vuelta no es válida.
 - **Más de un giga de memoria.** El arranque deja mapeado el primer giga, con
   la dirección virtual igual a la física. Una región que se salga de ahí se
   rechaza, porque tocarla haría que el procesador se reiniciase sin decir
   nada. Ampliarlo es cambiar las tablas de páginas, que también es trabajo
   del sistema.
 - **Funciones guardadas en variables, tipos y `intenta`.**
-- **Varios archivos.** Por ahora un núcleo es un solo `.fal`.
+- **Varios archivos.** Un núcleo es un solo `.fal`, más los programas que
+  incluya con `incluye_programa`, que van aparte.
 
 Si usas algo de esto, `fal --nucleo` lo dice al compilar, con la línea.
 

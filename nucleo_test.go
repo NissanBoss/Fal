@@ -16,11 +16,17 @@ import (
 // paro el preludio (codigo 3 de isa-debug-exit) en vez de acabar bien (1).
 func arrancarEnQemu(t *testing.T, programa string) (salida string, reventado bool) {
 	t.Helper()
+	return arrancarConProgramas(t, programa, nil)
+}
+
+// arrancarConProgramas es arrancarEnQemu con archivos para incluye_programa.
+func arrancarConProgramas(t *testing.T, programa string, archivos map[string]string) (salida string, reventado bool) {
+	t.Helper()
 	qemu := buscarQemu()
 	if qemu == "" {
 		t.Skip("no hay QEMU instalado")
 	}
-	imagen, err := compilarNucleo(programa, true)
+	imagen, err := compilarImagen(programa, opcionesNucleo{prueba: true, leer: leerDe(archivos)})
 	if err != nil {
 		t.Fatalf("no compila: %s (linea %d)", err.Mensaje, err.Linea)
 	}
@@ -53,6 +59,16 @@ func arrancarEnQemu(t *testing.T, programa string) (salida string, reventado boo
 	}
 	t.Fatalf("QEMU salio con %d (%v); lo que llego a escribir:\n%s", codigo, e, salida)
 	return
+}
+
+func leerDe(archivos map[string]string) func(string) (string, error) {
+	return func(ruta string) (string, error) {
+		fuente, hay := archivos[ruta]
+		if !hay {
+			return "", os.ErrNotExist
+		}
+		return fuente, nil
+	}
 }
 
 // Lo de cada prueba va en un solo arranque: QEMU tarda mas en arrancar que
@@ -421,5 +437,253 @@ func TestNucleoReproducible(t *testing.T) {
 		if string(otra) != string(primera) {
 			t.Fatal("dos compilaciones de lo mismo dan imagenes distintas")
 		}
+	}
+}
+
+// Un sistema minimo: unas tablas con el programa en el anillo 3, un cargador y
+// la llamada que entra en el. El numero 99 solo lo usa el nucleo para saltar
+// al programa, y cada programa vuelve con la llamada 0 o con un fallo.
+const anillo3 = `
+USUARIO es 7
+raiz es final_del_nucleo
+tablas es region con raiz y 4096 y 8
+para cada i desde 1 hasta 4096
+    elemento i de tablas es 0
+fin
+arriba es region con raiz y 512 y 8
+elemento 1 de arriba es raiz mas 4096 mas USUARIO
+medio es region con raiz mas 4096 y 512 y 8
+elemento 1 de medio es raiz mas 8192 mas USUARIO
+directorio es region con raiz mas 8192 y 512 y 8
+para cada i desde 1 hasta 512
+    elemento i de directorio es (i menos 1) por 2097152 mas 131
+fin
+paginas es region con raiz mas 12288 y 512 y 8
+elemento 385 de directorio es raiz mas 12288 mas USUARIO
+usa_tablas con raiz
+
+tope es raiz mas 20480
+memoria es raiz mas 24576
+vuelta es 0
+entrada es 0
+banderas es 2
+fallos es 0
+
+funcion cargar con imagen
+    comparte entrada
+    entrada es elemento 2 de imagen
+    total es elemento 4 de imagen
+    cuantas es cociente con (total mas 4095) y 4096
+    para cada i desde 1 hasta cuantas
+        elemento i de paginas es memoria mas (i menos 1) por 4096 mas USUARIO
+    fin
+    palabras es cociente con total y 8
+    destino es region con memoria y palabras y 8
+    para cada i desde 1 hasta palabras
+        elemento i de destino es 0
+    fin
+    para cada i desde 1 hasta largo de imagen
+        elemento i de destino es elemento i de imagen
+    fin
+    usa_tablas con raiz
+fin
+
+funcion llamada
+    comparte vuelta
+    marco es region con contexto y 20 y 8
+    numero es elemento 15 de marco
+    si numero es 99
+        vuelta es contexto
+        otro es region con tope menos 160 y 20 y 8
+        para cada i desde 1 hasta 20
+            elemento i de otro es 0
+        fin
+        elemento 16 de otro es entrada
+        elemento 17 de otro es 27
+        elemento 18 de otro es banderas
+        elemento 20 de otro es 35
+        pila_de_entrada con tope
+        pon_contexto con tope menos 160
+    si no si numero es 1
+        pon_en_puerto con 1016 y elemento 9 de marco
+        elemento 15 de marco es 77
+    si no si numero es 0
+        escribe "salio con"
+        escribe elemento 9 de marco
+        pon_contexto con vuelta
+    fin
+fin
+
+funcion fallo con numero y codigo y direccion
+    comparte fallos
+    fallos es fallos mas 1
+    escribe "fallo"
+    escribe numero
+    escribe codigo
+    escribe direccion
+    pon_contexto con vuelta
+fin
+
+atiende_llamadas con llamada
+atiende_fallos con fallo
+`
+
+func TestNucleoAnillo3(t *testing.T) {
+	programa := anillo3 + `
+cargar con (incluye_programa de "hola.fal")
+llama_al_sistema con 99
+escribe "de vuelta en el nucleo"
+
+cargar con (incluye_programa de "apaga.fal")
+llama_al_sistema con 99
+cargar con (incluye_programa de "espia.fal")
+llama_al_sistema con 99
+cargar con (incluye_programa de "duerme.fal")
+llama_al_sistema con 99
+cargar con (incluye_programa de "tablas.fal")
+llama_al_sistema con 99
+cargar con (incluye_programa de "revienta.fal")
+llama_al_sistema con 99
+cargar con (incluye_programa de "pila.fal")
+llama_al_sistema con 99
+escribe fallos
+`
+	salida, reventado := arrancarConProgramas(t, programa, map[string]string{
+		"hola.fal": `
+suma es 0
+para cada i desde 1 hasta 10
+    suma es suma mas i
+fin
+escribe "hola desde el anillo 3"
+escribe suma
+llama_al_sistema con 0 y (llama_al_sistema con 1 y 33)
+`,
+		"apaga.fal": `
+escribe "voy"
+pon_en_puerto con 100 y 254
+escribe "he podido"
+`,
+		"espia.fal": `
+nucleo es region con 1048576 y 4
+escribe elemento 1 de nucleo
+escribe "he podido"
+`,
+		"duerme.fal": `
+espera_interrupcion
+escribe "he podido"
+`,
+		"tablas.fal": `
+usa_tablas con 4096
+escribe "he podido"
+`,
+		"revienta.fal": `
+x es 1 entre 0
+`,
+		"pila.fal": `
+funcion sin_fin con n
+    devuelve (sin_fin con n mas 1) mas 1
+fin
+escribe sin_fin con 1
+`,
+	})
+	if reventado {
+		t.Fatalf("el nucleo se paro:\n%s", salida)
+	}
+	if strings.Contains(salida, "he podido") {
+		t.Errorf("un programa hizo lo que no podia:\n%s", salida)
+	}
+	quiere := []string{
+		"hola desde el anillo 3\n55\n!salio con\n77\n", // la llamada 1 devuelve lo que puso el nucleo
+		"de vuelta en el nucleo\n",
+		"voy\nfallo\n13\n0\n",     // un puerto: fallo general
+		"fallo\n14\n5\n1048576\n", // leer el nucleo: la pagina existe, sin permiso
+		"entre 0",
+		"salio con\n1\n",
+		"se acabo la pila",
+		"\n4\n", // los cuatro intentos acabaron en el manejador
+	}
+	for _, q := range quiere {
+		if !strings.Contains(salida, q) {
+			t.Errorf("no aparece %q en:\n%s", q, salida)
+		}
+	}
+}
+
+// El reloj tiene que sacar de la CPU a un programa que no la suelta nunca.
+func TestNucleoEchaAUnPrograma(t *testing.T) {
+	programa := anillo3 + `
+tics es 0
+en_programa es 0
+
+funcion al_tic
+    comparte tics y en_programa
+    pon_en_puerto con 32 y 32
+    tics es tics mas 1
+    marco es region con contexto y 20 y 8
+    si (elemento 17 de marco) es 27
+        en_programa es en_programa mas 1
+    fin
+    si tics es 10
+        pon_contexto con vuelta
+    fin
+fin
+
+pon_en_puerto con 32 y 17
+pon_en_puerto con 160 y 17
+pon_en_puerto con 33 y 32
+pon_en_puerto con 161 y 40
+pon_en_puerto con 33 y 4
+pon_en_puerto con 161 y 2
+pon_en_puerto con 33 y 1
+pon_en_puerto con 161 y 1
+pon_en_puerto con 33 y 254
+pon_en_puerto con 161 y 255
+atiende_interrupcion con 32 y al_tic
+
+banderas es 514
+cargar con (incluye_programa de "bucle.fal")
+llama_al_sistema con 99
+desactiva_interrupciones
+escribe tics
+escribe en_programa
+`
+	salida, reventado := arrancarConProgramas(t, programa, map[string]string{
+		"bucle.fal": `
+mientras verdadero
+fin
+`,
+	})
+	if reventado {
+		t.Fatalf("el nucleo se paro:\n%s", salida)
+	}
+	if !strings.Contains(salida, "10\n10\n") {
+		t.Errorf("el reloj no echo al programa:\n%s", salida)
+	}
+}
+
+func TestNucleoProgramasNoCompilan(t *testing.T) {
+	casos := []struct {
+		nombre, sistema, archivo, espera string
+	}{
+		{"ruta de una cuenta", `r es "a.fal"
+incluye_programa de r`, "", "entre comillas"},
+		{"archivo que no esta", `incluye_programa de "b.fal"`, "", "No pude abrir"},
+		{"programa con un fallo", `incluye_programa de "a.fal"`, "x es\n", "a.fal, linea"},
+		{"un programa no atiende interrupciones", `incluye_programa de "a.fal"`,
+			"funcion f\nfin\natiende_interrupcion con 33 y f\n", "solo tiene sentido en el nucleo"},
+		{"un programa no incluye otro", `incluye_programa de "a.fal"`,
+			"incluye_programa de \"c.fal\"\n", "solo tiene sentido en el nucleo"},
+	}
+	for _, caso := range casos {
+		t.Run(caso.nombre, func(t *testing.T) {
+			_, err := compilarImagen(caso.sistema, opcionesNucleo{prueba: true,
+				leer: leerDe(map[string]string{"a.fal": caso.archivo})})
+			if err == nil {
+				t.Fatal("deberia no compilar")
+			}
+			if !strings.Contains(err.Mensaje, caso.espera) {
+				t.Errorf("el aviso es %q", err.Mensaje)
+			}
+		})
 	}
 }

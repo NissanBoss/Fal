@@ -7,10 +7,7 @@ package main
 // otra mitad va a la pila. Sale un codigo lento al lado del de gcc, pero
 // cada trozo se puede leer y comprobar por separado.
 
-import (
-	"sort"
-	"strings"
-)
+import "strings"
 
 func (c *compiladorNucleo) bloque(instrucciones []Instruccion) *ErrorFal {
 	for _, ins := range instrucciones {
@@ -673,6 +670,9 @@ func (c *compiladorNucleo) llamada(nombre string, args []Expresion, ln int) *Err
 		if strings.HasPrefix(nombre, "nucleo_") && !c.enPreludio {
 			return c.nombrePermitido(nombre, ln, false)
 		}
+		if c.programa && soloEnElNucleo[nombre] {
+			return nuevoError(`"`+nombre+`" solo tiene sentido en el nucleo, no en un programa.`, ln, "", ClaseNombre)
+		}
 		if len(args) < cuantos[0] || len(args) > cuantos[1] {
 			pide := itoa(cuantos[0])
 			if cuantos[1] != cuantos[0] {
@@ -832,6 +832,74 @@ func (c *compiladorNucleo) integrada(nombre string, args []Expresion, ln int) *E
 		e.bytes(0x0F, 0x22, 0xDA) // mov cr3, rdx
 		e.movImm(rax, etiquetaNada)
 		e.movImm(rdx, 0)
+
+	case "contexto":
+		e.leeAbs(rdx, "contexto")
+		e.movImm(rax, etiquetaNumero)
+
+	case "pon_contexto":
+		if err := c.direccionDeMarco(args[0], `"pon_contexto" necesita la direccion de un contexto.`, ln); err != nil {
+			return err
+		}
+		e.guardaAbs("contexto", rdx)
+		e.movImm(rax, etiquetaNada)
+		e.movImm(rdx, 0)
+
+	case "pila_de_entrada":
+		if err := c.direccionDeMarco(args[0], `"pila_de_entrada" necesita la direccion del tope de una pila.`, ln); err != nil {
+			return err
+		}
+		e.movSimbolo(rcx, "tss", 0)
+		e.guarda(rcx, 4, rdx)
+		e.movImm(rax, etiquetaNada)
+		e.movImm(rdx, 0)
+
+	case "atiende_llamadas":
+		nombre, err := c.funcionQueAtiende(args[0], "atiende_llamadas", 0, ln)
+		if err != nil {
+			return err
+		}
+		c.atenciones[nombre] = true
+		e.bytes(0x9C, 0xFA) // pushfq; cli
+		e.movSimbolo(rsi, "idt", vectorLlamadas*16)
+		e.movSimbolo(rax, "atencion:"+nombre, 0)
+		emitirPuerta(e, puertaUsuario)
+		e.bytes(0x9D) // popfq
+		e.movImm(rax, etiquetaNada)
+		e.movImm(rdx, 0)
+
+	case "atiende_fallos":
+		nombre, err := c.funcionQueAtiende(args[0], "atiende_fallos", 3, ln)
+		if err != nil {
+			return err
+		}
+		c.fallos[nombre] = true
+		e.movSimbolo(rax, "fallo:"+nombre, 0)
+		e.guardaAbs("manejador_fallos", rax)
+		e.movImm(rax, etiquetaNada)
+		e.movImm(rdx, 0)
+
+	case "llama_al_sistema":
+		for _, a := range args {
+			if err := c.expr(a); err != nil {
+				return err
+			}
+			c.exige(rax, etiquetaNumero, ln, `Los datos de "llama_al_sistema" tienen que ser numeros.`, "")
+			e.push(rdx)
+		}
+		for i := len(args); i < 3; i++ {
+			e.movImm(rdx, 0)
+			e.push(rdx)
+		}
+		e.pop(rsi)
+		e.pop(rdi)
+		e.pop(rax)
+		e.bytes(0xCD, vectorLlamadas)
+		e.mov(rdx, rax)
+		e.movImm(rax, etiquetaNumero)
+
+	case "incluye_programa":
+		return c.incluyePrograma(args[0], ln)
 	}
 	if strings.HasSuffix(nombre, "interrupciones") || nombre == "espera_interrupcion" {
 		e.movImm(rax, etiquetaNada)
@@ -883,10 +951,89 @@ func (c *compiladorNucleo) atiende(args []Expresion, ln int) *ErrorFal {
 	e.movSimbolo(rsi, "idt", 0)
 	e.add(rsi, rbx)
 	e.movSimbolo(rax, "atencion:"+nombre, 0)
-	emitirPuerta(e)
+	emitirPuerta(e, puertaNucleo)
 	e.bytes(0x9D) // popfq
 	e.movImm(rax, etiquetaNada)
 	e.movImm(rdx, 0)
+	return nil
+}
+
+// funcionQueAtiende comprueba que lo que se pone a atender algo sea una
+// funcion del programa con los datos que se le van a dar, y devuelve su nombre.
+func (c *compiladorNucleo) funcionQueAtiende(arg Expresion, integrada string, datos, ln int) (string, *ErrorFal) {
+	nombre := ""
+	if n, es := arg.(*ExNombre); es {
+		nombre = clave(n.Nombre)
+	}
+	f, hay := c.funciones[nombre]
+	if !hay || (f.preludio && !c.enPreludio) {
+		return "", nuevoError(`"`+integrada+`" necesita el nombre de una funcion tuya.`, ln, "", ClaseValor)
+	}
+	if len(f.params) != datos {
+		return "", nuevoError(`"`+nombre+`" tiene que pedir `+itoa(datos)+` datos para "`+integrada+`".`, ln, "", ClaseValor)
+	}
+	return nombre, nil
+}
+
+// direccionDeMarco deja en rdx una direccion alineada del primer giga. Lo que
+// se le da al procesador para cambiar de pila no se puede comprobar despues:
+// mal puesto, el reinicio es mudo.
+func (c *compiladorNucleo) direccionDeMarco(arg Expresion, mensaje string, ln int) *ErrorFal {
+	e := c.e
+	if err := c.expr(arg); err != nil {
+		return err
+	}
+	c.exige(rax, etiquetaNumero, ln, mensaje, "")
+	mal := c.panico(ln, mensaje, "Tiene que ser un multiplo de 8, dentro del primer giga.")
+	e.mov(rcx, rdx)
+	e.andImm(rcx, 7)
+	e.cmpImm(rcx, 0)
+	e.jcc(siDistinto, mal)
+	e.cmpImm(rdx, 4096)
+	e.jcc(siMenor, mal)
+	e.cmpImm(rdx, memoriaVisible)
+	e.jcc(siMayor, mal)
+	return nil
+}
+
+// incluyePrograma compila otro archivo como programa suelto y lo mete en la
+// imagen del sistema, que todavia no tiene disco de donde sacarlo. Devuelve
+// una region con el programa entero, en palabras de 8 bytes.
+func (c *compiladorNucleo) incluyePrograma(arg Expresion, ln int) *ErrorFal {
+	literal, es := arg.(*ExValor)
+	ruta := ""
+	if es {
+		ruta, es = literal.V.(string)
+	}
+	if !es {
+		return nuevoError(`"incluye_programa" necesita la ruta escrita entre comillas.`, ln,
+			"Se compila junto con el sistema, asi que no puede salir de una cuenta.", ClaseValor)
+	}
+	numero, hay := c.incluidos[ruta]
+	if !hay {
+		if c.leer == nil {
+			return nuevoError(`Aqui no hay archivos que leer para "incluye_programa".`, ln, "", ClaseValor)
+		}
+		fuente, e := c.leer(ruta)
+		if e != nil {
+			return nuevoError(`No pude abrir el programa "`+ruta+`".`, ln,
+				"La ruta se cuenta desde la carpeta del sistema.", ClaseValor)
+		}
+		imagen, err := compilarImagen(fuente, opcionesNucleo{programa: true})
+		if err != nil {
+			err.Mensaje = ruta + ", linea " + itoa(err.Linea) + ": " + err.Mensaje
+			err.Linea = ln
+			return err
+		}
+		for len(imagen)%8 != 0 {
+			imagen = append(imagen, 0)
+		}
+		numero = len(c.imagenes)
+		c.incluidos[ruta] = numero
+		c.imagenes = append(c.imagenes, imagen)
+	}
+	c.e.movImm(rax, int64(len(c.imagenes[numero])/8)<<16|8<<8|etiquetaRegion)
+	c.e.movSimbolo(rdx, "programa:"+itoa(numero), 0)
 	return nil
 }
 
@@ -987,28 +1134,33 @@ func (c *compiladorNucleo) emitirRutinas() {
 	// Con la pila agotada ni siquiera se puede llamar al aviso, asi que se
 	// empieza una nueva: de esta ya no se vuelve.
 	e.movSimbolo(rsp, "pila_tope", 0)
+	e.movSimbolo(rax, "pila_suelo", 0)
+	e.guardaAbs("suelo", rax)
 	c.llamarPanico("Demasiadas llamadas, una dentro de otra: se acabo la pila.",
 		"Pista: una funcion que se llama a si misma necesita un caso en el que deja de hacerlo.")
 
-	c.emitirTrampas()
-	nombres := make([]string, 0, len(c.atenciones))
-	for n := range c.atenciones {
-		nombres = append(nombres, n)
-	}
-	sort.Strings(nombres)
-	for _, n := range nombres {
-		// El codigo compilado solo usa estos siete registros, asi que
-		// guardando estos el programa interrumpido no nota nada.
-		e.marca("atencion:" + n)
-		guardados := []int{rax, rcx, rdx, rbx, rsi, rdi, rbp}
-		for _, r := range guardados {
-			e.push(r)
+	if !c.programa {
+		c.emitirTrampas()
+		for _, n := range ordenados(c.atenciones) {
+			e.marca("atencion:" + n)
+			c.entrarEnAtencion()
+			e.call(c.funciones[n].entrada)
+			c.salirDeAtencion()
 		}
-		e.call(c.funciones[n].entrada)
-		for i := len(guardados) - 1; i >= 0; i-- {
-			e.pop(guardados[i])
+		for _, n := range ordenados(c.fallos) {
+			e.marca("fallo:" + n)
+			c.entrarEnAtencion()
+			e.leeAbs(rdx, "fallo_numero")
+			e.leeAbs(rcx, "fallo_codigo")
+			e.bytes(0x0F, 0x20, 0xD3) // mov rbx, cr2
+			for _, r := range []int{rdx, rcx, rbx} {
+				e.push(r)
+				e.movImm(rax, etiquetaNumero)
+				e.push(rax)
+			}
+			e.call(c.funciones[n].entrada)
+			c.salirDeAtencion()
 		}
-		e.bytes(0x48, 0xCF) // iretq
 	}
 
 	// rtLugar: coleccion en rcx/rbx y posicion en rax/rdx. Deja en rsi la
@@ -1152,6 +1304,43 @@ func (c *compiladorNucleo) emitirRutinas() {
 	e.ret()
 }
 
+// Las 20 palabras del contexto de una tarea, de abajo arriba: los 15
+// registros (r15 a r8, rdi, rsi, rbp, rbx, rdx, rcx, rax) y lo que mete el
+// procesador (rip, cs, rflags, rsp, ss). El contexto es la direccion de la
+// primera. Cambiar de tarea es dejar otra en su sitio: al salir se recupera
+// lo que diga la variable, sea o no lo que entro.
+//
+// La funcion corre en una sola pila aparte, como en seL4, y no en la de cada
+// tarea: sus marcos no cabrian en la pagina que tiene cada una para esto. Y
+// como las interrupciones estan cerradas mientras dura, nada la pisa.
+func (c *compiladorNucleo) entrarEnAtencion() {
+	e := c.e
+	// Un programa puede entrar con la bandera de direccion al reves, y el
+	// nucleo borra sus marcos con rep stosq: iria hacia abajo, pisando lo que
+	// el programa quisiera.
+	e.bytes(0xFC) // cld
+	for _, r := range []int{rax, rcx, rdx, rbx, rbp, rsi, rdi} {
+		e.push(r)
+	}
+	e.guardaAltos()
+	e.guardaAbs("contexto", rsp)
+	e.movSimbolo(rsp, "pila_atencion_tope", 0)
+	e.movSimbolo(rax, "suelo_atencion", 0)
+	e.guardaAbs("suelo", rax)
+}
+
+func (c *compiladorNucleo) salirDeAtencion() {
+	e := c.e
+	e.movSimbolo(rax, "pila_suelo", 0)
+	e.guardaAbs("suelo", rax)
+	e.leeAbs(rsp, "contexto")
+	e.devuelveAltos()
+	for _, r := range []int{rdi, rsi, rbp, rbx, rdx, rcx, rax} {
+		e.pop(r)
+	}
+	e.bytes(0x48, 0xCF) // iretq
+}
+
 // Las excepciones que meten en la pila un codigo de error. Las demas no, y
 // para que todas lleguen igual al aviso, a esas se les mete un 0 a mano.
 var conCodigoDeError = map[int]bool{8: true, 10: true, 11: true, 12: true, 13: true, 14: true,
@@ -1180,23 +1369,54 @@ func (c *compiladorNucleo) emitirTrampas() {
 		}
 	}
 
+	// Una excepcion en el anillo 3 es cosa de ese programa: va a quien el
+	// sistema haya dicho, con el numero y el codigo fuera de la pila para que
+	// quede el mismo contexto que deja cualquier interrupcion. Lo que no
+	// viene de un programa, o si nadie se encarga, sigue al aviso rojo.
+	nucleo := e.nueva()
+	e.aqui(comun)
+	e.bytes(0xFA, 0xFC)                 // cli; cld
+	e.bytes(0x48, 0x83, 0x3C, 0x24, 32) // cmp qword [rsp], 32
+	e.jcc(siMayorOIgual, nucleo)
+	e.bytes(0xF6, 0x44, 0x24, 24, 3) // test byte [rsp+24], 3: el anillo de cs
+	e.jcc(siIgual, nucleo)
+	e.bytes(0x48, 0x83, 0x3C, 0x25) // cmp qword [manejador_fallos], 0
+	e.ref(4, "manejador_fallos", 0)
+	e.bytes(0)
+	e.jcc(siIgual, nucleo)
+	e.bytes(0x8F, 0x04, 0x25) // pop [fallo_numero]
+	e.ref(4, "fallo_numero", 0)
+	e.bytes(0x8F, 0x04, 0x25) // pop [fallo_codigo]
+	e.ref(4, "fallo_codigo", 0)
+	e.bytes(0xFF, 0x24, 0x25) // jmp [manejador_fallos]
+	e.ref(4, "manejador_fallos", 0)
+
 	// En la pila: el numero, el codigo de error y la direccion donde iba.
 	// De aqui no se vuelve, asi que se empieza una pila nueva: la de antes
 	// puede ser justo lo que se rompio.
-	e.aqui(comun)
-	e.bytes(0xFA)
+	e.aqui(nucleo)
 	e.mov(rsi, rsp)
 	e.lee(rbx, rsi, 0)
 	e.lee(rcx, rsi, 8)
 	e.lee(rdi, rsi, 16)
 	e.bytes(0x0F, 0x20, 0xD2) // mov rdx, cr2: la direccion de un fallo de pagina
 	e.movSimbolo(rsp, "pila_tope", 0)
+	e.movSimbolo(rax, "pila_suelo", 0)
+	e.guardaAbs("suelo", rax)
 	for _, r := range []int{rbx, rcx, rdi, rdx} {
 		e.push(r)
 		e.movImm(rax, etiquetaNumero)
 		e.push(rax)
 	}
 	e.call(c.funciones["nucleo_excepcion"].entrada)
+}
+
+func (c *compiladorNucleo) emitirImagenes() {
+	for i, imagen := range c.imagenes {
+		c.e.alinea(8)
+		c.e.marca("programa:" + itoa(i))
+		c.e.bytes(imagen...)
+	}
 }
 
 // Los textos van detras del codigo con su largo delante, en bytes de UTF-8.

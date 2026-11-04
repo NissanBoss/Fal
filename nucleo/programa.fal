@@ -1,0 +1,86 @@
+# El preludio de un programa: lo que "incluye_programa" mete delante de cada
+# uno. Va en el anillo 3, sin puertos ni pantalla, y lo unico que puede hacer
+# es pedirle cosas al sistema con llama_al_sistema. Las dos primeras llamadas
+# las fija el compilador porque las necesita "escribe" y salir: la 0 es salir
+# con un codigo y la 1 es mandar un byte.
+#
+# Se manda letra a letra y no un texto entero para que el sistema no tenga
+# que leer memoria de un programa: una direccion que viene de fuera es lo
+# primero que se aprovecha para engañar a un nucleo.
+
+funcion nucleo_escribe_texto con t
+    para cada letra en t
+        llama_al_sistema con 1 y letra
+    fin
+fin
+
+funcion nucleo_escribe_numero con n
+    si n es menor que 0
+        llama_al_sistema con 1 y 45
+        nucleo_cifras con n
+    si no
+        nucleo_cifras con 0 menos n
+    fin
+fin
+
+# En negativo por lo mismo que en el preludio del nucleo: el numero mas
+# pequeño no tiene opuesto.
+funcion nucleo_cifras con n
+    si n es menor que menos 9
+        nucleo_cifras con (cociente con n y 10)
+    fin
+    llama_al_sistema con 1 y 48 menos (n resto 10)
+fin
+
+funcion nucleo_escribe con valor y salto
+    etiqueta es nucleo_etiqueta de valor
+    si etiqueta es 1
+        nucleo_escribe_numero con valor
+    si no si etiqueta es 3
+        nucleo_escribe_texto con valor
+    si no si etiqueta es 2
+        si valor
+            nucleo_escribe_texto con "verdadero"
+        si no
+            nucleo_escribe_texto con "falso"
+        fin
+    si no si etiqueta es 4
+        nucleo_escribe_texto con "una region de "
+        nucleo_escribe_numero con largo de valor
+        nucleo_escribe_texto con " elementos"
+    si no
+        nucleo_escribe_texto con "nada"
+    fin
+    si salto
+        llama_al_sistema con 1 y 10
+    fin
+fin
+
+funcion nucleo_textos_iguales con a y b
+    si (largo de a) no es igual a (largo de b)
+        devuelve falso
+    fin
+    i es 1
+    mientras i es menor o igual que largo de a
+        si (elemento i de a) no es igual a (elemento i de b)
+            devuelve falso
+        fin
+        i es i mas 1
+    fin
+    devuelve verdadero
+fin
+
+# Un programa que revienta no se lleva nada por delante: cuenta que paso, de
+# la linea que va delante del salto, y sale con un 1.
+funcion nucleo_panico con mensaje y donde
+    nucleo_escribe_texto con mensaje
+    llama_al_sistema con 1 y 32
+    para cada letra en donde
+        si letra es 10
+            detente
+        fin
+        llama_al_sistema con 1 y letra
+    fin
+    llama_al_sistema con 1 y 10
+    llama_al_sistema con 0 y 1
+fin

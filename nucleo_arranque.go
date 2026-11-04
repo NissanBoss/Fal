@@ -9,11 +9,25 @@ package main
 // one"). Con los campos de direccion de la cabecera rellenos (el bit 16 de
 // las banderas) lo carga tal cual, y GRUB tambien.
 
+import "encoding/binary"
+
 const (
 	cargaEn        = 0x100000 // el primer mega: lo de debajo es de la BIOS y la pantalla
 	tamanoPila     = 256 << 10
+	tamanoAtencion = 64 << 10 // donde corre la funcion que atiende una interrupcion
 	margenPila     = 16 << 10 // lo que queda libre para poder contar el desborde
 	memoriaVisible = 1 << 30  // el primer giga, que es lo que mapean las tablas de paginas
+
+	// Un programa se compila para estar en 768 megas: dentro del primer giga
+	// para que el sistema lo alcance con una region, y lejos de todo lo suyo.
+	cargaPrograma  = 0x30000000
+	pilaPrograma   = 64 << 10
+	margenPrograma = 8 << 10
+	magiaPrograma  = 0x00474F52504C4146 // "FALPROG"
+
+	segmentoTSS    = 0x28
+	tamanoTSS      = 104
+	vectorLlamadas = 0x80
 )
 
 func emitirCabecera(e *ensamblador) {
@@ -116,6 +130,8 @@ func emitirArranque(e *ensamblador, principal etiqueta, prueba bool) {
 		e.bytes(0x8E, segmento) // ds, es, ss, fs, gs
 	}
 	e.movSimbolo(rsp, "pila_tope", 0)
+	e.movSimbolo(rax, "pila_suelo", 0)
+	e.guardaAbs("suelo", rax)
 
 	// Las 256 interrupciones a sus trampas antes de nada: desde aqui, un
 	// fallo del procesador ya se cuenta en vez de reiniciar la maquina.
@@ -124,7 +140,7 @@ func emitirArranque(e *ensamblador, principal etiqueta, prueba bool) {
 	e.movImm(rbx, 0)
 	cada := e.nueva()
 	e.aqui(cada)
-	emitirPuerta(e)
+	emitirPuerta(e, puertaNucleo)
 	e.addImm(rax, 16)
 	e.addImm(rsi, 16)
 	e.addImm(rbx, 1)
@@ -133,15 +149,36 @@ func emitirArranque(e *ensamblador, principal etiqueta, prueba bool) {
 	e.movSimbolo(rax, "idtr", 0)
 	e.bytes(0x0F, 0x01, 0x18) // lidt [rax]
 
+	// Lo que el procesador necesita para volver del anillo 3: la pila a la
+	// que salta al entrar. Sale de aqui hasta que el sistema diga otra, para
+	// que olvidarse no acabe en un reinicio mudo.
+	e.movSimbolo(rsi, "tss", 0)
+	e.movSimbolo(rax, "pila_entrada_tope", 0)
+	e.guarda(rsi, 4, rax)
+	// Donde empieza el mapa de puertos permitidos. A 0, que es como queda sin
+	// tocarlo, el mapa serian los primeros bytes del TSS, y sus ceros le
+	// abririan a cualquier programa los puertos que coincidieran. Con el
+	// tamaño del TSS no hay mapa, y sin mapa no se abre ninguno.
+	e.movImm(rax, tamanoTSS)
+	e.bytes(0x66, 0x89, 0x46, 102) // mov [rsi+102], ax
+	e.movImm(rax, segmentoTSS)
+	e.bytes(0x0F, 0x00, 0xD8) // ltr ax
+
 	e.call(principal)
 	emitirCongela(e, prueba, 0)
 }
 
+// Las dos entran con las interrupciones cerradas. La de usuario es la unica
+// que un programa puede cruzar con "int".
+const (
+	puertaNucleo  = 0x8E00
+	puertaUsuario = 0xEE00
+)
+
 // emitirPuerta escribe en rsi la entrada de la tabla de interrupciones que
-// salta a la direccion de rax. Es una puerta de interrupcion (0x8E: entra
-// con las interrupciones cerradas) en el segmento de codigo 0x08. La
-// direccion va partida en tres trozos, que es como la quiere el procesador.
-func emitirPuerta(e *ensamblador) {
+// salta a la direccion de rax, en el segmento de codigo 0x08. La direccion
+// va partida en tres trozos, que es como la quiere el procesador.
+func emitirPuerta(e *ensamblador, tipo int64) {
 	e.mov(rcx, rax)
 	e.andImm(rcx, 0xFFFF)
 	e.mov(rdx, rax)
@@ -149,7 +186,7 @@ func emitirPuerta(e *ensamblador) {
 	e.andImm(rdx, 0xFFFF)
 	e.shl(rdx, 48)
 	e.add(rcx, rdx)
-	e.movImm(rdx, 0x8E00<<32|0x08<<16)
+	e.movImm(rdx, tipo<<32|0x08<<16)
 	e.add(rcx, rdx)
 	e.guarda(rsi, 0, rcx)
 	e.mov(rdx, rax)
@@ -178,8 +215,15 @@ func emitirGDT(e *ensamblador) {
 	// lectura, esa escritura seria un fallo de pagina.
 	e.d64(0x00AF9B000000FFFF) // codigo de 64 bits
 	e.d64(0x00CF93000000FFFF) // datos
+	e.d64(0x00AFFB000000FFFF) // los mismos dos, en el anillo 3
+	e.d64(0x00CFF3000000FFFF)
+	// El TSS ocupa dos entradas. Su direccion va partida a trozos y no se
+	// sabe hasta colocar la memoria: la rellena ponerTSS.
+	e.marca("gdt_tss")
+	e.d64(0)
+	e.d64(0)
 	e.marca("gdtr")
-	e.bytes(23, 0)
+	e.bytes(segmentoTSS+15, 0)
 	e.ref(4, "gdt", 0)
 	e.alinea(8)
 	e.marca("idtr")
@@ -206,11 +250,79 @@ func colocarBSS(e *ensamblador, globales int) {
 	poner("pila", tamanoPila)
 	e.simbolos["pila_suelo"] = e.simbolos["pila"] + margenPila
 	e.simbolos["pila_tope"] = pos
+	poner("pila_atencion", tamanoAtencion)
+	e.simbolos["suelo_atencion"] = e.simbolos["pila_atencion"] + margenPila
+	e.simbolos["pila_atencion_tope"] = pos
+	poner("pila_entrada", 4096)
+	e.simbolos["pila_entrada_tope"] = pos
 	poner("globales", int64(16*globales))
 	poner("datos_arranque", 8)
 	poner("hay_nx", 8)
+	poner("suelo", 8)
+	poner("contexto", 8)
+	poner("manejador_fallos", 8)
+	poner("fallo_numero", 8)
+	poner("fallo_codigo", 8)
+	poner("tss", tamanoTSS)
 	e.simbolos["fin_bss"] = pos
 	e.simbolos["fin_nucleo"] = (pos + 4095) &^ 4095
 	e.simbolos["palabras_bss"] = (pos - e.simbolos["inicio_bss"]) / 4
 	e.simbolos["cabecera"] = cargaEn
+	ponerTSS(e)
+}
+
+func ponerTSS(e *ensamblador) {
+	direccion := uint64(e.simbolos["tss"])
+	sitio := e.simbolos["gdt_tss"] - e.base
+	baja := uint64(tamanoTSS-1) | (direccion&0xFFFFFF)<<16 | 0x89<<40 | (direccion>>24&0xFF)<<56
+	binary.LittleEndian.PutUint64(e.b[sitio:], baja)
+	binary.LittleEndian.PutUint64(e.b[sitio+8:], direccion>>32)
+}
+
+// Un programa suelto no arranca nada: lo carga el sistema, en el anillo 3.
+// Delante lleva cuatro palabras para que el cargador sepa que es y cuanta
+// memoria pedir.
+func emitirCabeceraPrograma(e *ensamblador) {
+	e.d64(magiaPrograma)
+	e.ref(8, "entrada_programa", 0)
+	e.ref(8, "tamano_archivo", 0)
+	e.ref(8, "tamano_memoria", 0)
+}
+
+// emitirEntradaPrograma pone la pila del programa, lo llama y, si vuelve,
+// sale por la llamada al sistema 0: en el anillo 3 nadie se puede parar solo.
+func emitirEntradaPrograma(e *ensamblador, principal etiqueta) {
+	e.marca("entrada_programa")
+	e.movSimbolo(rsp, "pila_tope", 0)
+	e.movSimbolo(rax, "pila_suelo", 0)
+	e.guardaAbs("suelo", rax)
+	e.call(principal)
+	e.movImm(rax, 0)
+	e.movImm(rdi, 0)
+	e.bytes(0xCD, vectorLlamadas)
+	e.bytes(0xEB, 0xFE) // aqui mismo, por si el sistema no lo cierra
+}
+
+// colocarBSSPrograma es colocarBSS para un programa: lo unico que tiene a
+// cero son su pila y sus variables. Lo del nucleo aqui no existe, pero sus
+// simbolos si, para que "datos_de_arranque" y compañia compilen.
+func colocarBSSPrograma(e *ensamblador, globales int) {
+	e.marca("fin_archivo")
+	pos := (e.base + int64(len(e.b)) + 4095) &^ 4095
+	poner := func(simbolo string, tamano int64) {
+		e.simbolos[simbolo] = pos
+		pos += tamano
+	}
+	poner("inicio_bss", 0)
+	poner("pila", pilaPrograma)
+	e.simbolos["pila_suelo"] = e.simbolos["pila"] + margenPrograma
+	e.simbolos["pila_tope"] = pos
+	poner("globales", int64(16*globales))
+	poner("datos_arranque", 8)
+	poner("hay_nx", 8)
+	poner("suelo", 8)
+	e.simbolos["fin_nucleo"] = (pos + 4095) &^ 4095
+	e.simbolos["cabecera"] = e.base
+	e.simbolos["tamano_archivo"] = e.simbolos["fin_archivo"] - e.base
+	e.simbolos["tamano_memoria"] = e.simbolos["fin_nucleo"] - e.base
 }

@@ -21,7 +21,11 @@ func compilarYArrancar(ruta string, arrancar bool) int {
 		return 1
 	}
 	fuente := quitarBOM(string(datos))
-	imagen, err := compilarNucleo(fuente, false)
+	carpeta := filepath.Dir(ruta)
+	imagen, err := compilarImagen(fuente, opcionesNucleo{leer: func(incluida string) (string, error) {
+		datos, e := os.ReadFile(filepath.Join(carpeta, filepath.FromSlash(incluida)))
+		return string(datos), e
+	}})
 	if err != nil {
 		mostrarError(err, fuente)
 		return 1

@@ -7,7 +7,8 @@ package main
 //
 // Solo se usan los ocho registros de siempre. Con ellos no hace falta el
 // prefijo REX.R ni REX.B, y la codificacion queda en una tabla que se puede
-// comprobar a ojo con objdump.
+// comprobar a ojo con objdump. Los otros ocho solo se guardan y se devuelven
+// al entrar y salir de una interrupcion (ver guardaAltos).
 
 import "encoding/binary"
 
@@ -51,6 +52,7 @@ type referencia struct {
 }
 
 type ensamblador struct {
+	base     int64 // donde va a estar cargado el primer byte
 	b        []byte
 	sitios   []int
 	saltos   []salto
@@ -58,8 +60,8 @@ type ensamblador struct {
 	simbolos map[string]int64
 }
 
-func nuevoEnsamblador() *ensamblador {
-	return &ensamblador{simbolos: map[string]int64{}}
+func nuevoEnsamblador(base int64) *ensamblador {
+	return &ensamblador{base: base, simbolos: map[string]int64{}}
 }
 
 func (e *ensamblador) nueva() etiqueta {
@@ -70,7 +72,7 @@ func (e *ensamblador) nueva() etiqueta {
 func (e *ensamblador) aqui(l etiqueta) { e.sitios[l] = len(e.b) }
 
 // marca apunta la direccion final de lo que venga a continuacion.
-func (e *ensamblador) marca(simbolo string) { e.simbolos[simbolo] = cargaEn + int64(len(e.b)) }
+func (e *ensamblador) marca(simbolo string) { e.simbolos[simbolo] = e.base + int64(len(e.b)) }
 
 func (e *ensamblador) bytes(b ...byte) { e.b = append(e.b, b...) }
 func (e *ensamblador) d32(v uint32)    { e.b = binary.LittleEndian.AppendUint32(e.b, v) }
@@ -118,6 +120,34 @@ func (e *ensamblador) movImm(r int, v int64) {
 func (e *ensamblador) movSimbolo(r int, simbolo string, mas int64) {
 	e.bytes(0x48, 0xB8|byte(r))
 	e.ref(8, simbolo, mas)
+}
+
+// leeAbs y guardaAbs van a una direccion fija sin tocar ningun otro registro:
+// es lo unico que se puede hacer al entrar en una interrupcion, cuando aun no
+// hay ninguno libre. La direccion va en 32 bits, y toda la imagen cabe.
+func (e *ensamblador) leeAbs(r int, simbolo string) {
+	e.bytes(0x48, 0x8B, 0x04|byte(r)<<3, 0x25)
+	e.ref(4, simbolo, 0)
+}
+
+func (e *ensamblador) guardaAbs(simbolo string, r int) {
+	e.bytes(0x48, 0x89, 0x04|byte(r)<<3, 0x25)
+	e.ref(4, simbolo, 0)
+}
+
+// guardaAltos mete r8 a r15 en la pila, y devuelveAltos los saca. El codigo
+// compilado no los usa, pero un programa podria dejar algo ahi y leer lo que
+// dejo otro: lo que no se guarda al cambiar de tarea, se filtra.
+func (e *ensamblador) guardaAltos() {
+	for i := byte(0); i < 8; i++ {
+		e.bytes(0x41, 0x50|i)
+	}
+}
+
+func (e *ensamblador) devuelveAltos() {
+	for i := 7; i >= 0; i-- {
+		e.bytes(0x41, 0x58|byte(i))
+	}
 }
 
 func (e *ensamblador) mov(dst, src int) { e.bytes(0x48, 0x89, 0xC0|byte(src)<<3|byte(dst)) }
