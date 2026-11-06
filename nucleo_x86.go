@@ -217,6 +217,10 @@ func (e *ensamblador) guardaAncho(ancho int) {
 func (e *ensamblador) entraPuerto() { e.bytes(0xEC, 0x0F, 0xB6, 0xC0) } // in al, dx; movzx eax, al
 func (e *ensamblador) salePuerto()  { e.bytes(0xEE) }                   // out dx, al
 
+// entraPalabra lee 16 bits de golpe. Un disco ATA da sus datos asi y no se
+// los puede pedir byte a byte.
+func (e *ensamblador) entraPalabra() { e.bytes(0x66, 0xED, 0x0F, 0xB7, 0xC0) } // in ax, dx; movzx eax, ax
+
 // resolver rellena los saltos y las direcciones. Devuelve el simbolo que
 // falte, que solo puede ser un fallo del propio compilador.
 func (e *ensamblador) resolver() string {

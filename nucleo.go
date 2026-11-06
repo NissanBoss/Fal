@@ -226,6 +226,7 @@ var integradasNucleo = map[string][2]int{
 	"largo":           {1, 1},
 	"cociente":        {2, 2},
 	"lee_puerto":      {1, 1},
+	"lee_palabra":     {1, 1},
 	"pon_en_puerto":   {2, 2},
 	"congela":         {0, 0},
 	"nucleo_etiqueta": {1, 1},
@@ -249,6 +250,7 @@ var integradasNucleo = map[string][2]int{
 	"atiende_fallos":   {1, 1},
 	"llama_al_sistema": {1, 3},
 	"incluye_programa": {1, 1},
+	"mapa_de_puertos":  {0, 0},
 }
 
 // Lo que no tiene sentido en un programa porque habla de cosas que solo
@@ -259,6 +261,7 @@ var integradasNucleo = map[string][2]int{
 var soloEnElNucleo = map[string]bool{
 	"atiende_interrupcion": true, "contexto": true, "pon_contexto": true, "pila_de_entrada": true,
 	"atiende_llamadas": true, "atiende_fallos": true, "incluye_programa": true,
+	"mapa_de_puertos": true,
 }
 
 func (c *compiladorNucleo) recogerFunciones(programa []Instruccion, preludio bool) *ErrorFal {

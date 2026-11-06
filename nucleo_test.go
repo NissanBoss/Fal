@@ -20,7 +20,7 @@ func arrancarEnQemu(t *testing.T, programa string) (salida string, reventado boo
 }
 
 // arrancarConProgramas es arrancarEnQemu con archivos para incluye_programa.
-func arrancarConProgramas(t *testing.T, programa string, archivos map[string]string) (salida string, reventado bool) {
+func arrancarConProgramas(t *testing.T, programa string, archivos map[string]string, disco ...byte) (salida string, reventado bool) {
 	t.Helper()
 	qemu := buscarQemu()
 	if qemu == "" {
@@ -36,9 +36,16 @@ func arrancarConProgramas(t *testing.T, programa string, archivos map[string]str
 	}
 	ctx, cancelar := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancelar()
-	orden := exec.CommandContext(ctx, qemu, "-kernel", "prueba.bin", "-display", "none",
+	argumentos := []string{"-kernel", "prueba.bin", "-display", "none",
 		"-serial", "file:serie.txt", "-no-reboot",
-		"-device", "isa-debug-exit,iobase=0xf4,iosize=0x04")
+		"-device", "isa-debug-exit,iobase=0xf4,iosize=0x04"}
+	if len(disco) > 0 {
+		if e := os.WriteFile(filepath.Join(carpeta, "disco.img"), disco, 0644); e != nil {
+			t.Fatal(e)
+		}
+		argumentos = append(argumentos, "-drive", "file=disco.img,format=raw,if=ide")
+	}
+	orden := exec.CommandContext(ctx, qemu, argumentos...)
 	orden.Dir = carpeta
 	e := orden.Run()
 	codigo := 0
@@ -685,5 +692,66 @@ incluye_programa de r`, "", "entre comillas"},
 				t.Errorf("el aviso es %q", err.Mensaje)
 			}
 		})
+	}
+}
+
+// Lo que abre el mapa de puertos para uno no puede abrirlo para otro, y lo que
+// no se ha abierto sigue cerrado: el 113 y el 100 estan en el mismo byte que
+// sus vecinos, asi que aqui se ve si el bit es el que toca.
+func TestNucleoMapaDePuertos(t *testing.T) {
+	programa := anillo3 + `
+mapa es region con mapa_de_puertos y 8192
+escribe elemento 1 de mapa
+escribe elemento 8192 de mapa
+elemento 15 de mapa es 254
+cargar con (incluye_programa de "abierto.fal")
+llama_al_sistema con 99
+elemento 15 de mapa es 255
+cargar con (incluye_programa de "abierto.fal")
+llama_al_sistema con 99
+escribe fallos
+`
+	salida, reventado := arrancarConProgramas(t, programa, map[string]string{
+		"abierto.fal": `
+pon_en_puerto con 112 y 0
+escribe "puerto abierto"
+pon_en_puerto con 113 y 0
+escribe "no deberia llegar"
+`,
+	})
+	if reventado {
+		t.Fatalf("revento:\n%s", salida)
+	}
+	if !strings.HasPrefix(salida, "255\n255\n") {
+		t.Errorf("el mapa no nace cerrado:\n%s", salida)
+	}
+	if strings.Count(salida, "puerto abierto") != 1 || strings.Contains(salida, "no deberia") {
+		t.Errorf("el mapa no manda:\n%s", salida)
+	}
+}
+
+// Un disco ATA da los datos de 16 en 16 bits. Si la lectura fuera de un byte,
+// aqui saldria 72 o nada, porque el disco no adelanta su cola.
+func TestNucleoLeePalabra(t *testing.T) {
+	programa := `
+pon_en_puerto con 502 y 224
+pon_en_puerto con 498 y 1
+pon_en_puerto con 499 y 0
+pon_en_puerto con 500 y 0
+pon_en_puerto con 501 y 0
+pon_en_puerto con 503 y 32
+mientras ((lee_puerto de 503) resto 16) es menor que 8
+fin
+escribe lee_palabra de 496
+escribe lee_palabra de 496
+`
+	disco := make([]byte, 1024)
+	copy(disco, "HOLA")
+	salida, reventado := arrancarConProgramas(t, programa, nil, disco...)
+	if reventado {
+		t.Fatalf("revento:\n%s", salida)
+	}
+	if salida != "20296\n16716\n" {
+		t.Errorf("no leyo el disco de dos en dos bytes:\n%q", salida)
 	}
 }

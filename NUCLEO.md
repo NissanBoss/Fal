@@ -65,6 +65,7 @@ Para la parte entera está `cociente con 7 y 2`, y para lo que sobra,
 | `largo de x` | cuántos elementos tiene |
 | `cociente con a y b` | la división entera |
 | `lee_puerto de p` | lee un byte de un puerto de entrada y salida |
+| `lee_palabra de p` | lee 16 bits de un puerto, como pide un disco ATA |
 | `pon_en_puerto con p y v` | manda un byte a un puerto |
 | `congela` | para el procesador para siempre |
 | `atiende_interrupcion con n y f` | la función `f` atiende la interrupción `n` |
@@ -323,3 +324,19 @@ Si usas algo de esto, `fal --nucleo` lo dice al compilar, con la línea.
 
 Las pruebas (`go test -run Nucleo`) arrancan cada programa de verdad en QEMU
 y comparan lo que sale por el puerto serie. Si no hay QEMU, se saltan.
+
+## Puertos para un programa
+
+El mapa de puertos del procesador va detrás del TSS y nace lleno de unos: un bit
+a 1 es un puerto cerrado. `mapa_de_puertos` da su dirección, y el sistema abre
+los que quiera poniendo a 0 el bit de cada uno:
+
+```fal
+mapa es region con mapa_de_puertos y 8192
+elemento 13 de mapa es 254      # abre el puerto 96 y deja cerrado el 100
+```
+
+El mapa es uno solo, así que el sistema lo cambia al cambiar de tarea. Abrir un
+puerto no lo abre para siempre: lo abre para quien corre en ese momento.
+
+`fal --arranca` conecta el `disco.img` que haya al lado del fuente.

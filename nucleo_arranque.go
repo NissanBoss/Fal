@@ -25,9 +25,11 @@ const (
 	margenPrograma = 8 << 10
 	magiaPrograma  = 0x00474F52504C4146 // "FALPROG"
 
-	segmentoTSS    = 0x28
-	tamanoTSS      = 104
-	vectorLlamadas = 0x80
+	segmentoTSS = 0x28
+	tamanoTSS   = 104
+	// Un bit por puerto, mas el byte de unos que el procesador exige al final.
+	tamanoMapaPuertos = 65536/8 + 1
+	vectorLlamadas    = 0x80
 )
 
 func emitirCabecera(e *ensamblador) {
@@ -157,10 +159,15 @@ func emitirArranque(e *ensamblador, principal etiqueta, prueba bool) {
 	e.guarda(rsi, 4, rax)
 	// Donde empieza el mapa de puertos permitidos. A 0, que es como queda sin
 	// tocarlo, el mapa serian los primeros bytes del TSS, y sus ceros le
-	// abririan a cualquier programa los puertos que coincidieran. Con el
-	// tamaño del TSS no hay mapa, y sin mapa no se abre ninguno.
+	// abririan a cualquier programa los puertos que coincidieran. El mapa va
+	// detras del TSS y nace lleno de unos: un bit a 1 es un puerto cerrado,
+	// asi que abrir uno es algo que el sistema tiene que hacer a proposito.
 	e.movImm(rax, tamanoTSS)
 	e.bytes(0x66, 0x89, 0x46, 102) // mov [rsi+102], ax
+	e.movSimbolo(rdi, "tss", tamanoTSS)
+	e.movImm(rcx, tamanoMapaPuertos)
+	e.movImm(rax, 0xFF)
+	e.bytes(0xF3, 0xAA) // rep stosb
 	e.movImm(rax, segmentoTSS)
 	e.bytes(0x0F, 0x00, 0xD8) // ltr ax
 
@@ -263,7 +270,7 @@ func colocarBSS(e *ensamblador, globales int) {
 	poner("manejador_fallos", 8)
 	poner("fallo_numero", 8)
 	poner("fallo_codigo", 8)
-	poner("tss", tamanoTSS)
+	poner("tss", tamanoTSS+tamanoMapaPuertos)
 	e.simbolos["fin_bss"] = pos
 	e.simbolos["fin_nucleo"] = (pos + 4095) &^ 4095
 	e.simbolos["palabras_bss"] = (pos - e.simbolos["inicio_bss"]) / 4
@@ -274,7 +281,8 @@ func colocarBSS(e *ensamblador, globales int) {
 func ponerTSS(e *ensamblador) {
 	direccion := uint64(e.simbolos["tss"])
 	sitio := e.simbolos["gdt_tss"] - e.base
-	baja := uint64(tamanoTSS-1) | (direccion&0xFFFFFF)<<16 | 0x89<<40 | (direccion>>24&0xFF)<<56
+	limite := uint64(tamanoTSS + tamanoMapaPuertos - 1)
+	baja := limite&0xFFFF | (direccion&0xFFFFFF)<<16 | 0x89<<40 | (limite>>16&0xF)<<48 | (direccion>>24&0xFF)<<56
 	binary.LittleEndian.PutUint64(e.b[sitio:], baja)
 	binary.LittleEndian.PutUint64(e.b[sitio+8:], direccion>>32)
 }

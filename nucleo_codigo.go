@@ -746,6 +746,15 @@ func (c *compiladorNucleo) integrada(nombre string, args []Expresion, ln int) *E
 		e.mov(rdx, rax)
 		e.movImm(rax, etiquetaNumero)
 
+	case "lee_palabra":
+		if err := c.expr(args[0]); err != nil {
+			return err
+		}
+		c.puerto(rax, rdx, ln)
+		e.entraPalabra()
+		e.mov(rdx, rax)
+		e.movImm(rax, etiquetaNumero)
+
 	case "pon_en_puerto":
 		if err := c.dosValores(args[0], args[1]); err != nil {
 			return err
@@ -801,6 +810,9 @@ func (c *compiladorNucleo) integrada(nombre string, args []Expresion, ln int) *E
 		e.movImm(rax, etiquetaNumero)
 	case "final_del_nucleo":
 		e.movSimbolo(rdx, "fin_nucleo", 0)
+		e.movImm(rax, etiquetaNumero)
+	case "mapa_de_puertos":
+		e.movSimbolo(rdx, "tss", tamanoTSS)
 		e.movImm(rax, etiquetaNumero)
 	case "inicio_del_codigo":
 		e.movSimbolo(rdx, "cabecera", 0)

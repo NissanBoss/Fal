@@ -53,7 +53,13 @@ func compilarYArrancar(ruta string, arrancar bool) int {
 	// -no-reboot porque un nucleo que se cuelga del todo hace que el
 	// procesador se reinicie, y sin esto QEMU lo vuelve a arrancar en bucle
 	// sin que se vea que paso.
-	orden := exec.Command(qemu, "-kernel", destino, "-serial", "stdio", "-no-reboot")
+	argumentos := []string{"-kernel", destino, "-serial", "stdio", "-no-reboot"}
+	// Un disco.img al lado del fuente se conecta solo, para que probar un
+	// sistema que lee disco no pida aprenderse la linea de QEMU.
+	if disco := filepath.Join(carpeta, "disco.img"); existeArchivo(disco) {
+		argumentos = append(argumentos, "-drive", "file="+disco+",format=raw,if=ide")
+	}
+	orden := exec.Command(qemu, argumentos...)
 	orden.Stdin, orden.Stdout, orden.Stderr = os.Stdin, os.Stdout, os.Stderr
 	if e := orden.Run(); e != nil {
 		if _, salio := e.(*exec.ExitError); !salio {
@@ -62,6 +68,11 @@ func compilarYArrancar(ruta string, arrancar bool) int {
 		}
 	}
 	return 0
+}
+
+func existeArchivo(ruta string) bool {
+	info, e := os.Stat(ruta)
+	return e == nil && !info.IsDir()
 }
 
 // buscarQemu mira el PATH y, en Windows, donde lo dejan sus instaladores,
