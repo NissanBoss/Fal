@@ -10,6 +10,7 @@ import (
 	"math/big"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
@@ -65,6 +66,78 @@ func registrarArchivos() {
 	}
 	escribirArchivo("graba", os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
 	escribirArchivo("anexa", os.O_CREATE|os.O_WRONLY|os.O_APPEND)
+
+	// Bytes y no texto: lo que no es UTF-8, como un programa compilado, se
+	// romperia al pasar por "lee".
+	integrada("lee_bytes", 1, 1, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
+		r, err := pideTexto(a[0], ln, "lee_bytes")
+		if err != nil {
+			return nil, err
+		}
+		datos, e := os.ReadFile(in.rutaDe(r))
+		if e != nil {
+			return nil, nuevoError(`No pude leer el archivo "`+r+`".`, ln, e.Error(), ClaseArchivo)
+		}
+		return listaDeBytes(datos), nil
+	})
+
+	integrada("anexa_bytes", 2, 2, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
+		r, err := pideTexto(a[0], ln, "anexa_bytes")
+		if err != nil {
+			return nil, err
+		}
+		l, err := pideLista(a[1], ln, "anexa_bytes")
+		if err != nil {
+			return nil, err
+		}
+		datos := make([]byte, len(l.Datos))
+		for i, v := range l.Datos {
+			n, err := pideEntero(v, ln, "anexa_bytes")
+			if err != nil {
+				return nil, err
+			}
+			if n < 0 || n > 255 {
+				return nil, nuevoError("Un byte va de 0 a 255, y esto es "+itoa(n)+".", ln,
+					"Va en el sitio "+itoa(i+1)+" de la lista.", ClaseValor)
+			}
+			datos[i] = byte(n)
+		}
+		f, e := os.OpenFile(in.rutaDe(r), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+		if e != nil {
+			return nil, nuevoError(`No pude escribir en el archivo "`+r+`".`, ln, e.Error(), ClaseArchivo)
+		}
+		defer f.Close()
+		if _, e := f.Write(datos); e != nil {
+			return nil, nuevoError(`No pude escribir en el archivo "`+r+`".`, ln, e.Error(), ClaseArchivo)
+		}
+		return nil, nil
+	})
+
+	// Lo que hace falta para meter un programa en un disco desde Fal, sin
+	// pasar por la terminal. Da los bytes que incluye_programa mete en una imagen.
+	integrada("compila_programa", 1, 1, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
+		r, err := pideTexto(a[0], ln, "compila_programa")
+		if err != nil {
+			return nil, err
+		}
+		completa := in.rutaDe(r)
+		datos, e := os.ReadFile(completa)
+		if e != nil {
+			return nil, nuevoError(`No pude leer el archivo "`+r+`".`, ln, e.Error(), ClaseArchivo)
+		}
+		carpeta := filepath.Dir(completa)
+		imagen, err := compilarImagen(quitarBOM(string(datos)), opcionesNucleo{programa: true,
+			leer: func(incluida string) (string, error) {
+				datos, e := os.ReadFile(filepath.Join(carpeta, filepath.FromSlash(incluida)))
+				return string(datos), e
+			}})
+		if err != nil {
+			err.Mensaje = r + ", linea " + itoa(err.Linea) + ": " + err.Mensaje
+			err.Linea = ln
+			return nil, err
+		}
+		return listaDeBytes(imagen), nil
+	})
 
 	integrada("existe", 1, 1, func(in *Interprete, a []Valor, ln int) (Valor, *ErrorFal) {
 		r, err := pideTexto(a[0], ln, "existe")

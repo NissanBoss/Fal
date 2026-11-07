@@ -67,6 +67,9 @@ Para la parte entera está `cociente con 7 y 2`, y para lo que sobra,
 | `lee_puerto de p` | lee un byte de un puerto de entrada y salida |
 | `lee_palabra de p` | lee 16 bits de un puerto, como pide un disco ATA |
 | `pon_en_puerto con p y v` | manda un byte a un puerto |
+| `pon_palabra con p y v` | manda 16 bits a un puerto |
+| `pon_doble con p y v`, `lee_doble de p` | manda o lee 32 bits, como pide el bus PCI |
+| `copia_region con d y i y o y j y n` | copia `n` elementos de `o` desde `j` a `d` desde `i`, de golpe y comprobado |
 | `congela` | para el procesador para siempre |
 | `atiende_interrupcion con n y f` | la función `f` atiende la interrupción `n` |
 | `activa_interrupciones` | deja que lleguen |
@@ -78,6 +81,7 @@ Para la parte entera está `cociente con 7 y 2`, y para lo que sobra,
 | `hay_no_ejecutar` | si el procesador sabe prohibir que se ejecute una página |
 | `usa_tablas con d` | pasa a usar las tablas de páginas que empiezan en `d` |
 | `incluye_programa de "ruta"` | compila otro `.fal` como programa y lo mete en la imagen |
+| `incluye_archivo de "ruta"` | mete un archivo en la imagen y da una región de bytes de solo lectura |
 | `atiende_llamadas con f` | `f` atiende las llamadas al sistema de los programas |
 | `atiende_fallos con f` | `f` atiende lo que rompan los programas |
 | `llama_al_sistema con n y a y b` | desde un programa: pide algo al sistema |
@@ -340,3 +344,15 @@ El mapa es uno solo, así que el sistema lo cambia al cambiar de tarea. Abrir un
 puerto no lo abre para siempre: lo abre para quien corre en ese momento.
 
 `fal --arranca` conecta el `disco.img` que haya al lado del fuente.
+
+## Modo gráfico
+
+El núcleo no sabe de gráficos: eso es del sistema, que habla con la tarjeta por
+sus puertos. La que trae QEMU se enciende escribiendo el ancho, el alto y los
+bits por los puertos 462 y 463, y la dirección de su imagen se lee del bus PCI
+con `pon_doble` y `lee_doble`.
+
+Si algo revienta con los gráficos encendidos, el preludio los apaga y vuelve al
+modo de texto para pintar el aviso rojo. Para que eso funcione, el sistema no
+puede pisar los primeros 256 KB de la memoria de la tarjeta, que es donde vive la
+letra del modo de texto: FalOS desplaza la imagen 70 filas.

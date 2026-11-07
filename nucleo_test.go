@@ -755,3 +755,150 @@ escribe lee_palabra de 496
 		t.Errorf("no leyo el disco de dos en dos bytes:\n%q", salida)
 	}
 }
+
+// El bus PCI solo habla de 32 en 32 bits. El primer aparato de QEMU es siempre
+// el mismo puente, asi que si esto sale mal es la instruccion y no el aparato.
+func TestNucleoPuertosGrandes(t *testing.T) {
+	salida, reventado := arrancarEnQemu(t, `
+pon_doble con 3320 y 2147483648
+escribe lee_doble de 3324
+pon_palabra con 462 y 0
+escribe (lee_palabra de 463) es mayor o igual que 45248
+`)
+	if reventado {
+		t.Fatalf("revento:\n%s", salida)
+	}
+	if salida != "305627270\nverdadero\n" {
+		t.Errorf("no leyo lo que esperaba:\n%q", salida)
+	}
+}
+
+func TestNucleoCopiaRegion(t *testing.T) {
+	salida, reventado := arrancarEnQemu(t, `
+r es region con 2097152 y 12 y 2
+para cada i desde 1 hasta 12
+    elemento i de r es i
+fin
+copia_region con r y 1 y r y 3 y 10
+escribe elemento 1 de r
+escribe elemento 10 de r
+escribe elemento 12 de r
+para cada i desde 1 hasta 12
+    elemento i de r es i
+fin
+copia_region con r y 3 y r y 1 y 10
+escribe elemento 3 de r
+escribe elemento 12 de r
+escribe elemento 2 de r
+copia_region con r y 1 y r y 1 y 0
+b es region con 2097408 y 21
+para cada i desde 1 hasta 21
+    elemento i de b es i
+fin
+copia_region con b y 2 y b y 1 y 20
+escribe elemento 21 de b
+escribe elemento 2 de b
+`)
+	if reventado {
+		t.Fatalf("revento:\n%s", salida)
+	}
+	if salida != "3\n12\n12\n1\n10\n2\n20\n1\n" {
+		t.Errorf("copio mal:\n%q", salida)
+	}
+}
+
+func TestNucleoCopiaRegionNoSeSale(t *testing.T) {
+	for _, caso := range []struct{ nombre, codigo, aviso string }{
+		{"destino", "copia_region con a y 8 y b y 1 y 4", "se sale"},
+		{"origen", "copia_region con a y 1 y b y 8 y 4", "se sale"},
+		{"cuenta negativa", "copia_region con a y 1 y b y 1 y 0 menos 1", "se sale"},
+		{"desde cero", "copia_region con a y 0 y b y 1 y 1", "se sale"},
+		{"cuenta enorme", "copia_region con a y 2 y b y 2 y 9223372036854775807", "se sale"},
+		{"anchos distintos", "copia_region con a y 1 y c y 1 y 1", "mismo ancho"},
+		{"un numero", "copia_region con 5 y 1 y b y 1 y 1", "de una region a otra"},
+	} {
+		t.Run(caso.nombre, func(t *testing.T) {
+			programa := `
+a es region con 2097152 y 10
+b es region con 2097408 y 10
+c es region con 2097664 y 10 y 2
+` + caso.codigo + `
+escribe "no deberia llegar"
+`
+			salida, reventado := arrancarEnQemu(t, programa)
+			if !reventado || !strings.Contains(salida, caso.aviso) {
+				t.Errorf("reventado=%v:\n%s", reventado, salida)
+			}
+		})
+	}
+}
+
+func TestNucleoIncluyeArchivo(t *testing.T) {
+	salida, reventado := arrancarConProgramas(t, anillo3+`
+letra es incluye_archivo de "letra.txt"
+escribe largo de letra
+escribe elemento 2 de letra
+cargar con (incluye_programa de "usa.fal")
+llama_al_sistema con 99
+`, map[string]string{
+		"letra.txt": "hola",
+		"usa.fal": `
+dato es incluye_archivo de "letra.txt"
+escribe elemento 1 de dato
+`,
+	})
+	if reventado {
+		t.Fatalf("revento:\n%s", salida)
+	}
+	if !strings.HasPrefix(salida, "4\n111\n") || !strings.Contains(salida, "104") {
+		t.Errorf("no llego el archivo:\n%s", salida)
+	}
+}
+
+// Si el sistema estaba en modo grafico, el aviso rojo tiene que seguir saliendo.
+// La vuelta al texto no se ve desde aqui, pero no puede parar el aviso.
+func TestNucleoAvisoDesdeGraficos(t *testing.T) {
+	salida, reventado := arrancarEnQemu(t, `
+pon_palabra con 462 y 1
+pon_palabra con 463 y 960
+pon_palabra con 462 y 2
+pon_palabra con 463 y 600
+pon_palabra con 462 y 3
+pon_palabra con 463 y 32
+pon_palabra con 462 y 4
+pon_palabra con 463 y 193
+x es 1 entre 0
+`)
+	if !reventado || !strings.Contains(salida, "entre cero") {
+		t.Errorf("reventado=%v:\n%s", reventado, salida)
+	}
+}
+
+func TestBytesDeArchivos(t *testing.T) {
+	carpeta := t.TempDir()
+	viejo, _ := os.Getwd()
+	if e := os.Chdir(carpeta); e != nil {
+		t.Fatal(e)
+	}
+	defer os.Chdir(viejo)
+	os.WriteFile("hola.fal", []byte("escribe \"hola\"\n"), 0644)
+	salida, err := ejecutarEnMemoria(`
+anexa_bytes con "b.bin" y (lista con 0 y 255 y 195)
+anexa_bytes con "b.bin" y (lista con 7)
+b es lee_bytes de "b.bin"
+escribe largo de b
+escribe elemento 2 de b
+imagen es compila_programa de "hola.fal"
+escribe (largo de imagen) es mayor que 100
+escribe elemento 1 de imagen
+`)
+	if err != nil {
+		t.Fatal(err.Mensaje)
+	}
+	if salida != "4\n255\nverdadero\n70" {
+		t.Errorf("salio %q", salida)
+	}
+	if _, err := ejecutarEnMemoria(`anexa_bytes con "b.bin" y (lista con 256)`); err == nil {
+		t.Error("un 256 no es un byte")
+	}
+}

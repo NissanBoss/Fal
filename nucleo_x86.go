@@ -221,6 +221,11 @@ func (e *ensamblador) salePuerto()  { e.bytes(0xEE) }                   // out d
 // los puede pedir byte a byte.
 func (e *ensamblador) entraPalabra() { e.bytes(0x66, 0xED, 0x0F, 0xB7, 0xC0) } // in ax, dx; movzx eax, ax
 
+// Las tarjetas graficas y el bus PCI tampoco aceptan bytes sueltos.
+func (e *ensamblador) salePalabra() { e.bytes(0x66, 0xEF) } // out dx, ax
+func (e *ensamblador) saleDoble()   { e.bytes(0xEF) }       // out dx, eax
+func (e *ensamblador) entraDoble()  { e.bytes(0xED) }       // in eax, dx
+
 // resolver rellena los saltos y las direcciones. Devuelve el simbolo que
 // falte, que solo puede ser un fallo del propio compilador.
 func (e *ensamblador) resolver() string {

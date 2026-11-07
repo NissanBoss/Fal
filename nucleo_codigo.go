@@ -771,6 +771,43 @@ func (c *compiladorNucleo) integrada(nombre string, args []Expresion, ln int) *E
 		e.movImm(rax, etiquetaNada)
 		e.movImm(rdx, 0)
 
+	case "lee_doble":
+		if err := c.expr(args[0]); err != nil {
+			return err
+		}
+		c.puerto(rax, rdx, ln)
+		e.entraDoble()
+		e.mov(rdx, rax)
+		e.movImm(rax, etiquetaNumero)
+
+	case "pon_palabra", "pon_doble":
+		if err := c.dosValores(args[0], args[1]); err != nil {
+			return err
+		}
+		c.exige(rcx, etiquetaNumero, ln, "A un puerto solo se le mandan numeros.", "")
+		e.cmpImm(rbx, 0)
+		mensaje, tope := "A ese puerto se le mandan 16 bits: de 0 a 65535.", int64(65535)
+		if nombre == "pon_doble" {
+			mensaje, tope = "A ese puerto se le mandan 32 bits: de 0 a 4294967295.", 4294967295
+		}
+		fuera := c.panico(ln, mensaje, "")
+		e.jcc(siMenor, fuera)
+		e.movImm(rcx, tope)
+		e.cmp(rbx, rcx)
+		e.jcc(siMayor, fuera)
+		c.puerto(rax, rdx, ln)
+		e.mov(rax, rbx)
+		if nombre == "pon_palabra" {
+			e.salePalabra()
+		} else {
+			e.saleDoble()
+		}
+		e.movImm(rax, etiquetaNada)
+		e.movImm(rdx, 0)
+
+	case "copia_region":
+		return c.copiaRegion(args, ln)
+
 	case "congela":
 		// En las pruebas, que el preludio congele es que algo revento.
 		codigo := int64(0)
@@ -912,6 +949,9 @@ func (c *compiladorNucleo) integrada(nombre string, args []Expresion, ln int) *E
 
 	case "incluye_programa":
 		return c.incluyePrograma(args[0], ln)
+
+	case "incluye_archivo":
+		return c.incluyeArchivo(args[0], ln)
 	}
 	if strings.HasSuffix(nombre, "interrupciones") || nombre == "espera_interrupcion" {
 		e.movImm(rax, etiquetaNada)
@@ -1031,7 +1071,7 @@ func (c *compiladorNucleo) incluyePrograma(arg Expresion, ln int) *ErrorFal {
 			return nuevoError(`No pude abrir el programa "`+ruta+`".`, ln,
 				"La ruta se cuenta desde la carpeta del sistema.", ClaseValor)
 		}
-		imagen, err := compilarImagen(fuente, opcionesNucleo{programa: true})
+		imagen, err := compilarImagen(fuente, opcionesNucleo{programa: true, leer: c.leer})
 		if err != nil {
 			err.Mensaje = ruta + ", linea " + itoa(err.Linea) + ": " + err.Mensaje
 			err.Linea = ln
@@ -1046,6 +1086,148 @@ func (c *compiladorNucleo) incluyePrograma(arg Expresion, ln int) *ErrorFal {
 	}
 	c.e.movImm(rax, int64(len(c.imagenes[numero])/8)<<16|8<<8|etiquetaRegion)
 	c.e.movSimbolo(rdx, "programa:"+itoa(numero), 0)
+	return nil
+}
+
+// incluyeArchivo mete un archivo tal cual en la imagen y da una region de bytes
+// con el. Un programa no puede pedir archivos cuando corre, asi que lo que ya
+// sabe al nacer, como su letra, le llega por aqui. Va con el codigo y es de
+// solo lectura.
+func (c *compiladorNucleo) incluyeArchivo(arg Expresion, ln int) *ErrorFal {
+	literal, es := arg.(*ExValor)
+	ruta := ""
+	if es {
+		ruta, es = literal.V.(string)
+	}
+	if !es {
+		return nuevoError(`"incluye_archivo" necesita la ruta escrita entre comillas.`, ln,
+			"Se mete en la imagen al compilar, asi que no puede salir de una cuenta.", ClaseValor)
+	}
+	if c.leer == nil {
+		return nuevoError(`Aqui no hay archivos que leer para "incluye_archivo".`, ln, "", ClaseValor)
+	}
+	contenido, e := c.leer(ruta)
+	if e != nil {
+		return nuevoError(`No pude abrir el archivo "`+ruta+`".`, ln,
+			"La ruta se cuenta desde la carpeta del sistema.", ClaseValor)
+	}
+	if len(contenido) == 0 {
+		return nuevoError(`El archivo "`+ruta+`" esta vacio.`, ln,
+			"Una region tiene que tener al menos un elemento.", ClaseValor)
+	}
+	numero, hay := c.incluidos["archivo:"+ruta]
+	if !hay {
+		numero = len(c.imagenes)
+		c.incluidos["archivo:"+ruta] = numero
+		c.imagenes = append(c.imagenes, []byte(contenido))
+	}
+	c.e.movImm(rax, int64(len(contenido))<<16|1<<8|etiquetaRegion)
+	c.e.movSimbolo(rdx, "programa:"+itoa(numero), 0)
+	return nil
+}
+
+// copiaRegion copia n elementos de una region a otra de golpe, con las mismas
+// comprobaciones que un "elemento": subir una pantalla entera de uno en uno se
+// ve bajar la imagen a saltos. Se puede pisar a si misma: si el destino va
+// detras del origen, se copia de atras adelante.
+func (c *compiladorNucleo) copiaRegion(args []Expresion, ln int) *ErrorFal {
+	e := c.e
+	for _, a := range args {
+		if err := c.expr(a); err != nil {
+			return err
+		}
+		e.push(rdx)
+		e.push(rax)
+	}
+	e.mov(rsi, rsp)
+	const (
+		cuantos = 0
+		desde2  = 16
+		origen  = 32
+		desde1  = 48
+		destino = 64
+	)
+	for _, sitio := range []int32{cuantos, desde2, desde1} {
+		e.lee(rax, rsi, sitio)
+		c.exige(rax, etiquetaNumero, ln, `"copia_region" cuenta con numeros.`, "")
+	}
+	for _, sitio := range []int32{origen, destino} {
+		e.lee(rdx, rsi, sitio)
+		e.andImm(rdx, 0xFF)
+		c.exige(rdx, etiquetaRegion, ln, `"copia_region" copia de una region a otra.`, "")
+	}
+	e.lee(rcx, rsi, origen)
+	e.shl(rcx, 48)
+	e.lee(rbx, rsi, destino)
+	e.shl(rbx, 48)
+	e.cmp(rcx, rbx)
+	e.jcc(siDistinto, c.panico(ln, "Para copiar, las dos regiones tienen que tener el mismo ancho.", ""))
+
+	fuera := c.panico(ln, "Esa copia se sale de una de las dos regiones.", "")
+	e.lee(rcx, rsi, cuantos+8)
+	e.cmpImm(rcx, 0)
+	e.jcc(siMenor, fuera)
+	for _, par := range [][2]int32{{desde1, destino}, {desde2, origen}} {
+		e.lee(rbx, rsi, par[0]+8)
+		e.cmpImm(rbx, 1)
+		e.jcc(siMenor, fuera)
+		e.lee(rax, rsi, par[1])
+		e.shr(rax, 16)
+		// Por resta: sumar el inicio y la cuenta, que vienen de fuera, podria
+		// desbordar y dar por buena una copia que no lo es.
+		e.cmp(rcx, rax)
+		e.jcc(siMayor, fuera)
+		e.sub(rax, rcx)
+		e.addImm(rax, 1)
+		e.cmp(rbx, rax)
+		e.jcc(siMayor, fuera)
+	}
+
+	e.lee(rbx, rsi, origen)
+	e.shr(rbx, 8)
+	e.andImm(rbx, 0xFF)
+	e.lee(rax, rsi, desde1+8)
+	e.subImm(rax, 1)
+	e.imul(rax, rbx)
+	e.lee(rdi, rsi, destino+8)
+	e.add(rdi, rax)
+	e.lee(rax, rsi, desde2+8)
+	e.subImm(rax, 1)
+	e.imul(rax, rbx)
+	e.lee(rdx, rsi, origen+8)
+	e.add(rdx, rax)
+	e.imul(rcx, rbx)
+	e.addImm(rsp, 80)
+	e.mov(rsi, rdx)
+	e.mov(rbx, rcx)
+
+	atras, listo := e.nueva(), e.nueva()
+	e.cmp(rdi, rsi)
+	e.jcc(siMayor, atras)
+	e.bytes(0xFC) // cld
+	e.shr(rcx, 3)
+	e.bytes(0xF3, 0x48, 0xA5) // rep movsq
+	e.mov(rcx, rbx)
+	e.andImm(rcx, 7)
+	e.bytes(0xF3, 0xA4) // rep movsb
+	e.jmp(listo)
+	e.aqui(atras)
+	e.add(rdi, rbx)
+	e.add(rsi, rbx)
+	e.subImm(rdi, 1)
+	e.subImm(rsi, 1)
+	e.bytes(0xFD) // std
+	e.andImm(rcx, 7)
+	e.bytes(0xF3, 0xA4) // rep movsb
+	e.mov(rcx, rbx)
+	e.shr(rcx, 3)
+	e.subImm(rdi, 7)
+	e.subImm(rsi, 7)
+	e.bytes(0xF3, 0x48, 0xA5) // rep movsq
+	e.bytes(0xFC)             // cld
+	e.aqui(listo)
+	e.movImm(rax, etiquetaNada)
+	e.movImm(rdx, 0)
 	return nil
 }
 

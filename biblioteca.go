@@ -117,6 +117,14 @@ func pideConjunto(v Valor, ln int, quien string) (*Conjunto, *ErrorFal) {
 
 func lista(vs []Valor) *Lista { return &Lista{vs} }
 
+func listaDeBytes(datos []byte) *Lista {
+	salida := make([]Valor, len(datos))
+	for i, b := range datos {
+		salida[i] = Entero(int64(b))
+	}
+	return &Lista{salida}
+}
+
 func listaDeTextos(xs []string) *Lista {
 	salida := make([]Valor, len(xs))
 	for i, x := range xs {

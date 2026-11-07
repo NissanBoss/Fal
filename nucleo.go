@@ -95,7 +95,7 @@ type compiladorNucleo struct {
 // opcionesNucleo: con prueba, al terminar o al reventar avisa a QEMU para que
 // se cierre. Con programa, sale un programa suelto para que lo cargue un
 // sistema, en vez de una imagen que arranca. leer es como se llega a los
-// archivos de incluye_programa, que en la web no existen.
+// archivos de incluye_programa e incluye_archivo, que en la web no existen.
 type opcionesNucleo struct {
 	prueba   bool
 	programa bool
@@ -187,10 +187,10 @@ func compilarImagen(fuente string, op opcionesNucleo) ([]byte, *ErrorFal) {
 
 	c.emitirRutinas()
 	c.emitirTextos()
+	c.emitirImagenes()
 	if op.programa {
 		colocarBSSPrograma(e, len(c.globales))
 	} else {
-		c.emitirImagenes()
 		emitirGDT(e)
 		colocarBSS(e, len(c.globales))
 	}
@@ -250,7 +250,12 @@ var integradasNucleo = map[string][2]int{
 	"atiende_fallos":   {1, 1},
 	"llama_al_sistema": {1, 3},
 	"incluye_programa": {1, 1},
+	"incluye_archivo":  {1, 1},
 	"mapa_de_puertos":  {0, 0},
+	"pon_palabra":      {2, 2},
+	"pon_doble":        {2, 2},
+	"lee_doble":        {1, 1},
+	"copia_region":     {5, 5},
 }
 
 // Lo que no tiene sentido en un programa porque habla de cosas que solo

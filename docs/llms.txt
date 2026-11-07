@@ -1,6 +1,6 @@
 # Fal
 
-> Un lenguaje de programación completo escrito íntegramente en español y sin un solo símbolo: 42 palabras, 93 funciones, y todo se lee en voz alta. Se reparte como un único ejecutable sin dependencias, y el mismo intérprete compila a WebAssembly para poder probarlo en el navegador.
+> Un lenguaje de programación completo escrito íntegramente en español y sin un solo símbolo: 42 palabras, 96 funciones, y todo se lee en voz alta. Se reparte como un único ejecutable sin dependencias, y el mismo intérprete compila a WebAssembly para poder probarlo en el navegador.
 
 Fal existe para un hueco concreto: entre los lenguajes de bloques que se arrastran y un lenguaje de adultos no hay nada, y ese salto se lleva por delante a mucha gente que habría seguido programando. El pseudocódigo de clase enseña la lógica pero no abre un archivo ni monta un juego. Fal se lee casi como ese pseudocódigo y por debajo tiene objetos con herencia, clausuras, módulos, archivos, JSON, fechas, expresiones regulares e internet.
 
@@ -14,7 +14,7 @@ Lo que cuesta, dicho por los autores: en cuanto una expresión crece, escribirla
 
 ## Documentación
 
-- [Manual completo](https://fal-lang.org/manual.html): todo el lenguaje, de las variables a las clausuras. Las 42 palabras reservadas, las 93 funciones de la biblioteca, los objetos, los errores, los archivos y la tabla de equivalencias con Python y JavaScript.
+- [Manual completo](https://fal-lang.org/manual.html): todo el lenguaje, de las variables a las clausuras. Las 42 palabras reservadas, las 96 funciones de la biblioteca, los objetos, los errores, los archivos y la tabla de equivalencias con Python y JavaScript.
 - [Portada](https://fal-lang.org/): qué es Fal, para quién, las ocho reglas de diseño y lo que cuestan.
 - [Vídeo de 48 segundos](https://fal-lang.org/que-es-fal.mp4): para qué existe Fal, qué resuelve y qué no. Está en la portada, con voz.
 

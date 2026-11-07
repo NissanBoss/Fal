@@ -1,7 +1,7 @@
 # Fal
 
 Un lenguaje de programación **completo** escrito íntegramente en español y **sin un solo
-símbolo raro**: 42 palabras, 93 funciones, y todo se lee en voz alta.
+símbolo raro**: 42 palabras, 96 funciones, y todo se lee en voz alta.
 
 Se reparte como un **único ejecutable** que no necesita nada instalado. Para ponerlo en
 marcha, mira [LEEME.md](LEEME.md).
@@ -495,7 +495,7 @@ Se usan igual que un objeto: `doble de mate con 21`.
 
 ---
 
-# Todo lo que trae puesto (93 funciones)
+# Todo lo que trae puesto (96 funciones)
 
 Todas se llaman igual: `nombre de dato` o `nombre con dato1 y dato2`.
 
@@ -574,7 +574,8 @@ escribe logaritmo con 100 y e   → el logaritmo natural
 
 ## Archivos
 
-`lee` · `lineas` · `graba` · `anexa` · `existe` · `borra` · `archivos`
+`lee` · `lineas` · `graba` · `anexa` · `existe` · `borra` · `archivos` ·
+`lee_bytes` · `anexa_bytes` · `compila_programa`
 
 ## JSON
 
@@ -787,7 +788,7 @@ si x es (mayor)          # con paréntesis, compara x con la variable mayor
 
 Pasa únicamente con `mayor` y `menor`, y el error te lo recuerda.
 
-Las 93 funciones integradas tampoco son palabras reservadas: puedes tener una variable
+Las 96 funciones integradas tampoco son palabras reservadas: puedes tener una variable
 llamada `numero`, `lista` o `suma` sin problema.
 
 ---

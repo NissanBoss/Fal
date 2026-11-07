@@ -214,6 +214,7 @@ fin
 funcion nucleo_rojo
     comparte nucleo_casilla
     desactiva_interrupciones
+    nucleo_vuelve_al_texto
     para cada casilla desde 1 hasta 2000
         elemento casilla de nucleo_pantalla es 20256
     fin
@@ -223,6 +224,35 @@ funcion nucleo_rojo
     pon_en_puerto con 981 y 32
     nucleo_casilla es 163
     nucleo_serie con 10
+fin
+
+# Si el sistema dejo la pantalla en modo grafico, el aviso seria invisible y un
+# nucleo parado pareceria colgado. La tarjeta de QEMU apaga los graficos por el
+# registro 4, pero no devuelve sola lo que toco al encenderlos.
+funcion nucleo_vuelve_al_texto
+    pon_palabra con 462 y 4
+    encendida es lee_palabra de 463
+    si encendida es 65535 o (encendida resto 2) es 0
+        devuelve nada
+    fin
+    pon_palabra con 463 y 0
+    nucleo_registro con 964 y 1 y 0
+    nucleo_registro con 964 y 4 y 2
+    nucleo_registro con 974 y 5 y 16
+    nucleo_registro con 974 y 6 y 14
+    nucleo_registro con 980 y 17 y 14
+    nucleo_registro con 980 y 1 y 79
+    nucleo_registro con 980 y 7 y 31
+    nucleo_registro con 980 y 9 y 79
+    nucleo_registro con 980 y 18 y 143
+    nucleo_registro con 980 y 19 y 40
+    nucleo_registro con 980 y 23 y 163
+    nucleo_registro con 980 y 24 y 255
+fin
+
+funcion nucleo_registro con puerto y cual y valor
+    pon_en_puerto con puerto y cual
+    pon_en_puerto con puerto mas 1 y valor
 fin
 
 # Una letra al puerto serie y a la pantalla. La pantalla no habla UTF-8 sino

@@ -46,7 +46,7 @@ func envolver(cuerpo string, indice []seccion) string {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Manual de Fal</title>
-<meta name="description" content="El manual completo de Fal: las 42 palabras del lenguaje, las 93 funciones de la biblioteca, los objetos, los errores, los archivos y una tabla que lo traduce todo a Python y JavaScript.">
+<meta name="description" content="El manual completo de Fal: las 42 palabras del lenguaje, las 96 funciones de la biblioteca, los objetos, los errores, los archivos y una tabla que lo traduce todo a Python y JavaScript.">
 <link rel="canonical" href="https://fal-lang.org/manual.html">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
