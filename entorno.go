@@ -126,6 +126,7 @@ func registrarArchivos() {
 			return nil, nuevoError(`No pude leer el archivo "`+r+`".`, ln, e.Error(), ClaseArchivo)
 		}
 		carpeta := filepath.Dir(completa)
+		avisarChoques(os.Stderr, r, quitarBOM(string(datos)))
 		imagen, err := compilarImagen(quitarBOM(string(datos)), opcionesNucleo{programa: true,
 			leer: func(incluida string) (string, error) {
 				datos, e := os.ReadFile(filepath.Join(carpeta, filepath.FromSlash(incluida)))

@@ -22,6 +22,7 @@ func compilarYArrancar(ruta string, arrancar bool) int {
 	}
 	fuente := quitarBOM(string(datos))
 	carpeta := filepath.Dir(ruta)
+	avisarChoques(os.Stderr, filepath.Base(ruta), fuente)
 	imagen, err := compilarImagen(fuente, opcionesNucleo{leer: func(incluida string) (string, error) {
 		datos, e := os.ReadFile(filepath.Join(carpeta, filepath.FromSlash(incluida)))
 		return string(datos), e

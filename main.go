@@ -101,6 +101,7 @@ func ejecutarArchivo(ruta string, args []string) int {
 	completa, _ := filepath.Abs(ruta)
 	in := nuevoInterprete(filepath.Dir(completa), args)
 
+	avisarChoques(os.Stderr, filepath.Base(ruta), fuente)
 	err := correrFuente(in, fuente)
 	in.salida.Flush()
 	// El dibujo se guarda aunque el programa reviente: lo que llego a

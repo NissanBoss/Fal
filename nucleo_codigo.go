@@ -7,7 +7,10 @@ package main
 // otra mitad va a la pila. Sale un codigo lento al lado del de gcc, pero
 // cada trozo se puede leer y comprobar por separado.
 
-import "strings"
+import (
+	"os"
+	"strings"
+)
 
 func (c *compiladorNucleo) bloque(instrucciones []Instruccion) *ErrorFal {
 	for _, ins := range instrucciones {
@@ -1071,6 +1074,7 @@ func (c *compiladorNucleo) incluyePrograma(arg Expresion, ln int) *ErrorFal {
 			return nuevoError(`No pude abrir el programa "`+ruta+`".`, ln,
 				"La ruta se cuenta desde la carpeta del sistema.", ClaseValor)
 		}
+		avisarChoques(os.Stderr, ruta, quitarBOM(fuente))
 		imagen, err := compilarImagen(fuente, opcionesNucleo{programa: true, leer: c.leer})
 		if err != nil {
 			err.Mensaje = ruta + ", linea " + itoa(err.Linea) + ": " + err.Mensaje

@@ -75,7 +75,7 @@ fal --version
 
 ## Las 8 reglas de diseño
 
-1. **Todo en español.** Con tildes o sin ellas, mayúsculas o minúsculas: `FUNCIÓN`, `funcion` y `Función` son la misma palabra.
+1. **Todo en español.** Con tildes o sin ellas, mayúsculas o minúsculas: `FUNCIÓN`, `funcion` y `Función` son la misma palabra. Tus nombres también: `MARCO` y `marco` son la misma variable, y si una pisa a una constante escrita en mayúsculas, Fal te avisa y sigue.
 2. **Cero símbolos.** No hay `;` `{}` `==` `!=` `&&` `+` `>` `.`. Solo palabras y paréntesis.
 3. **Una sola forma de hacer cada cosa.**
 4. **Todo se llama igual.** `nombre de dato` o `nombre con dato1 y dato2`. Da igual si es una función tuya, una integrada o el campo de un objeto.
