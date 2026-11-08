@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -325,6 +326,13 @@ func registrarDatos() {
 		if err != nil {
 			return nil, err
 		}
+		// En el playground y en la academia, pide salia desde el navegador
+		// de quien abria un enlace compartido: el programa de otro podia
+		// llamar a cualquier servidor con tu IP con solo pulsar Ejecutar.
+		if runtime.GOOS == "js" {
+			return nil, nuevoError("En el navegador no se puede usar pide.", ln,
+				"Pruebalo con Fal instalado en tu ordenador.", ClaseRed)
+		}
 		if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
 			url = "https://" + url
 		}
@@ -335,7 +343,13 @@ func registrarDatos() {
 			}
 		}
 		cliente := &http.Client{Timeout: time.Duration(segundos) * time.Second}
-		peticion, _ := http.NewRequest("GET", url, nil)
+		// Con una direccion mal escrita, como un % suelto, NewRequest no
+		// devuelve peticion, y antes eso tumbaba el interprete entero.
+		peticion, e := http.NewRequest("GET", url, nil)
+		if e != nil {
+			return nil, nuevoError("Esa direccion no esta bien escrita.", ln,
+				url+"  ("+e.Error()+")", ClaseRed)
+		}
 		peticion.Header.Set("User-Agent", "Fal")
 		respuesta, e := cliente.Do(peticion)
 		if e != nil {
