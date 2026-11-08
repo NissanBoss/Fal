@@ -88,6 +88,12 @@ jobs:
           } > docs/sitemap.xml
           cat docs/sitemap.xml
 
+      # La politica de contenidos y el trozo contra marcos ajenos. Va lo
+      # ultimo, sobre la copia que se sube, porque lleva el hash de cada
+      # script de dentro y el manual se acaba de fabricar ahi arriba.
+      - name: Poner la politica de contenidos
+        run: go run ./herramientas/politica docs/*.html
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
