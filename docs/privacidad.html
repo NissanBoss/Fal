@@ -140,10 +140,15 @@ problema.</p>
 <h2 id="cuanto-tiempo-se-guarda">4. Cuánto tiempo se guarda</h2>
 <ul>
   <li><b>La cuenta y el progreso</b>: mientras la tengas. Se borra en el
-  momento en que tú la borres.</li>
+  momento en que tú la borres. Cloudflare guarda además el historial de la
+  base de datos durante 7 días para poder recuperarla si algo se rompe, así
+  que una cuenta borrada desaparece de ese historial a los 7 días. No se
+  puede apagar, y solo se usa para restaurar la base entera tras un
+  fallo.</li>
   <li><b>Las sesiones</b>: caducan a los 180 días, y antes si cierras
   sesión.</li>
-  <li><b>Los intentos fallidos</b>: quince minutos.</li>
+  <li><b>Los intentos fallidos</b>: dejan de contar a los quince minutos, y
+  se borran la siguiente vez que alguien entra en su cuenta.</li>
   <li><b>Lo que escribiste en el foro</b>: al borrar la cuenta, el texto de
   tus mensajes se borra de la base de datos, no se esconde. Lo que queda es
   un hueco que dice que ahí había un mensaje, y los temas que abriste pasan

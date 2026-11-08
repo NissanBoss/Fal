@@ -60,7 +60,7 @@ página en página para saber qué te interesa y venderlo.</p>
 <table>
   <tr><th>Nombre</th><th>Qué guarda</th><th>Cuánto dura</th><th>Quién la pone</th></tr>
   <tr>
-    <td><code>sesion</code></td>
+    <td><code>__Host-sesion</code></td>
     <td>Un número aleatorio, y nada más. No lleva tu nombre, ni tu
     contraseña, ni nada legible. Sirve para que el servidor sepa que la
     persona que pide la siguiente página es la misma que entró.</td>
@@ -83,6 +83,10 @@ en absoluto.</p>
   <li><code>SameSite=Lax</code>: no se manda cuando otra web te trae hasta
   aquí a hacer algo, que es como funcionan los ataques de petición
   falsificada.</li>
+  <li>El prefijo <code>__Host-</code> del nombre: el navegador solo la acepta
+  si la pone el propio servidor de cuentas, por conexión cifrada. Otra
+  página de fal-lang.org no puede ponerte una cookie con ese nombre para
+  colarte en una sesión que no es la tuya.</li>
 </ul>
 
 <p>Y en el servidor no se guarda ni siquiera ese número: se guarda un
@@ -108,7 +112,9 @@ salen de tu máquina:</p>
     <td>Tu progreso del curso y el código que llevas escrito en cada
     ejercicio.</td>
     <td>Para que puedas seguir el curso <b>sin cuenta</b> y no perderlo todo
-    al cerrar la pestaña.</td>
+    al cerrar la pestaña. Si tienes cuenta, al salir de ella o borrarla se
+    borra también de aquí, para que no se lo encuentre quien use el
+    ordenador después.</td>
   </tr>
   <tr>
     <td>La página de probar</td>
