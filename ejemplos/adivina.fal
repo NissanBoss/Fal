@@ -1,5 +1,3 @@
-# El juego de adivinar el numero.
-
 escribe "Estoy pensando un numero del 1 al 100."
 
 secreto es azar entre 1 y 100

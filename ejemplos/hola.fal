@@ -1,6 +1,3 @@
-# Tu primer programa en Fal.
-# Todo lo que va despues de # es un comentario: el programa lo ignora.
-
 escribe "Hola mundo"
 
 nombre es "Ana"

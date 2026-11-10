@@ -1,6 +1,3 @@
-# Un recorrido por todo lo que sabe hacer Fal.
-# Se ejecuta solo, no hace falta escribir nada.
-
 escribe "=== TEXTOS ==="
 frase es "  El veloz murcielago hindu  "
 escribe recorta de frase

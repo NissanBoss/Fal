@@ -80,9 +80,6 @@ aside {
 .buscar kbd { position: absolute; right: 29px; top: 9px; color: var(--suave); background: var(--papel); }
 .buscar input:focus + kbd, .buscar input:not(:placeholder-shown) + kbd { display: none; }
 
-/* Las secciones grandes en cursiva y las de dentro colgando de una raya,
-   como las del curso. Antes eran todas la misma lista en negrita o en gris
-   y no se veía dónde empezaba cada parte. */
 #listaIndice a {
   display: block; text-decoration: none; color: var(--suave);
   font-size: 14px; line-height: 1.35; padding: 4px 20px 4px 33px;
@@ -123,8 +120,6 @@ main { padding: 34px 48px 100px; min-width: 0; }
 .texto ol > li::marker { font-family: var(--serif); }
 .texto strong { font-weight: 600; }
 .texto :not(pre) > code { white-space: nowrap; }
-/* Las rayas de separación marcan dónde empieza otra parte del manual:
-   un hueco con más aire que el de una sección cualquiera. */
 .texto hr { border: 0; height: 0; margin: 64px 0 40px; border-top: 1px solid var(--borde); }
 
 .enlazar {
@@ -145,9 +140,6 @@ main { padding: 34px 48px 100px; min-width: 0; }
 .texto pre.lenguaje-bash code::before { content: "$ "; color: var(--suave); user-select: none; }
 .texto pre.lenguaje-go { color: var(--suave); }
 
-/* Copiar y probar salen al pasar por encima. En el móvil no hay encima y
-   puestos sobre el código tapaban el final de las líneas largas, así que
-   allí bajan a una fila propia debajo del bloque. */
 .bloque { position: relative; margin: 16px 0 20px; }
 .bloque pre { margin: 0; }
 .acciones {
@@ -190,19 +182,13 @@ main { padding: 34px 48px 100px; min-width: 0; }
   aside {
     position: fixed; z-index: 40; top: var(--alto-barra); left: 0; bottom: 0; width: min(320px, 86vw);
     max-height: none; background: var(--papel); box-shadow: var(--sombra);
-    /* Con el start de arriba el cajón medía lo que su contenido y, como no
-       cabía, el navegador lo subía hasta tapar la barra. */
     align-self: stretch;
     transform: translateX(-102%); visibility: hidden;
     transition: transform .3s cubic-bezier(.3, .7, .2, 1), visibility 0s .3s;
   }
-  /* Escondido de verdad y no solo fuera de la pantalla: asomaba la sombra
-     por el borde y el tabulador se metía en enlaces que no se veían. */
   aside.abierto { transform: none; visibility: visible; transition-delay: 0s; }
   .velo { position: fixed; inset: var(--alto-barra) 0 0 0; z-index: 35; background: rgba(20, 18, 14, .35); }
   main { padding: 20px 16px 70px; }
-  /* Una franja pegada bajo la barra y no un botón flotante: el botón
-     tapaba media línea del título que tenía debajo. */
   html { scroll-padding-top: calc(var(--alto-barra) + 60px); }
   .abrir-indice {
     display: flex; align-items: center; gap: 10px; width: calc(100% + 32px); margin: -20px -16px 22px;
@@ -293,9 +279,6 @@ const $ = (id) => document.getElementById(id);
 const enlaces = [...document.querySelectorAll("#listaIndice a")];
 const textos = new Map(enlaces.map((a) => [a, a.textContent]));
 
-// Los bloques sin clase son de Fal; los de la consola y el de Go llevan la
-// suya y se quedan sin pintar, que si no el resaltado marcaba "func" y "if"
-// como si fueran palabras nuestras.
 for (const pre of document.querySelectorAll(".texto pre")) {
   const codigo = pre.querySelector("code");
   const fuente = codigo.textContent.replace(/\n$/, "");
@@ -304,8 +287,6 @@ for (const pre of document.querySelectorAll(".texto pre")) {
 
   const acciones = document.createElement("div");
   acciones.className = "acciones";
-  // Probar solo en los que corren tal cual. En el primero, por ejemplo,
-  // falta Figura y llevarlo al playground era estrenarse con un error.
   if (pre.classList.contains("corre")) {
     const probar = document.createElement("a");
     probar.href = "probar.html#p=" + aTextoDeEnlace(fuente);
@@ -331,9 +312,6 @@ for (const pre of document.querySelectorAll(".texto pre")) {
   bloque.append(pre, acciones);
 }
 
-// Filtrar el índice según se escribe. Sin tildes y en minúsculas por los
-// dos lados, para que "funcion" encuentre "Funciones" y "Ámbito" salga
-// buscando "ambito".
 const pelado = (t) => t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 const filtro = $("filtro");
 filtro.addEventListener("input", () => {
@@ -346,8 +324,6 @@ filtro.addEventListener("input", () => {
     a.hidden = !cabe;
     if (!cabe) continue;
     visibles++;
-    // Quitar las tildes no cambia la longitud del texto (cada letra suelta
-    // su marca y nada más), así que la posición vale para el original.
     if (donde >= 0) {
       a.replaceChildren(original.slice(0, donde), Object.assign(document.createElement("mark"), {
         textContent: original.slice(donde, donde + busca.length),
@@ -377,10 +353,6 @@ addEventListener("keydown", (ev) => {
   }
 });
 
-// Marcar en el índice la sección que se está leyendo: la última cuyo título
-// ya ha pasado por arriba. El vigilante de antes solo se enteraba cuando un
-// título entraba en pantalla, y en una sección larga se quedaba marcada la
-// anterior o ninguna.
 const titulos = enlaces.map((a) => $(decodeURIComponent(a.hash.slice(1)))).filter(Boolean);
 const porId = new Map(enlaces.map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
 let marcado = null;
@@ -401,9 +373,6 @@ function marcar() {
   acercar(a);
 }
 
-// Mover el índice sin scrollIntoView, que arrastraba también la página y
-// daba tirones mientras leías. El aside está posicionado (sticky o fixed),
-// así que offsetTop ya se mide desde él.
 function acercar(a) {
   const indice = $("indice");
   if (a.offsetTop < indice.scrollTop + 60 || a.offsetTop > indice.scrollTop + indice.clientHeight - 80) {
@@ -422,7 +391,6 @@ $("subir").onclick = () => {
   scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 };
 
-// El índice del móvil, igual que el del curso.
 function abrirIndice() {
   if (!matchMedia("(max-width: 900px)").matches) return;
   $("indice").classList.add("abierto");

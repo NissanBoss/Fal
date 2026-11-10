@@ -22,10 +22,6 @@
 <meta property="og:description" content="42 palabras, 96 funciones y ni un solo símbolo. Pruébalo en el navegador sin instalar nada.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://fal-lang.org/">
-<!-- Lo que le dice a un buscador qué es esto sin tener que adivinarlo por el
-     texto. Todo lo de aquí son hechos comprobables: no hay valoraciones
-     inventadas ni número de usuarios, que es por donde estas fichas se
-     convierten en mentiras y acaban penalizadas. -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -55,9 +51,6 @@
 }
 </script>
 <style>
-/* Las letras se sirven desde aquí y no desde Google Fonts: pedirlas fuera
-   le cuenta a un tercero quién visita la página, y este sitio no guarda ni
-   las IP de sus propias cuentas. Las dos son OFL; las licencias van al lado. */
 @font-face {
   font-family: "Newsreader"; font-style: normal; font-weight: 200 800; font-display: swap;
   src: url("fuentes/newsreader.woff2") format("woff2");
@@ -79,9 +72,6 @@
   src: url("fuentes/plex-mono-negrita.woff2") format("woff2");
 }
 
-/* Papel y tinta. El sitio es claro por defecto y se pone oscuro solo si el
-   sistema lo pide: la documentación de un lenguaje se parece más a un libro
-   que a un panel de control. */
 :root {
   --papel: #fbfaf7;
   --caja: #ffffff;
@@ -114,8 +104,6 @@
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: 76px; }
 
-/* Las barras de desplazamiento vienen del sistema y en una página oscura
-   salen blancas, que es lo primero que se ve y lo único que desentona. */
 * { scrollbar-width: thin; scrollbar-color: var(--borde) transparent; }
 ::-webkit-scrollbar { width: 11px; height: 11px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -138,8 +126,6 @@ a { color: var(--azul); text-underline-offset: 0.18em; text-decoration-thickness
 h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.15; text-wrap: balance; }
 code, pre, textarea { font-family: var(--mono); }
 :focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; border-radius: 3px; }
-/* El código suelto dentro de una frase. Sin esto, un ; o un == en medio de
-   un párrafo pasa desapercibido justo cuando es de lo que se está hablando. */
 :not(pre) > code {
   background: var(--codigo-fondo);
   border: 1px solid var(--borde);
@@ -153,7 +139,6 @@ code, pre, textarea { font-family: var(--mono); }
 .com { color: var(--suave); font-style: italic; }
 .versalitas { color: var(--suave); letter-spacing: 0.08em; font-variant-caps: all-small-caps; font-size: 14.5px; }
 
-/* Barra de arriba */
 nav {
   border-bottom: 1px solid var(--borde);
   background: color-mix(in srgb, var(--papel) 86%, transparent);
@@ -189,13 +174,10 @@ nav .enlaces a:hover { color: var(--tinta); }
 .boton.hueco:hover { background: color-mix(in srgb, var(--azul) 8%, transparent); }
 .boton svg { width: 11px; height: 11px; fill: currentColor; flex: none; }
 
-/* Portada */
 .portada { padding: 76px 0 84px; overflow: hidden; }
 .portada .dos { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); gap: 60px; align-items: center; }
 @media (max-width: 940px) { .portada .dos { grid-template-columns: 1fr; gap: 48px; } .portada { padding: 44px 0 60px; } }
 .portada h1 {
-  /* El tope está medido para que "Un lenguaje de" quepa en la primera
-     línea. Con más, el "de" se quedaba solo en la segunda. */
   font-size: clamp(44px, 5.9vw, 72px); line-height: 1; font-weight: 500;
   margin: 0 0 26px; letter-spacing: -0.028em;
 }
@@ -204,9 +186,6 @@ nav .enlaces a:hover { color: var(--tinta); }
 .portada .entrada strong { color: var(--tinta); font-weight: 600; }
 .bajo-botones { font-size: 14px; color: var(--suave); margin: 0; }
 
-/* La escena de la portada: a una línea de otro lenguaje se le caen los
-   símbolos y debajo se escribe lo mismo en Fal. Es la idea entera del
-   lenguaje, y se entiende antes de leer una sola frase. */
 .escena {
   position: relative; padding: 30px 32px 24px;
   background: var(--caja); border: 1px solid var(--borde);
@@ -217,8 +196,6 @@ nav .enlaces a:hover { color: var(--tinta); }
 .escena .renglon + .renglon { margin-top: 30px; }
 .escena .linea {
   display: block; min-height: 1.5em; padding: 6px 0 14px;
-  /* El tope sale de la línea más larga, la del for, que tiene que caber
-     entera dentro de la hoja. */
   font: 500 clamp(14.5px, 1.95vw, 22px)/1.5 var(--mono); white-space: nowrap;
   border-bottom: 1px solid var(--borde);
 }
@@ -249,8 +226,6 @@ nav .enlaces a:hover { color: var(--tinta); }
 }
 .escena .puntos button[aria-current="true"]::before { background: var(--tierra); }
 
-/* Secciones. Ninguna lleva fondo propio: se separan con una línea fina y
-   ya. Ponerle color a una la hace parecer de otra web. */
 section { padding: 84px 0; border-top: 1px solid var(--borde); }
 @media (max-width: 640px) { section { padding: 56px 0; } }
 .capitulo {
@@ -258,17 +233,12 @@ section { padding: 84px 0; border-top: 1px solid var(--borde); }
   color: var(--tierra); margin-bottom: 4px;
 }
 section h2 { font-size: clamp(32px, 4vw, 46px); font-weight: 500; margin: 0 0 12px; letter-spacing: -0.02em; line-height: 1.08; }
-/* balance reparte las líneas para que la última no se quede con una sola
-   palabra colgando, que es lo que pasaba en "antes de empezar". */
 section .sumario {
   font: 400 21px/1.45 var(--serif); color: var(--suave);
   margin: 0 0 40px; max-width: 32em; text-wrap: balance;
 }
 section p { max-width: 36em; text-wrap: pretty; }
 
-/* El cuaderno: un trozo de playground metido en la portada. Quien llega
-   quiere ver si esto funciona, y lo más convincente es que pueda tocarlo
-   sin cambiar de página. */
 .hoja {
   background: var(--caja); border: 1px solid var(--borde);
   border-radius: 14px; box-shadow: var(--sombra); overflow: hidden;
@@ -284,8 +254,6 @@ section p { max-width: 36em; text-wrap: pretty; }
 }
 .pestanas button:hover { color: var(--tinta); }
 .pestanas button[aria-selected="true"] { color: var(--tinta); }
-/* Una sola raya que se desliza de pestaña en pestaña, en vez de un borde en
-   cada una que aparece y desaparece. */
 .pestanas .indicador {
   position: absolute; left: 0; bottom: 0; height: 2px; width: 0;
   background: var(--tierra); border-radius: 2px 2px 0 0;
@@ -295,13 +263,10 @@ section p { max-width: 36em; text-wrap: pretty; }
 @media (max-width: 860px) { .mesa { grid-template-columns: 1fr; } }
 .lado-codigo { display: flex; flex-direction: column; min-width: 0; }
 .editor { display: flex; position: relative; flex: 1; --alto-linea: 23px; }
-/* La raya roja del margen de los cuadernos de colegio. */
 .editor .numeros {
   flex: none; width: 46px; padding: 18px 10px 18px 0; text-align: right;
   color: color-mix(in srgb, var(--suave) 60%, transparent);
   border-right: 1px solid color-mix(in srgb, var(--tierra) 35%, transparent);
-  /* El alto de línea en píxeles y no relativo: con la letra más pequeña que
-     la del código, 1.6 daba otra altura y los números se iban despegando. */
   font: 12.5px/var(--alto-linea) var(--mono); user-select: none; white-space: pre;
 }
 .capas { position: relative; flex: 1; min-width: 0; overflow: hidden; }
@@ -311,9 +276,6 @@ section p { max-width: 36em; text-wrap: pretty; }
   letter-spacing: 0; word-spacing: 0;
 }
 .capas pre { width: max-content; min-width: 100%; min-height: 100%; pointer-events: none; }
-/* El texto de verdad va encima y transparente, y debajo el pintado. Así se
-   puede escribir con el teclado de siempre, corrector y deshacer incluidos,
-   sin montar un editor entero. */
 .capas textarea {
   position: absolute; inset: 0; width: 100%; height: 100%;
   background: transparent; color: transparent; caret-color: var(--tinta);
@@ -345,35 +307,15 @@ section p { max-width: 36em; text-wrap: pretty; }
 .dibujo { color: var(--tierra); flex: 1; display: grid; place-items: center; }
 .dibujo:empty { display: none; }
 .dibujo svg { display: block; width: 100%; height: auto; max-height: 300px; }
-/* El grosor que pone la tortuga está pensado para el tamaño real del dibujo.
-   Ampliado a lo ancho del cuaderno salían brochazos, y un dibujo denso se
-   volvía una mancha. */
 .dibujo line, .dibujo path, .dibujo polyline { vector-effect: non-scaling-stroke; stroke-width: 1.5px; }
 
-/* El vídeo de "qué es Fal". Va justo después del cuaderno, que es donde
-   alguien que acaba de llegar decide si se queda.
-
-   NO se reproduce solo, y es a propósito: lleva voz. Un vídeo que se pone a
-   hablar en cuanto abres una página se cierra antes de la segunda frase.
-   Y preload=metadata para que quien no le dé al play no se descargue dos
-   megas por si acaso. */
 .video-que-es video {
-  /* height auto y aspect-ratio, las dos. Los atributos width y height del
-     HTML están para que el hueco ya tenga su tamaño antes de que cargue
-     nada y la página no pegue un salto, pero sin esto de aquí la caja se
-     queda con los 1080 de alto y el vídeo sale flotando en medio de dos
-     franjas blancas. */
   width: 100%; height: auto; aspect-ratio: 16 / 9;
   display: block; border-radius: 14px;
   border: 1px solid var(--borde); background: var(--caja); box-shadow: var(--sombra);
 }
 .video-que-es .debajo { font-size: 14.5px; color: var(--suave); margin-top: 14px; }
 
-/* La escalera, dibujada en sección: peldaños macizos y, en el medio, el
-   hueco a lápiz. Cuando entra en pantalla, Fal
-   sube desde el suelo y lo tapa. La primera versión era tres cajas a raya y
-   el hueco no se leía como hueco, sino como otra caja con algo escrito.
-   Sin JavaScript se ve directamente con Fal ya puesto. */
 .escalera {
   display: grid; grid-template-columns: repeat(3, 1fr); align-items: end;
   border-bottom: 2px solid var(--tinta); margin: 8px 0 44px;
@@ -389,14 +331,6 @@ section p { max-width: 36em; text-wrap: pretty; }
 .peldano:nth-child(1) .escalon { height: 77px; border-left: 2px solid var(--tinta); }
 .peldano:nth-child(2) .escalon { height: 142px; }
 .peldano:nth-child(3) .escalon { height: 208px; border-left: 2px solid var(--tinta); }
-/* Los peldaños de los lados van llenos de nombres y el del medio solo
-   lleva Fal: a los lados sobra dónde elegir, en el medio no había nada.
-   Nombres y no logotipos: Scratch no deja usar el suyo sin permiso, el de
-   Python no se puede pasar a un color, y en sus colores de marca la
-   escalera parecería de otra web. La altura se redondea a líneas enteras
-   para que la última no salga cortada por la mitad, y lo que no cabe se
-   queda fuera. Los nombres los oye el lector de pantalla en una frase
-   aparte: setenta seguidos no se los merece nadie. */
 .peldano .nombres {
   position: absolute; top: 6px; left: 14px; right: 14px; margin: 0; max-width: none;
   height: round(down, calc(100% - 12px), 21px); overflow: hidden;
@@ -406,12 +340,7 @@ section p { max-width: 36em; text-wrap: pretty; }
   font-size: 14.5px; line-height: 21px;
 }
 .peldano .nombres span { white-space: nowrap; }
-/* Al entrar en pantalla los nombres aparecen sueltos y a la vez en los dos
-   lados, el hueco sigue vacío un momento y solo entonces sube Fal. Con todo
-   puesto de golpe el contraste se veía, pero nadie lo leía como una historia. */
 .escalera.pendiente .nombres span { opacity: 0; }
-/* Las transiciones solo al salir de pendiente: puestas en la regla de base,
-   al cargar se veía a Fal un segundo y medio antes de esconderse. */
 .escalera:not(.pendiente) .nombres span { transition: opacity .3s var(--espera, 0ms); }
 .escalera:not(.pendiente) .relleno { transition: transform 1.1s cubic-bezier(.2, .9, .25, 1) 1.5s; }
 .para-lectores {
@@ -436,19 +365,14 @@ section p { max-width: 36em; text-wrap: pretty; }
   .escalera { grid-template-columns: 1fr; border-bottom: 0; gap: 28px; }
   .peldano { flex-direction: column-reverse; }
   .peldano .texto { padding: 12px 0 0; }
-  /* A 38px de alto cabía una línea de nombres y los peldaños no se veían
-     llenos. Con 56 caben dos, y el último crece a tres para seguir siendo
-     el más grande. */
   .peldano .escalon { height: 56px !important; }
   .peldano:nth-child(3) .escalon { height: 77px !important; }
-  /* Al 34% de 375 entraba un nombre por línea. */
   .peldano:nth-child(1) .escalon { width: max(34%, 170px); }
   .peldano:nth-child(2) .escalon { width: 67%; }
   .peldano.aqui .relleno span { font-size: 30px; }
   .escalera.pendiente .relleno { transform: translateX(-101%); }
 }
 
-/* Comparación */
 table.compara { width: 100%; border-collapse: collapse; margin-top: 8px; table-layout: fixed; }
 table.compara th {
   text-align: left; font-weight: 400; padding: 0 12px 12px 0;
@@ -464,9 +388,6 @@ table.compara .nada { font: italic 15px var(--serif); }
   padding: 7px 12px; border-radius: 6px; cursor: pointer;
 }
 .selector button[aria-pressed="true"] { background: var(--codigo-fondo); color: var(--tinta); box-shadow: 0 0 0 1px var(--borde); }
-/* Cada símbolo va en su span para poder marcarlo. El recuento de abajo sale
-   de contar esos spans, no de un número escrito a mano que se desfasa en
-   cuanto alguien cambia una fila. */
 .compara .sim { border-radius: 3px; transition: background-color .25s, color .25s, box-shadow .25s; }
 .compara .sim.marcado { color: var(--tierra); background: var(--tierra-velo); box-shadow: 0 0 0 2px var(--tierra-velo); }
 .recuento { display: flex; gap: 56px; flex-wrap: wrap; margin: 34px 0 0; align-items: baseline; }
@@ -475,7 +396,6 @@ table.compara .nada { font: italic 15px var(--serif); }
 .recuento .de-otro b { color: var(--tierra); }
 .recuento span { font-size: 15px; color: var(--suave); max-width: 13em; line-height: 1.4; }
 
-/* Reglas */
 ol.reglas {
   padding: 0; margin: 0; list-style: none; counter-reset: r;
   display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, auto);
@@ -495,7 +415,6 @@ ol.reglas .ej { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; font-
 ol.reglas .tachados { gap: 16px; font: 17px var(--mono); }
 ol.reglas s { text-decoration-color: var(--tierra); text-decoration-thickness: 2px; color: var(--suave); }
 
-/* Errores */
 .pestanas.sueltas { padding: 0; margin-bottom: 26px; }
 .pestanas.sueltas button { padding-left: 0; padding-right: 0; margin-right: 26px; font-size: 15.5px; }
 .par { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.45fr); gap: 24px; align-items: start; }
@@ -516,8 +435,6 @@ pre.codigo .linea::before {
 }
 pre.codigo .linea.falla { background: var(--tierra-velo); box-shadow: inset 3px 0 0 var(--tierra); }
 pre.codigo .linea.camino { background: color-mix(in srgb, var(--azul) 9%, transparent); box-shadow: inset 3px 0 0 color-mix(in srgb, var(--azul) 60%, transparent); }
-/* El mensaje se parte en vez de desplazarse: la pista es lo último y lo más
-   importante, y con desplazamiento lateral era justo lo que quedaba cortado. */
 pre.fallo { padding: 16px 20px; background: var(--caja); box-shadow: var(--sombra); white-space: pre-wrap; }
 pre.fallo .x { color: var(--tierra); font-weight: 600; }
 pre.fallo .pista { color: var(--tinta); font-weight: 600; }
@@ -525,13 +442,10 @@ pre.fallo .ln { color: var(--tierra); }
 pre.fallo .cm { color: var(--azul); }
 .al-pie { font-size: 14px; color: var(--suave); margin: 16px 2px 0; }
 
-/* Peros */
 .peros { background: var(--caja); border: 1px solid var(--borde); border-left: 3px solid var(--tierra); border-radius: 0 12px 12px 0; padding: 28px 30px; max-width: 46em; }
 .peros h3 { margin: 0 0 20px; font-size: 25px; font-weight: 500; }
 .peros p { margin: 0 0 12px; }
 .peros p:last-child { margin-bottom: 0; }
-/* Una regla debajo de cada cuenta, con una raya por letra. Que se vea a
-   simple vista lo que dice el texto: que con palabras ocupa más. */
 .medida { display: grid; gap: 16px; margin: 0 0 24px; }
 .medida div { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .medida .regla {
@@ -542,16 +456,11 @@ pre.fallo .cm { color: var(--azul); }
 .medida .es-otro { color: var(--suave); }
 .medida small { font-size: 14px; color: var(--suave); }
 
-/* Cifras */
 .cifras { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; margin: 0 0 52px; }
 @media (max-width: 720px) { .cifras { grid-template-columns: repeat(2, 1fr); } }
 .cifra { border-top: 2px solid var(--tinta); padding-top: 16px; }
 .cifra .n { font: 400 76px/0.9 var(--serif); display: block; letter-spacing: -0.03em; }
 .cifra .q { font-size: 14.5px; color: var(--suave); display: block; margin-top: 10px; line-height: 1.45; }
-/* Las 42 enteras, como el índice de un libro. Decir "pocas palabras" no
-   convence a nadie; enseñarlas todas sí. Primero iban en un párrafo con
-   letra de texto y parecían una frase sin sentido: agrupadas por lo que
-   hacen y con la letra del código, además se aprende algo mirándolas. */
 .vocabulario { margin: 0 0 48px; }
 .vocabulario > .versalitas { display: block; margin-bottom: 14px; }
 .indice {
@@ -567,7 +476,6 @@ pre.fallo .cm { color: var(--azul); }
 .indice p { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0; max-width: none; font: 16.5px/1.5 var(--mono); }
 .indice p span { color: var(--tierra); }
 
-/* Aprender */
 .tres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 @media (max-width: 860px) { .tres { grid-template-columns: 1fr; } }
 .tarjeta {
@@ -582,7 +490,6 @@ a.tarjeta:hover { border-color: color-mix(in srgb, var(--tierra) 50%, var(--bord
 .tarjeta p { margin: 0; font-size: 15.5px; color: var(--suave); max-width: none; }
 .tarjeta .ir { margin-top: auto; padding-top: 10px; font-size: 15px; color: var(--azul); }
 
-/* Instalar */
 .sistemas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 30px; max-width: 780px; }
 @media (max-width: 720px) { .sistemas { grid-template-columns: 1fr; } }
 .sistema { border: 1px solid var(--borde); border-radius: 12px; padding: 18px 20px; background: var(--caja); position: relative; }
@@ -678,8 +585,7 @@ footer .colofon { width: 100%; font-size: 13px; margin-top: 6px; }
             <div class="capas">
               <pre class="pintado" aria-hidden="true"></pre>
               <textarea id="programa" spellcheck="false" autocapitalize="off" autocomplete="off"
-                        wrap="off" aria-label="Programa en Fal, se puede editar"># El área de un círculo, en Fal
-tipo Circulo con radio
+                        wrap="off" aria-label="Programa en Fal, se puede editar">tipo Circulo con radio
     funcion area
         devuelve pi por radio de mi por radio de mi
     fin
@@ -1070,12 +976,6 @@ escribe a con 10</pre>
 </footer>
 
 <script>
-// Los enlaces que la gente compartió del playground llevan el programa
-// dentro de la dirección, y antes esa dirección era esta página. Ahora el
-// playground vive en /probar.html, así que si llega uno de los viejos se le
-// manda allí con su programa intacto en lugar de dejarlo mirando la portada.
-// Antes bastaba con que hubiera algo detrás de la almohadilla, pero ahora la
-// portada tiene anclas propias (#errores) y esas se iban al playground.
 if (location.hash.startsWith("#p=")) {
   location.replace("/probar.html" + location.hash);
 }
@@ -1083,8 +983,6 @@ if (location.hash.startsWith("#p=")) {
 const sinMovimiento = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const espera = ms => new Promise(r => setTimeout(r, ms));
 
-// Pintar código. Las 42 palabras más las nueve que el lenguaje usa sin
-// prohibirlas como nombre: en un ejemplo corto casi siempre van de palabra.
 const PALABRAS = new Set(("agrega como comparte con continua de detente devuelve entre es " +
   "escribe esta falla falso fin finalmente funcion hereda igual intenta mas menos mi mientras " +
   "nada no nuevo o padre para por pregunta quita relanza repite resto retorna si sino tipo usa " +
@@ -1094,7 +992,6 @@ function escapar(t) {
   return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// FUNCIÓN y funcion son la misma palabra, así que también se pintan igual.
 function sinTildes(p) {
   return p.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
@@ -1132,8 +1029,6 @@ function pintar(codigo) {
   return codigo.split("\n").map(pintarLinea).join("\n");
 }
 
-// Los bloques de código de la página se escriben en texto plano y se pintan
-// aquí, para que sin JavaScript se sigan leyendo enteros.
 document.querySelectorAll("[data-fal]").forEach(el => {
   if (el.tagName !== "PRE") {
     el.innerHTML = pintar(el.textContent);
@@ -1147,7 +1042,6 @@ document.querySelectorAll("[data-fal]").forEach(el => {
   }).join("");
 });
 
-// Pestañas con una sola raya que se desliza hasta la elegida.
 function moverIndicador(lista) {
   const elegida = lista.querySelector('[aria-selected="true"]');
   const raya = lista.querySelector(".indicador");
@@ -1166,12 +1060,9 @@ function pestanas(lista, alElegir) {
   }));
   moverIndicador(lista);
   addEventListener("resize", () => moverIndicador(lista));
-  // Las letras propias llegan un poco después, y con ellas cambia el ancho
-  // de cada pestaña: la raya medida antes quedaba corta.
   document.fonts && document.fonts.ready.then(() => moverIndicador(lista));
 }
 
-// La escena de la portada
 
 const ESCENAS = [
   { otro: "if (edad > 18) {", fal: "si edad es mayor que 18" },
@@ -1218,8 +1109,6 @@ function montarEscena(n) {
   $puntosEscena.querySelectorAll("button").forEach((b, i) => b.setAttribute("aria-current", i === n));
 }
 
-// Cada vuelta lleva su número. Si alguien pulsa otro ejemplo a mitad, la
-// vuelta vieja ve que ya no es la última y se retira sin pisar a la nueva.
 async function representar(n) {
   const mia = ++vueltaEscena;
   turno = n;
@@ -1236,8 +1125,6 @@ async function representar(n) {
   };
   try {
     await paso(60, "entra");
-    // "senala" y no "marca": marca es la clase del logo, y la escena entera
-    // salía con su letra y su color.
     await paso(1000, "senala");
     await paso(650, "cae");
     await paso(900, "escribe");
@@ -1249,8 +1136,6 @@ async function representar(n) {
   if (enPantalla) representar((n + 1) % ESCENAS.length);
 }
 
-// Fuera de la vista no se anima: ni gasta batería ni, al volver, te
-// encuentras la escena a medias.
 const vigiaEscena = new IntersectionObserver(entradas => {
   const antes = enPantalla;
   enPantalla = entradas[0].isIntersecting && !document.hidden;
@@ -1264,12 +1149,7 @@ document.addEventListener("visibilitychange", () => {
 });
 representar(0);
 
-// El cuaderno
 
-// Las salidas van escritas de antemano, sacadas del intérprete de verdad,
-// para que se vean nada más llegar sin bajarse los 13 MB del lenguaje. Al
-// darle a Ejecutar ya sí se carga y se corre lo que haya escrito. Los
-// dibujos se guardan como la lista de puntos por los que pasó la tortuga.
 function dibujoDePuntos(caja, puntos) {
   let rayas = "";
   for (let i = 2; i < puntos.length; i += 2) {
@@ -1304,24 +1184,21 @@ const EJEMPLOS = [
     salida: "28.27"
   },
   {
-    codigo: `# Cuatro líneas y sale una estrella
-repite 36 veces
+    codigo: `repite 36 veces
     camina de 100
     gira de 170
 fin`,
     dibujo: ESTRELLA
   },
   {
-    codigo: `# Una espiral: cada paso, un poco más largo
-para cada n desde 1 hasta 80
+    codigo: `para cada n desde 1 hasta 80
     camina de (n por 2)
     gira de 91
 fin`,
     dibujo: ESPIRAL
   },
   {
-    codigo: `# Los decimales son exactos, como en una calculadora
-escribe 0.1 mas 0.2
+    codigo: `escribe 0.1 mas 0.2
 escribe (0.1 mas 0.2) es 0.3
 
 precio es 19.99
@@ -1353,8 +1230,6 @@ const $dibujo = document.getElementById("dibujo");
 const $alPlayground = document.getElementById("alPlayground");
 const AYUDA_TECLAS = $estado.innerHTML;
 
-// El mismo formato que usa el playground al compartir: el programa en base64
-// de la variante sin + ni /, detrás de #p=.
 function aTextoDeEnlace(texto) {
   const bytes = new TextEncoder().encode(texto);
   let binario = "";
@@ -1364,8 +1239,6 @@ function aTextoDeEnlace(texto) {
 
 function repintar() {
   const codigo = $programa.value;
-  // El espacio del final cuenta: sin él, una línea vacía al acabar no ocupa
-  // alto en el pre y el texto de encima se descuadra una línea.
   $pintado.innerHTML = pintar(codigo) + "\n ";
   const lineas = codigo.split("\n").length;
   $numeros.textContent = Array.from({ length: lineas }, (_, n) => n + 1).join("\n");
@@ -1380,9 +1253,6 @@ $programa.addEventListener("scroll", () => {
   $pintado.style.transform = `translateX(${-$programa.scrollLeft}px)`;
 });
 
-// Cada raya de un dibujo se traza detrás de la anterior, en el orden en que
-// la tortuga la hizo. Es la forma de que se entienda que lo ha dibujado un
-// bucle y no que es una imagen pegada.
 function ponerDibujo(svg) {
   $dibujo.innerHTML = svg || "";
   const rayas = $dibujo.querySelectorAll("line, path, polyline");
@@ -1416,9 +1286,6 @@ pestanas($listaCuaderno, b => {
   ponerSalida(e.salida, "", e.dibujo);
 });
 
-// El intérprete vive en un worker, igual que en el playground, y se pide
-// solo cuando alguien da señales de ir a usarlo. Cargarlo al abrir la página
-// serían 13 MB para cada visita, la mayoría de gente que solo viene a leer.
 let trabajador = null;
 let preparado = null;
 let corriendo = false;
@@ -1459,9 +1326,6 @@ function terminar() {
   $estado.innerHTML = AYUDA_TECLAS;
 }
 
-// Cortar por las bravas es la única forma de parar un bucle sin fin. El
-// worker se tira y el próximo Ejecutar levanta otro, ya con el lenguaje en
-// la caché del navegador.
 function parar() {
   trabajador.terminate();
   trabajador = null;
@@ -1495,8 +1359,6 @@ async function ejecutar() {
 }
 
 $correr.addEventListener("click", ejecutar);
-// Con el ratón encima del botón, lo normal es que el clic venga ahora. Se
-// adelanta la descarga para que no haya que esperarla entera después.
 $correr.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") preparar().catch(() => {}); });
 $programa.addEventListener("keydown", e => {
   if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -1508,36 +1370,27 @@ $programa.addEventListener("keydown", e => {
 repintar();
 ponerSalida(EJEMPLOS[0].salida);
 
-// La escalera empieza vacía. Fal sube después que los nombres (el retraso
-// está en el CSS): si sube antes, nadie llega a ver el hueco.
 const $escalera = document.querySelector(".escalera");
 if ("IntersectionObserver" in window && !sinMovimiento) {
   $escalera.classList.add("pendiente");
   const vigiaEscalera = new IntersectionObserver(entradas => {
     if (!entradas[0].isIntersecting) return;
     vigiaEscalera.disconnect();
-    // Cada lado se llena en el mismo segundo tenga los nombres que tenga, y
-    // en desorden: en orden de lectura parecía una máquina de escribir.
     for (const $lista of $escalera.querySelectorAll(".nombres")) {
       const visibles = [...$lista.children].filter(n => n.offsetTop < $lista.clientHeight);
       visibles.forEach(n => n.style.setProperty("--espera", Math.round(Math.random() * 1000) + "ms"));
     }
     setTimeout(() => $escalera.classList.remove("pendiente"), 300);
   }, { threshold: 1 });
-  // Se vigila el hueco y no la escalera entera: apilada en el móvil es más
-  // alta que la pantalla y nunca llegaba a verse el tanto por ciento pedido.
   vigiaEscalera.observe($escalera.querySelector(".aqui .escalon"));
 }
 
-// Errores
 pestanas(document.querySelector("#errores .pestanas"), b => {
   document.querySelectorAll("#errores [role=tab]").forEach(o => {
     document.getElementById(o.getAttribute("aria-controls")).hidden = o !== b;
   });
 });
 
-// Cómo se lee. La columna de la derecha cambia de lenguaje, y los símbolos
-// se marcan uno a uno mientras el contador sube con ellos.
 const OTROS = {
   javascript: [
     'if <span class="sim">(</span>edad <span class="sim">&gt;</span> 18<span class="sim">)</span> <span class="sim">{</span>',
@@ -1602,8 +1455,6 @@ if ("IntersectionObserver" in window && !sinMovimiento) {
   marcar(0, 0);
 }
 
-// Se marca el sistema de quien visita. Si no se sabe, no se marca ninguno,
-// que es mejor que acertar a medias.
 const sistema = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent;
 const tuyo = /win/i.test(sistema) ? "windows" : /mac|linux|x11|cros/i.test(sistema) && !/android|iphone|ipad/i.test(sistema) ? "unix" : "";
 if (tuyo) document.querySelector(`[data-sistema="${tuyo}"]`).classList.add("tuyo");

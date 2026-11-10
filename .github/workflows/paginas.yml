@@ -1,11 +1,5 @@
 name: Playground
 
-# Compila el interprete a WebAssembly y publica la pagina donde se puede
-# probar Fal sin instalar nada. Se lanza en cada cambio de main.
-#
-# Para que funcione hay que activarlo una vez en el repositorio:
-#   Settings -> Pages -> Source -> GitHub Actions
-
 on:
   push:
     branches: [main]
@@ -16,7 +10,6 @@ permissions:
   pages: write
   id-token: write
 
-# Si se empujan dos cambios seguidos, que solo se publique el ultimo.
 concurrency:
   group: pages
   cancel-in-progress: true
@@ -39,34 +32,20 @@ jobs:
           GOOS=js GOARCH=wasm go build -trimpath \
             -ldflags "-s -w -X main.version=$GITHUB_REF_NAME" -o docs/fal.wasm .
           cp "$(go env GOROOT)/lib/wasm/wasm_exec.js" docs/
-          # Los ejemplos de verdad, para que la pagina pueda ofrecerlos sin
-          # llevar una segunda copia dentro del HTML. Solo se publica lo que
-          # se sube en este paso, asi que sin esto el playground los pediria
-          # y no estarian.
           mkdir -p docs/ejemplos
           cp ejemplos/*.fal docs/ejemplos/
           ls -lh docs/ docs/ejemplos/
 
-      # El manual se fabrica desde MANUAL.md en cada publicacion, para que no
-      # haya dos copias del mismo texto separandose poco a poco. El conversor
-      # esta en herramientas/manual y no usa ninguna libreria, igual que el
-      # resto del proyecto.
       - name: Hacer la pagina del manual
         run: |
           go run ./herramientas/manual MANUAL.md docs/manual.html
           test -s docs/manual.html
-          # Si el conversor deja markdown sin convertir, es que ha dejado de
-          # entender algo que el manual usa, y eso se ve en la pagina.
           if grep -qE '^\| |^\*\*|^```' docs/manual.html; then
             echo "el manual tiene markdown sin convertir:"
             grep -nE '^\| |^\*\*|^```' docs/manual.html | head
             exit 1
           fi
 
-      # El sitemap lleva la fecha del último commit que tocó cada página, no
-      # la de hoy. Generarlo con la fecha del despliegue le diría al buscador
-      # que el manual cambió cada vez que se toca cualquier otra cosa, y eso
-      # es justo lo que hace que dejen de fiarse del sitemap.
       - name: Hacer el sitemap
         run: |
           fecha() { git log -1 --format=%cs -- "$1" 2>/dev/null || date -I; }
@@ -88,9 +67,6 @@ jobs:
           } > docs/sitemap.xml
           cat docs/sitemap.xml
 
-      # La politica de contenidos y el trozo contra marcos ajenos. Va lo
-      # ultimo, sobre la copia que se sube, porque lleva el hash de cada
-      # script de dentro y el manual se acaba de fabricar ahi arriba.
       - name: Poner la politica de contenidos
         run: go run ./herramientas/politica docs/*.html
 

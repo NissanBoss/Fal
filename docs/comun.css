@@ -1,10 +1,4 @@
-/* Lo que comparten todas las páginas menos la portada, que lo lleva dentro
-   para no pedir un archivo más en la primera visita. Si cambias un color
-   aquí, cámbialo también allí: antes cada página tenía su propia copia de
-   los colores y la academia acabó con un verde que la portada no tenía. */
 
-/* Las letras se sirven desde el propio sitio y no desde Google Fonts: pedirlas
-   fuera le cuenta a un tercero quién visita la página. Las dos son OFL. */
 @font-face {
   font-family: "Newsreader"; font-style: normal; font-weight: 200 800; font-display: swap;
   src: url("fuentes/newsreader.woff2") format("woff2");
@@ -87,14 +81,10 @@ button { font: inherit; cursor: pointer; color: inherit; }
   clip-path: inset(50%); white-space: nowrap;
 }
 
-/* El código pintado, igual en todas partes. */
 .pal { color: var(--tierra); }
 .txt { color: var(--azul); }
 .com { color: var(--suave); font-style: italic; }
 
-/* La barra de arriba. La página en la que estás lleva una raya debajo del
-   nombre: con cuatro sitios que se parecen tanto, sin ella no se sabía si
-   estabas en el foro o en el curso hasta leer el título. */
 nav.sitio {
   border-bottom: 1px solid var(--borde);
   background: color-mix(in srgb, var(--papel) 86%, transparent);
@@ -143,15 +133,11 @@ nav.sitio .enlaces a[aria-current="page"]::after {
   text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 1px;
 }
 
-/* El editor: un textarea transparente encima del código pintado, con la raya
-   roja del margen de los cuadernos de colegio entre números y texto. */
 .editor { display: flex; position: relative; --alto-linea: 23px; background: var(--caja); }
 .editor .numeros {
   flex: none; width: 46px; padding: 16px 10px 16px 0; text-align: right;
   color: color-mix(in srgb, var(--suave) 60%, transparent);
   border-right: 1px solid color-mix(in srgb, var(--tierra) 35%, transparent);
-  /* El alto de línea en píxeles: con la letra más pequeña que la del código,
-     un valor relativo daba otra altura y los números se iban despegando. */
   font: 12.5px/var(--alto-linea) var(--mono); user-select: none; white-space: pre;
 }
 .capas { position: relative; flex: 1; min-width: 0; overflow: hidden; }
@@ -173,8 +159,6 @@ nav.sitio .enlaces a[aria-current="page"]::after {
 kbd { font-size: 12px; border: 1px solid var(--borde); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; }
 @media (hover: none) { .teclas { display: none; } }
 
-/* Los dibujos de la tortuga. El grosor que trae está pensado para el tamaño
-   real; ampliado salían brochazos. */
 .dibujo { color: var(--tierra); display: grid; place-items: center; }
 .dibujo:empty { display: none; }
 .dibujo svg { display: block; width: 100%; height: auto; max-height: 300px; }

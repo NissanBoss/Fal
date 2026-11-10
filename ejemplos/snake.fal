@@ -1,27 +1,8 @@
-# El juego de la serpiente, en Fal.
-#
-# Como se juega:
-#   w a s d   o las flechas, para girar
-#   q         salir
-#
-# La serpiente no espera a nadie: avanza sola hacia donde mira y tu solo la
-# tuerces. Eso lo hace "tecla", que dice lo que se acaba de pulsar y sigue
-# aunque no hayas tocado nada. Con "pregunta" habria que darle a Enter en
-# cada paso, y entonces esto seria un cuestionario y no un juego.
-
 ANCHO es 22
 ALTO es 12
 
-# Lo que se espera entre movimiento y movimiento. Es a la vez la velocidad
-# del juego y lo suave que se ve: en un tablero de letras la serpiente salta
-# de casilla en casilla, asi que no hay termino medio: cuantos mas movimientos
-# por segundo mas fluido se ve. 0.10 son diez por segundo.
-# Bajalo para que vaya mas fino y mas dificil, subelo para lo contrario.
 PAUSA es 0.10
 
-# Una casilla se guarda como un solo numero: fila por 100 mas columna.
-# Asi la serpiente es una simple lista de numeros y preguntar si se ha
-# mordido la cola es tan corto como "contiene de cuerpo con casilla".
 funcion casilla con fila y columna
     devuelve fila por 100 mas columna
 fin
@@ -34,8 +15,6 @@ funcion columna_de con c
     devuelve c resto 100
 fin
 
-# Empieza con cinco trozos: con menos de cinco es imposible morderse la
-# cola, y entonces media gracia del juego no existe.
 cuerpo es lista con (casilla con 6 y 8) y (casilla con 6 y 7) y (casilla con 6 y 6) y (casilla con 6 y 5) y (casilla con 6 y 4)
 paso_fila es 0
 paso_columna es 1
@@ -43,7 +22,6 @@ comida es nada
 puntos es 0
 vivo es verdadero
 motivo es ""
-
 
 funcion nueva_comida
     comparte comida
@@ -62,7 +40,6 @@ funcion nueva_comida
         fin
     fin
 fin
-
 
 funcion dibuja
     limpia
@@ -87,12 +64,8 @@ funcion dibuja
     escribe " +" mas (repetido de "-" con ANCHO) mas "+"
 fin
 
-
 funcion gira con t
     comparte paso_fila y paso_columna
-    # Valen las letras y las flechas, que es lo primero que prueba
-    # cualquiera antes de mirar las instrucciones.
-    # No se puede dar media vuelta sobre uno mismo.
     si (t es "w" o t es "arriba") y paso_fila no es igual a 1
         paso_fila es menos 1
         paso_columna es 0
@@ -107,7 +80,6 @@ funcion gira con t
         paso_columna es 1
     fin
 fin
-
 
 funcion avanza
     comparte cuerpo y puntos y vivo y motivo
@@ -124,7 +96,6 @@ funcion avanza
 
     siguiente es casilla con f y c
 
-    # La cola se mueve a la vez, asi que pisar la ultima casilla vale.
     cola es ultimo de cuerpo
     si (contiene de cuerpo con siguiente) y siguiente no es igual a cola
         vivo es falso
@@ -142,9 +113,6 @@ funcion avanza
     fin
 fin
 
-
-# ---- el juego ----
-
 nueva_comida
 dibuja
 
@@ -155,7 +123,6 @@ mientras vivo
         motivo es "Lo dejaste tu."
         vivo es falso
     si no
-        # Si no se pulso nada, t viene vacio y la serpiente sigue recto.
         si t no es ""
             gira con t
         fin

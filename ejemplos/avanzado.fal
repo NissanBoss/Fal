@@ -1,8 +1,4 @@
-# Todo lo que Fal aprendió para parecerse a un lenguaje serio.
-# Se ejecuta solo, sin escribir nada (salvo la parte de internet).
-
 escribe "=== 1. LOS DECIMALES NO MIENTEN ==="
-# Esta es la trampa clásica de casi todos los lenguajes:
 escribe "0.1 mas 0.2 = " mas (0.1 mas 0.2)
 escribe "¿y es igual a 0.3? " mas ((0.1 mas 0.2) es 0.3)
 carrito es lista con 19.99 y 4.95 y 0.60

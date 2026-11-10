@@ -1,11 +1,3 @@
-# Cifrado Cesar.
-#
-#   fal cifrado.fal
-#
-# Corre cada letra unas posiciones por el abecedario. Con salto 3, la "a"
-# pasa a ser "d". Es el cifrado que usaba Julio Cesar y aguanto quince
-# siglos; aqui se rompe en lo que tarda en imprimirse la lista.
-
 ABECEDARIO es "abcdefghijklmnopqrstuvwxyz"
 
 MENSAJE es "ataca al amanecer por el flanco este"
@@ -25,15 +17,10 @@ funcion cifra con frase y salto
     devuelve salida
 fin
 
-# Descifrar es cifrar hacia el otro lado. Se suma 26 menos el salto en vez
-# de restarlo, para no acabar con numeros negativos: el resto de un negativo
-# tambien sale negativo y se sale del abecedario.
 funcion descifra con frase y salto
     devuelve cifra con frase y (26 menos salto)
 fin
 
-# Cuenta palabras cortas de las que salen en cualquier frase. El descifrado
-# bueno saca unas cuantas y los otros veinticuatro no sacan casi ninguna.
 funcion puntua con frase
     puntos es 0
     para cada palabra en (lista con " de " y " la " y " el " y " en " y " un " y " por ")
@@ -49,7 +36,6 @@ escribe "Cifrado:  " mas secreto
 escribe "Y vuelta: " mas (descifra con secreto y CLAVE)
 escribe
 
-# A partir de aqui hacemos como que no sabemos la clave.
 mejor es 0
 clave_buena es 0
 para cada salto desde 1 hasta 25

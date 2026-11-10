@@ -1,15 +1,3 @@
-# Analizador de gastos.
-#
-# Lee un CSV con fecha, concepto, categoria e importe, y saca un informe de
-# en que se te va el dinero.
-#
-#   fal gastos.fal
-#   fal gastos.fal mis_gastos.csv
-#
-# Los totales salen exactos, y eso aqui no es un detalle bonito: sumar
-# veintitantos importes con decimales en cualquier lenguaje normal te deja
-# un resto de centimos que no cuadra con el extracto del banco.
-
 ARCHIVO es "gastos.csv"
 argus es argumentos
 si largo de argus es mayor que 0
@@ -28,11 +16,8 @@ si largo de filas es menor que 2
     termina de 1
 fin
 
-# La primera fila son los titulos de las columnas, no un gasto.
 quita 1 de filas
 
-
-# Deja el texto con el ancho justo para que las columnas queden alineadas.
 funcion ancho con texto y columnas
     faltan es columnas menos largo de texto
     si faltan es menor que 1
@@ -41,8 +26,6 @@ funcion ancho con texto y columnas
     devuelve texto mas (repetido de " " con faltan)
 fin
 
-# redondea quita los ceros del final, pero el dinero se enseña con dos
-# decimales siempre: 133.1 esta mal escrito, son 133.10.
 funcion euros con cantidad
     t es texto de (redondea con cantidad y 2)
     si no contiene de t con "."
@@ -53,7 +36,6 @@ funcion euros con cantidad
     fin
     devuelve t mas " EUR"
 fin
-
 
 totales es diccionario vacio
 apuntes es diccionario vacio
@@ -81,12 +63,10 @@ para cada fila en filas
     fin
 fin
 
-
 funcion gastado_en con categoria
     devuelve elemento categoria de totales
 fin
 
-# ordena deja lo pequeño delante, asi que se le da la vuelta.
 orden es invierte de (ordena con (claves de totales) y funcion gastado_en)
 
 funcion barra con parte
@@ -96,7 +76,6 @@ funcion barra con parte
     fin
     devuelve repetido de "#" con trozos
 fin
-
 
 escribe ""
 escribe "  GASTOS DE " mas ARCHIVO
@@ -127,8 +106,6 @@ escribe "  El mas caro:  " mas (elemento 2 de mas_caro) mas ", " mas caro
 escribe "  Categorias:   " mas largo de orden
 escribe ""
 
-# La prueba de que las cuentas cuadran de verdad: si las sumas fueran
-# aproximadas, esto casi nunca daria igual.
 suma_partes es 0
 para cada categoria en orden
     suma_partes es suma_partes mas (elemento categoria de totales)

@@ -24,9 +24,6 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="comun.css">
 <style>
-/* El playground ocupa la pantalla entera, como un editor: con la página
-   desplazándose por detrás, un programa largo tenía dos barras de
-   desplazamiento peleándose. */
 html, body { height: 100%; }
 body { display: flex; flex-direction: column; }
 nav.sitio .fila { max-width: none; padding: 0 24px; }
@@ -47,17 +44,12 @@ nav.sitio .fila { max-width: none; padding: 0 24px; }
   .herramientas .acciones { margin-left: 0; width: 100%; }
   #correr { margin-left: auto; }
 }
-/* Los tres botones no caben en 375 con su ancho de escritorio y el de
-   ejecutar se salía por la derecha, que es justo el que más se pulsa. */
 @media (max-width: 420px) {
   .herramientas .acciones { gap: 8px; }
   .herramientas .acciones .boton { padding-inline: 11px; }
   #correr { min-width: 0; flex: 1; }
 }
 
-/* Los ejemplos, con una línea que dice qué enseña cada uno. En un
-   desplegable solo había nombres, y "Funciones que reciben funciones" no
-   dice si es para ti hasta que lo abres. */
 .menu { position: relative; }
 .menu .boton svg { width: 10px; height: 10px; transition: transform .2s; }
 .menu .boton[aria-expanded="true"] svg { transform: rotate(180deg); }
@@ -92,8 +84,6 @@ nav.sitio .fila { max-width: none; padding: 0 24px; }
 .marco-editor .editor { min-height: 100%; }
 @media (max-width: 860px) { .marco-editor { flex: none; height: 56vh; } }
 
-/* Las respuestas para pregunta, plegadas: solo las necesitan los programas
-   que preguntan, y abiertas siempre se comían un tercio del editor. */
 .respuestas { border-top: 1px solid var(--borde); }
 .respuestas summary {
   cursor: pointer; padding: 9px 18px; font-size: 13.5px; color: var(--suave); list-style: none;
@@ -211,11 +201,7 @@ fin`,
   {
     nombre: "Dibujar con la tortuga",
     resumen: "Un cuadrado y una estrella de 36 puntas.",
-    codigo: `# La tortuga es un lápiz que se arrastra por la
-# pantalla. "camina" la mueve hacia donde mira y
-# "gira" la tuerce a la derecha.
-
-color de "azul"
+    codigo: `color de "azul"
 repite 4 veces
     camina de 80
     gira de 90
@@ -226,7 +212,6 @@ levanta
 camina de 170
 apoya
 
-# El mismo bucle de siempre, pero dibujando.
 color de "rojo"
 repite 36 veces
     camina de 100
@@ -237,11 +222,7 @@ fin`,
   {
     nombre: "Un juego: muévete con las flechas",
     resumen: "Lee el teclado mientras corre, sin esperar a nadie.",
-    codigo: `# "tecla" dice qué tecla acabas de pulsar, o texto
-# vacío si ninguna. No espera a nadie: por eso esto
-# es un juego y no un cuestionario.
-#
-# Pulsa las flechas. Escape para salir.
+    codigo: `#
 
 ANCHO es 20
 ALTO es 10
@@ -302,9 +283,6 @@ escribe "Hasta luego."`,
     entradas: ""
   },
   {
-    // El unico que no lleva el codigo aqui dentro. Es el mismo archivo que
-    // viene en la descarga, y copiarlo seria tener dos serpientes que se van
-    // separando sin que nadie se entere. Se baja al elegirlo.
     nombre: "Un juego: la serpiente",
     resumen: "La de toda la vida, la misma que viene en la descarga.",
     archivo: "ejemplos/snake.fal",
@@ -313,10 +291,7 @@ escribe "Hasta luego."`,
   {
     nombre: "Los decimales salen exactos",
     resumen: "0.1 más 0.2 da 0.3, que en otros lenguajes no pasa.",
-    codigo: `# Esta cuenta la fallan Python, JavaScript y Java.
-# Fal la hace bien.
-
-escribe 0.1 mas 0.2
+    codigo: `escribe 0.1 mas 0.2
 escribe (0.1 mas 0.2) es 0.3
 
 escribe ""
@@ -410,10 +385,7 @@ fin`,
   {
     nombre: "Los errores te enseñan",
     resumen: "Un error a propósito, para ver cómo avisa.",
-    codigo: `# Fal no te suelta un error en inglés: te dice
-# dónde, por dónde pasó, y cómo se arregla.
-
-nombre es "Ana"
+    codigo: `nombre es "Ana"
 escribe nombree`,
     entradas: ""
   },
@@ -435,7 +407,6 @@ escribe "Cuadrados: " mas (mapa con numeros y funcion cuadrado)
 escribe "Pares:     " mas (filtra con numeros y funcion es_par)
 escribe "Suma:      " mas suma de numeros
 
-# Una funcion que recuerda donde nacio
 funcion contador_desde con inicio
     cuenta es inicio
     devuelve funcion
@@ -464,7 +435,6 @@ const editor = montarEditor($("editor"), () => { guardarPrograma(); $salida.clas
 const $programa = editor.area;
 let elegido = -1;
 
-// --- Los ejemplos --------------------------------------------------------
 
 const $lista = $("listaEjemplos");
 const $abrir = $("abrirEjemplos");
@@ -517,8 +487,6 @@ async function cargar(i) {
     ponerPrograma(e.codigo, e.entradas, e.nombre);
     return;
   }
-  // Los que viven en un archivo aparte se bajan la primera vez y se quedan
-  // en memoria, para no volver a pedirlos al cambiar de ejemplo y volver.
   if (e.codigo === undefined) {
     ponerPrograma("# Bajando " + e.archivo + "…", "", e.nombre);
     try {
@@ -534,11 +502,6 @@ async function cargar(i) {
   ponerPrograma(e.codigo, e.entradas, e.nombre);
 }
 
-// --- Guardar lo que escribes ---------------------------------------------
-//
-// Se guarda según se escribe. Antes bastaba con recargar sin querer, darle
-// a atrás o que se cerrara la pestaña para perderlo todo: en un sitio donde
-// la gente viene justo a probar cosas, eso es lo peor que puede pasar.
 const LLAVE_PROGRAMA = "fal_programa";
 let relojGuardado = null;
 
@@ -548,12 +511,10 @@ function guardarPrograma() {
       programa: $programa.value,
       entradas: $entradas.value
     }));
-    // Decirlo, y en voz baja. Sin el aviso nadie se fiaba de recargar.
     $("guardado").textContent = "guardado en este navegador";
     clearTimeout(relojGuardado);
     relojGuardado = setTimeout(() => { $("guardado").textContent = ""; }, 1800);
   } catch (e) {
-    // Sin sitio, o en una ventana privada. Se sigue pudiendo programar.
   }
 }
 
@@ -577,11 +538,6 @@ function contarRespuestas() {
 }
 $entradas.addEventListener("input", () => { contarRespuestas(); guardarPrograma(); });
 
-// --- Compartir con un enlace ---------------------------------------------
-//
-// El programa entero viaja dentro de la dirección, detrás de la almohadilla.
-// Nadie tiene que guardar nada en ningún servidor, y por eso esto funciona
-// en GitHub Pages tal cual.
 function cargarDelEnlace() {
   const trozo = location.hash.replace(/^#/, "");
   if (!trozo.startsWith("p=")) return false;
@@ -592,7 +548,7 @@ function cargarDelEnlace() {
       partes.get("e") ? deTextoDeEnlace(partes.get("e")) : "");
     return true;
   } catch (e) {
-    return false; // enlace cortado o estropeado al pegarlo
+    return false;
   }
 }
 
@@ -617,25 +573,15 @@ $compartir.addEventListener("click", async () => {
     await navigator.clipboard.writeText(enlace);
     avisarCopia("Enlace copiado");
   } catch (e) {
-    // Sin permiso para el portapapeles queda en la barra de direcciones,
-    // que es de donde se copia a mano de toda la vida.
     avisarCopia("Está en la barra de arriba");
   }
 });
 
-// --- El intérprete -------------------------------------------------------
-//
-// Vive en un worker. Aquí solo se le manda el programa y se va pintando lo
-// que conteste, que puede llegar en muchos trozos.
 
 let trabajador = null;
 let corriendo = false;
 let alTerminar = null;
 let acumulada = "";
-// Lo que se deja escribir a un programa entre borrado y borrado de pantalla.
-// Un bucle sin fin que escribe en cada vuelta llenaba la memoria y tumbaba
-// la pestaña entera antes de que diera tiempo a pulsar Parar. Los juegos
-// borran la pantalla en cada fotograma y no se acercan ni de lejos.
 const TOPE_SALIDA = 200000;
 
 function crearTrabajador() {
@@ -650,15 +596,11 @@ function crearTrabajador() {
       if (corriendo) pintarTrozo(m.texto);
     } else if (m.tipo === "fin") {
       if (!corriendo) return;
-      // Se vuelca ya, sin esperar al fotograma: justo debajo se lee
-      // "acumulada", y tiene que estar entera.
       volcarPendiente();
       const avisar = alTerminar;
       pararInterfaz();
       if (m.dibujo) ponerDibujo($lienzo, m.dibujo);
       if (avisar) avisar({ salida: acumulada, error: m.error || "" });
-      // Un programa que solo dibuja no escribe nada, y dejar el panel de
-      // texto vacío ocupando media pantalla encima del dibujo solo estorba.
       $salida.hidden = !!$lienzo.innerHTML && !$salida.textContent.trim();
     }
   };
@@ -670,9 +612,6 @@ function crearTrabajador() {
   };
 }
 
-// pintarTrozo no pinta: apunta. Lo que va llegando se junta y se vuelca de
-// una vez, como mucho una por fotograma del navegador. Cada trozo tocando
-// el DOM por su cuenta era lo que se veía como parpadeo en la serpiente.
 let pendiente = "";
 let volcadoPedido = false;
 let relojVolcado = null;
@@ -681,8 +620,6 @@ function pintarTrozo(texto) {
   pendiente += texto;
   if (volcadoPedido) return;
   volcadoPedido = true;
-  // requestAnimationFrame no se dispara con la pestaña de fondo; el
-  // temporizador es el seguro, y gana el que llegue antes.
   requestAnimationFrame(volcarPendiente);
   relojVolcado = setTimeout(volcarPendiente, 50);
 }
@@ -695,8 +632,6 @@ function volcarPendiente() {
   let texto = pendiente;
   pendiente = "";
 
-  // Si en lo que llegó hubo un borrado de pantalla, solo cuenta lo de
-  // después del último: los fotogramas anteriores ya no se van a ver.
   const borrado = texto.lastIndexOf("\x1b[2J");
   const limpiar = borrado >= 0;
   if (limpiar) {
@@ -712,7 +647,6 @@ function volcarPendiente() {
     return;
   }
   if (limpiar) {
-    // Un único cambio: el panel no llega a verse vacío en ningún momento.
     $salida.textContent = texto;
   } else if (texto) {
     $salida.appendChild(document.createTextNode(texto));
@@ -754,18 +688,13 @@ function correrPrograma(programa, respuestas, avisar) {
   $salida.classList.remove("vieja");
   $lienzo.innerHTML = "";
   botonEn("parar");
-  // Si el programa lee teclas, se dice dónde van. Sin el aviso la gente
-  // pulsaba las flechas con el cursor en el editor y no pasaba nada.
   const leeTeclas = /\btecla\b/.test(programa);
   $estado.className = "lejos estado" + (leeTeclas ? " teclado" : "");
   $estado.textContent = leeTeclas ? "Las teclas van al programa" : "Ejecutando…";
-  // Para que las teclas del juego no acaben escritas en el programa.
   $programa.blur();
   trabajador.postMessage({ tipo: "correr", programa, respuestas });
 }
 
-// Cortar por las bravas es la única forma de parar un bucle sin fin. El
-// worker se tira y se levanta otro, que tarda lo que tarde en cargar.
 function parar(motivo) {
   if (!corriendo) return;
   trabajador.terminate();
@@ -793,8 +722,6 @@ function ejecutar() {
 
 $correr.addEventListener("click", ejecutar);
 
-// Cómo se llama cada tecla dentro de Fal. Las que no son una letra llevan
-// nombre en castellano, para poder escribir  si t es "arriba".
 const NOMBRES_TECLA = {
   ArrowUp: "arriba", ArrowDown: "abajo",
   ArrowLeft: "izquierda", ArrowRight: "derecha",
@@ -815,13 +742,10 @@ document.addEventListener("keydown", e => {
   if (!corriendo || e.ctrlKey || e.metaKey || e.altKey) return;
   const t = nombreDeTecla(e);
   if (!t) return;
-  // Sin esto, las flechas y el espacio mueven la página mientras juegas.
   if (e.key.startsWith("Arrow") || e.key === " ") e.preventDefault();
   trabajador.postMessage({ tipo: "tecla", tecla: t });
 });
 
-// Al abrir manda el enlace, si viene con un programa dentro; si no, lo que
-// quedó escrito la última vez; y si tampoco hay nada, el primer ejemplo.
 if (!cargarDelEnlace() && !recuperarPrograma()) cargar(0);
 $("guardado").textContent = "";
 

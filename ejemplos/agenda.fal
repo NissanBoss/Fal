@@ -1,6 +1,3 @@
-# Una agenda de contactos que se guarda en disco.
-# Junta: objetos, listas, archivos, errores y un menu.
-
 tipo Contacto con nombre y telefono
     funcion linea
         devuelve nombre de mi mas ";" mas telefono de mi
