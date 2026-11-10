@@ -238,6 +238,10 @@ section .sumario {
   margin: 0 0 40px; max-width: 32em; text-wrap: balance;
 }
 section p { max-width: 36em; text-wrap: pretty; }
+@media (max-width: 560px) {
+  section h2 { font-size: 34px; }
+  section .sumario { font-size: 19px; text-wrap: pretty; margin-bottom: 32px; }
+}
 
 .hoja {
   background: var(--caja); border: 1px solid var(--borde);
@@ -248,6 +252,13 @@ section p { max-width: 36em; text-wrap: pretty; }
   border-bottom: 1px solid var(--borde); scrollbar-width: none;
 }
 .pestanas::-webkit-scrollbar { display: none; }
+@media (max-width: 560px) {
+  .cuaderno .pestanas {
+    padding-right: 36px;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+  }
+}
 .pestanas button {
   font: 14.5px/1 var(--sans); color: var(--suave); background: none; border: 0;
   padding: 16px 12px 14px; cursor: pointer; white-space: nowrap;
@@ -381,7 +392,14 @@ table.compara th {
 table.compara td { padding: 14px 12px 14px 0; border-bottom: 1px solid var(--borde); vertical-align: top; font: 15.5px/1.5 var(--mono); }
 table.compara td.otro { color: var(--suave); }
 table.compara .nada { font: italic 15px var(--serif); }
-@media (max-width: 560px) { table.compara td { font-size: 13px; } }
+@media (max-width: 560px) {
+  table.compara, table.compara thead, table.compara tbody, table.compara tr, table.compara td { display: block; }
+  table.compara thead tr { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--borde); padding-bottom: 12px; }
+  table.compara th { padding: 0; border: 0; }
+  table.compara tbody tr { padding: 14px 0; border-bottom: 1px solid var(--borde); }
+  table.compara td { padding: 0; border: 0; font-size: 15px; }
+  table.compara td.otro { margin-top: 4px; font-size: 13.5px; }
+}
 .selector { display: inline-flex; border: 1px solid var(--borde); border-radius: 8px; padding: 2px; gap: 2px; }
 .selector button {
   font: 14px/1 var(--sans); border: 0; background: none; color: var(--suave);
@@ -395,6 +413,12 @@ table.compara .nada { font: italic 15px var(--serif); }
 .recuento b { font: 500 64px/0.9 var(--serif); font-variant-numeric: tabular-nums lining-nums; }
 .recuento .de-otro b { color: var(--tierra); }
 .recuento span { font-size: 15px; color: var(--suave); max-width: 13em; line-height: 1.4; }
+@media (max-width: 560px) {
+  .recuento { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .recuento div { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .recuento b { font-size: 56px; }
+  .recuento span { font-size: 14px; }
+}
 
 ol.reglas {
   padding: 0; margin: 0; list-style: none; counter-reset: r;
@@ -417,6 +441,7 @@ ol.reglas s { text-decoration-color: var(--tierra); text-decoration-thickness: 2
 
 .pestanas.sueltas { padding: 0; margin-bottom: 26px; }
 .pestanas.sueltas button { padding-left: 0; padding-right: 0; margin-right: 26px; font-size: 15.5px; }
+@media (max-width: 560px) { .pestanas.sueltas button { margin-right: 18px; font-size: 14.5px; } }
 .par { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.45fr); gap: 24px; align-items: start; }
 .par[hidden] { display: none; }
 @media (max-width: 860px) { .par { grid-template-columns: 1fr; } }
@@ -440,6 +465,7 @@ pre.fallo .x { color: var(--tierra); font-weight: 600; }
 pre.fallo .pista { color: var(--tinta); font-weight: 600; }
 pre.fallo .ln { color: var(--tierra); }
 pre.fallo .cm { color: var(--azul); }
+@media (max-width: 560px) { pre.fallo { padding: 14px 16px; font-size: 13px; } }
 .al-pie { font-size: 14px; color: var(--suave); margin: 16px 2px 0; }
 
 .peros { background: var(--caja); border: 1px solid var(--borde); border-left: 3px solid var(--tierra); border-radius: 0 12px 12px 0; padding: 28px 30px; max-width: 46em; }
@@ -507,7 +533,11 @@ footer a { color: var(--suave); }
 footer a:hover { color: var(--tinta); }
 footer .lejos { margin-left: auto; font: italic 17px var(--serif); }
 footer .colofon { width: 100%; font-size: 13px; margin-top: 6px; }
-@media (max-width: 640px) { footer .lejos { margin-left: 0; width: 100%; } }
+@media (max-width: 640px) {
+  footer .centro { gap: 12px 18px; }
+  footer .centro > span:first-child { width: 100%; }
+  footer .lejos { margin-left: 0; width: 100%; margin-top: 8px; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
