@@ -902,3 +902,56 @@ escribe elemento 1 de imagen
 		t.Error("un 256 no es un byte")
 	}
 }
+
+// El cuarto de vuelta de ChaCha20 con los numeros del RFC 8439 (2.1.1). Si
+// sale bien, las tres operaciones hacen lo que dicen, incluido que la suma
+// de la vuelta al pasar de 32 bits.
+func TestNucleoBitsDobles(t *testing.T) {
+	salida, reventado := arrancarEnQemu(t, `
+s es region con 2097152 y 4 y 8
+elemento 1 de s es 286331153
+elemento 2 de s es 16909060
+elemento 3 de s es 2609737539
+elemento 4 de s es 19088743
+funcion mezcla con a y b y n
+    elemento a de s es gira_doble con (o_exclusivo con (elemento a de s) y (elemento b de s)) y n
+fin
+funcion suma con a y b
+    elemento a de s es suma_doble con (elemento a de s) y (elemento b de s)
+fin
+suma con 1 y 2
+mezcla con 4 y 1 y 16
+suma con 3 y 4
+mezcla con 2 y 3 y 12
+suma con 1 y 2
+mezcla con 4 y 1 y 8
+suma con 3 y 4
+mezcla con 2 y 3 y 7
+para cada i desde 1 hasta 4
+    escribe elemento i de s
+fin
+escribe suma_doble con 4294967295 y 2
+escribe gira_doble con 2147483648 y 1
+escribe o_exclusivo con 4294967295 y 0
+`)
+	if reventado {
+		t.Fatalf("revento:\n%s", salida)
+	}
+	if salida != "3928658676\n3407673550\n1166100270\n1484899515\n1\n1\n4294967295\n" {
+		t.Errorf("el cuarto de vuelta no da lo del RFC:\n%q", salida)
+	}
+}
+
+func TestNucleoBitsDoblesFuera(t *testing.T) {
+	for _, programa := range []string{
+		"escribe o_exclusivo con (0 menos 1) y 3",
+		"escribe suma_doble con 4294967296 y 0",
+		"escribe gira_doble con 5 y 32",
+		`escribe o_exclusivo con "a" y 3`,
+	} {
+		salida, reventado := arrancarEnQemu(t, programa)
+		if !reventado {
+			t.Errorf("%s no revento:\n%q", programa, salida)
+		}
+	}
+}

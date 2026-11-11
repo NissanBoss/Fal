@@ -171,6 +171,12 @@ func (e *ensamblador) imul(dst, src int) { e.bytes(0x48, 0x0F, 0xAF, 0xC0|byte(d
 func (e *ensamblador) cqo()              { e.bytes(0x48, 0x99) }
 func (e *ensamblador) idiv(r int)        { e.bytes(0x48, 0xF7, 0xF8|byte(r)) }
 func (e *ensamblador) neg(r int)         { e.bytes(0x48, 0xF7, 0xD8|byte(r)) }
+func (e *ensamblador) xor(dst, src int)  { e.bytes(0x48, 0x31, 0xC0|byte(src)<<3|byte(dst)) }
+
+// En 32 bits el procesador pone a cero la mitad de arriba: la suma da la
+// vuelta sola y el giro no arrastra bits de fuera.
+func (e *ensamblador) add32(dst, src int) { e.bytes(0x01, 0xC0|byte(src)<<3|byte(dst)) }
+func (e *ensamblador) rol32(r int)        { e.bytes(0xD3, 0xC0|byte(r)) } // rol r32, cl
 
 func (e *ensamblador) shl(r int, n byte) { e.bytes(0x48, 0xC1, 0xE0|byte(r), n) }
 func (e *ensamblador) shr(r int, n byte) { e.bytes(0x48, 0xC1, 0xE8|byte(r), n) }

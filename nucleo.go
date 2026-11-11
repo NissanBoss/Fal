@@ -256,6 +256,9 @@ var integradasNucleo = map[string][2]int{
 	"pon_doble":        {2, 2},
 	"lee_doble":        {1, 1},
 	"copia_region":     {5, 5},
+	"o_exclusivo":      {2, 2},
+	"suma_doble":       {2, 2},
+	"gira_doble":       {2, 2},
 }
 
 // Lo que no tiene sentido en un programa porque habla de cosas que solo

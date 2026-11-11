@@ -609,6 +609,41 @@ func (c *compiladorNucleo) division(op string, ln int, desborda etiqueta) {
 	e.movImm(rax, etiquetaNumero)
 }
 
+// bitsDoble trabaja con palabras de 32 bits sin signo, que es con lo que se
+// cifra (ChaCha20 no necesita mas). Fuera de ese rango revienta en vez de
+// recortar en silencio: un numero negativo aqui casi siempre es un fallo de
+// quien lo llama, y cifrar con un fallo no avisa nunca.
+func (c *compiladorNucleo) bitsDoble(nombre string, args []Expresion, ln int) *ErrorFal {
+	e := c.e
+	if err := c.dosValores(args[0], args[1]); err != nil {
+		return err
+	}
+	mensaje := `"` + nombre + `" trabaja con numeros de 32 bits: de 0 a 4294967295.`
+	c.exige(rax, etiquetaNumero, ln, mensaje, "")
+	c.exige(rcx, etiquetaNumero, ln, mensaje, "")
+	fuera := c.panico(ln, mensaje, "")
+	e.movImm(rcx, 4294967295)
+	for _, r := range []int{rdx, rbx} {
+		e.cmpImm(r, 0)
+		e.jcc(siMenor, fuera)
+		e.cmp(r, rcx)
+		e.jcc(siMayor, fuera)
+	}
+	switch nombre {
+	case "o_exclusivo":
+		e.xor(rdx, rbx)
+	case "suma_doble":
+		e.add32(rdx, rbx)
+	case "gira_doble":
+		e.cmpImm(rbx, 31)
+		e.jcc(siMayor, c.panico(ln, `"gira_doble" gira de 0 a 31 bits.`, ""))
+		e.mov(rcx, rbx)
+		e.rol32(rdx)
+	}
+	e.movImm(rax, etiquetaNumero)
+	return nil
+}
+
 var comoSeDice = map[string]string{
 	">": "mayor que", ">=": "mayor o igual que", "<": "menor que", "<=": "menor o igual que",
 }
@@ -810,6 +845,9 @@ func (c *compiladorNucleo) integrada(nombre string, args []Expresion, ln int) *E
 
 	case "copia_region":
 		return c.copiaRegion(args, ln)
+
+	case "o_exclusivo", "suma_doble", "gira_doble":
+		return c.bitsDoble(nombre, args, ln)
 
 	case "congela":
 		// En las pruebas, que el preludio congele es que algo revento.

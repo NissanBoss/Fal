@@ -69,6 +69,9 @@ Para la parte entera está `cociente con 7 y 2`, y para lo que sobra,
 | `pon_en_puerto con p y v` | manda un byte a un puerto |
 | `pon_palabra con p y v` | manda 16 bits a un puerto |
 | `pon_doble con p y v`, `lee_doble de p` | manda o lee 32 bits, como pide el bus PCI |
+| `o_exclusivo con a y b` | el o exclusivo bit a bit de dos números de 32 bits |
+| `suma_doble con a y b` | la suma que da la vuelta al pasar de 32 bits |
+| `gira_doble con x y n` | gira `x` `n` bits a la izquierda dentro de 32 bits |
 | `copia_region con d y i y o y j y n` | copia `n` elementos de `o` desde `j` a `d` desde `i`, de golpe y comprobado |
 | `congela` | para el procesador para siempre |
 | `atiende_interrupcion con n y f` | la función `f` atiende la interrupción `n` |
