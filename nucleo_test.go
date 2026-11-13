@@ -955,3 +955,88 @@ func TestNucleoBitsDoblesFuera(t *testing.T) {
 		}
 	}
 }
+
+// Lo que pide BLAKE2b: sumar y multiplicar dando la vuelta a los 64 bits, y
+// partir un numero en sus dos mitades sin signo.
+func TestNucleoCuadruples(t *testing.T) {
+	salida, reventado := arrancarEnQemu(t, `
+escribe suma_cuadruple con 9223372036854775807 y 1
+escribe producto_cuadruple con 4294967296 y 4294967296
+escribe producto_cuadruple con 3 y (0 menos 1)
+escribe o_exclusivo_cuadruple con (0 menos 1) y 0
+escribe gira_cuadruple con 1 y 63
+escribe gira_cuadruple con (0 menos 2) y 1
+escribe mitad_baja con (0 menos 1)
+escribe mitad_alta con (0 menos 1)
+escribe mitad_alta con 4294967296
+`)
+	if reventado {
+		t.Fatalf("revento:\n%s", salida)
+	}
+	quiero := "-9223372036854775808\n0\n-3\n-1\n-9223372036854775808\n-3\n4294967295\n4294967295\n1\n"
+	if salida != quiero {
+		t.Errorf("las cuentas de 64 bits no dan:\n%q", salida)
+	}
+}
+
+func TestNucleoCuadruplesFuera(t *testing.T) {
+	for _, programa := range []string{
+		"escribe gira_cuadruple con 5 y 64",
+		"escribe gira_cuadruple con 5 y (0 menos 1)",
+		`escribe suma_cuadruple con "a" y 3`,
+		`escribe mitad_baja con verdadero`,
+	} {
+		salida, reventado := arrancarEnQemu(t, programa)
+		if !reventado {
+			t.Errorf("%s no revento:\n%q", programa, salida)
+		}
+	}
+}
+
+// El QEMU de las pruebas no siempre trae RDRAND. Si lo trae, dos numeros
+// seguidos no salen iguales; si no, azar_del_procesador revienta en vez de
+// devolver algo que parezca azar.
+func TestNucleoAzar(t *testing.T) {
+	salida, reventado := arrancarEnQemu(t, `
+si hay_azar
+    escribe (azar_del_procesador) no es igual a (azar_del_procesador)
+si no
+    escribe "sin azar"
+    escribe azar_del_procesador
+fin
+`)
+	switch {
+	case salida == "verdadero\n" && !reventado:
+	case strings.HasPrefix(salida, "sin azar\n") && reventado:
+	default:
+		t.Errorf("el azar no se porta:\n%q (reventado %v)", salida, reventado)
+	}
+}
+
+func TestNucleoUsa(t *testing.T) {
+	salida, reventado := arrancarConProgramas(t, `usa "comun/dobla.fal"
+escribe dobla de 21
+escribe dobla de (dobla de 1)
+`, map[string]string{"comun/dobla.fal": "funcion dobla con x\n    devuelve x mas x\nfin\n"})
+	if reventado || salida != "42\n4\n" {
+		t.Errorf("usa no trae la funcion:\n%q", salida)
+	}
+}
+
+func TestNucleoUsaSoloFunciones(t *testing.T) {
+	archivos := map[string]string{
+		"global.fal": "cuenta es 3\nfuncion dobla con x\n    devuelve x mas x\nfin\n",
+		"roto.fal":   "funcion dobla con x\n    devuelve x mas\nfin\n",
+	}
+	for programa, quiero := range map[string]string{
+		`usa "global.fal"`:                          "solo puede tener funciones",
+		`usa "roto.fal"`:                            "roto.fal, linea 2",
+		`usa "no_esta.fal"`:                         "No pude abrir",
+		"si verdadero\n    usa \"global.fal\"\nfin": "arriba del todo",
+	} {
+		_, err := compilarImagen(programa, opcionesNucleo{prueba: true, leer: leerDe(archivos)})
+		if err == nil || !strings.Contains(err.Mensaje, quiero) {
+			t.Errorf("%q: quiero un error con %q y sale %v", programa, quiero, err)
+		}
+	}
+}

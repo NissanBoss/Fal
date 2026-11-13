@@ -151,7 +151,9 @@ func (c *compiladorNucleo) instruccion(ins Instruccion) *ErrorFal {
 	case *InsIntenta, *InsRelanza:
 		return noHayTodavia(`"intenta"`, ln)
 	case *InsUsa:
-		return noHayTodavia(`"usa": el nucleo se compila de un solo archivo`, ln)
+		if u, _ := ins.(*InsUsa); !c.usados[u] {
+			return nuevoError(`"usa" va arriba del todo, fuera de cualquier bloque.`, ln, "", ClaseSintaxis)
+		}
 	case *InsAgrega, *InsQuita:
 		return noHayTodavia("listas", ln)
 	default:
@@ -644,6 +646,49 @@ func (c *compiladorNucleo) bitsDoble(nombre string, args []Expresion, ln int) *E
 	return nil
 }
 
+// bitsCuadruple trabaja con los 64 bits enteros, que es con lo que van BLAKE2b
+// y Argon2. Aqui un negativo es solo un numero con el bit de arriba puesto, y
+// dar la vuelta es justo lo que se quiere, asi que no revienta por eso.
+func (c *compiladorNucleo) bitsCuadruple(nombre string, args []Expresion, ln int) *ErrorFal {
+	e := c.e
+	if err := c.dosValores(args[0], args[1]); err != nil {
+		return err
+	}
+	mensaje := `"` + nombre + `" trabaja con numeros enteros.`
+	c.exige(rax, etiquetaNumero, ln, mensaje, "")
+	c.exige(rcx, etiquetaNumero, ln, mensaje, "")
+	switch nombre {
+	case "suma_cuadruple":
+		e.add(rdx, rbx)
+	case "producto_cuadruple":
+		e.imul(rdx, rbx)
+	case "o_exclusivo_cuadruple":
+		e.xor(rdx, rbx)
+	case "gira_cuadruple":
+		fuera := c.panico(ln, `"gira_cuadruple" gira de 0 a 63 bits.`, "")
+		e.cmpImm(rbx, 0)
+		e.jcc(siMenor, fuera)
+		e.cmpImm(rbx, 63)
+		e.jcc(siMayor, fuera)
+		e.mov(rcx, rbx)
+		e.rol64(rdx)
+	}
+	e.movImm(rax, etiquetaNumero)
+	return nil
+}
+
+// miraAzar deja en rdx un 1 si el procesador sabe dar azar con RDRAND: es el
+// bit 30 de ecx en la hoja 1 de cpuid. cpuid pisa rbx y rcx, que aqui no
+// guardan nada entre una instruccion y otra.
+func (c *compiladorNucleo) miraAzar() {
+	e := c.e
+	e.movImm(rax, 1)
+	e.cpuid()
+	e.mov(rdx, rcx)
+	e.shr(rdx, 30)
+	e.andImm(rdx, 1)
+}
+
 var comoSeDice = map[string]string{
 	">": "mayor que", ">=": "mayor o igual que", "<": "menor que", "<=": "menor o igual que",
 }
@@ -848,6 +893,41 @@ func (c *compiladorNucleo) integrada(nombre string, args []Expresion, ln int) *E
 
 	case "o_exclusivo", "suma_doble", "gira_doble":
 		return c.bitsDoble(nombre, args, ln)
+
+	case "suma_cuadruple", "producto_cuadruple", "o_exclusivo_cuadruple", "gira_cuadruple":
+		return c.bitsCuadruple(nombre, args, ln)
+
+	case "mitad_baja", "mitad_alta":
+		if err := c.expr(args[0]); err != nil {
+			return err
+		}
+		c.exige(rax, etiquetaNumero, ln, `"`+nombre+`" parte un numero entero.`, "")
+		if nombre == "mitad_baja" {
+			e.mov32(rdx, rdx)
+		} else {
+			e.shr(rdx, 32)
+		}
+		e.movImm(rax, etiquetaNumero)
+
+	case "hay_azar":
+		c.miraAzar()
+		e.movImm(rax, etiquetaBooleano)
+
+	case "azar_del_procesador":
+		c.miraAzar()
+		e.cmpImm(rdx, 0)
+		e.jcc(siIgual, c.panico(ln, "Este procesador no tiene generador de azar.",
+			"Pregunta antes con hay_azar. En QEMU lo trae -cpu max."))
+		e.movImm(rcx, 10)
+		otra, listo := e.nueva(), e.nueva()
+		e.aqui(otra)
+		e.rdrand(rdx)
+		e.jcc(siDebajo, listo)
+		e.subImm(rcx, 1)
+		e.jcc(siDistinto, otra)
+		e.jmp(c.panico(ln, "El generador de azar del procesador no ha contestado en diez intentos.", ""))
+		e.aqui(listo)
+		e.movImm(rax, etiquetaNumero)
 
 	case "congela":
 		// En las pruebas, que el preludio congele es que algo revento.
@@ -1351,6 +1431,9 @@ func (c *compiladorNucleo) donde(linea int, pista string) string {
 	donde := "linea " + itoa(linea)
 	if c.enPreludio {
 		donde += " del preludio"
+	}
+	if c.ruta != "" {
+		donde += " de " + c.ruta
 	}
 	if linea >= 1 && linea <= len(c.lineas) {
 		donde += " |  " + strings.TrimSpace(c.lineas[linea-1])

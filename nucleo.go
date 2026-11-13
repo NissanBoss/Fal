@@ -44,6 +44,11 @@ type funcionNucleo struct {
 	linea    int
 	entrada  etiqueta
 	preludio bool
+	// Las que vienen de un archivo con "usa": sus lineas, para los avisos, y
+	// la linea del usa, para que el error señale algo del archivo compilado.
+	lineas []string
+	ruta   string
+	usaEn  int
 }
 
 type bucleNucleo struct{ sigue, sale etiqueta }
@@ -76,9 +81,12 @@ type compiladorNucleo struct {
 	// Los programas que el sistema lleva dentro, ya compilados.
 	incluidos map[string]int
 	imagenes  [][]byte
+	usados    map[*InsUsa]bool
+	yaUsados  map[string]bool
 
 	// Lo de la funcion que se esta compilando.
 	lineas     []string
+	ruta       string
 	enPreludio bool
 	arriba     bool // el cuerpo del programa, fuera de toda funcion
 	locales    map[string]int32
@@ -131,16 +139,21 @@ func compilarImagen(fuente string, op opcionesNucleo) ([]byte, *ErrorFal) {
 		textos:    map[string]string{},
 		incluidos: map[string]int{},
 		fallos:    map[string]bool{},
+		usados:    map[*InsUsa]bool{},
+		yaUsados:  map[string]bool{},
 	}
 	c.pilaRota, c.rtLugar, c.rtLee, c.rtPon, c.rtLargo = e.nueva(), e.nueva(), e.nueva(), e.nueva(), e.nueva()
 	c.atenciones = map[string]bool{}
 
 	lineasPreludio := strings.Split(textoPreludio, "\n")
 	lineasUsuario := strings.Split(fuente, "\n")
-	if err := c.recogerFunciones(preludio, true); err != nil {
+	if err := c.recogerFunciones(preludio, true, nil, "", 0); err != nil {
 		return nil, err
 	}
-	if err := c.recogerFunciones(usuario, false); err != nil {
+	if err := c.recogerUsados(usuario); err != nil {
+		return nil, err
+	}
+	if err := c.recogerFunciones(usuario, false, nil, "", 0); err != nil {
 		return nil, err
 	}
 	if err := c.recogerGlobales(preludio, true); err != nil {
@@ -176,11 +189,17 @@ func compilarImagen(fuente string, op opcionesNucleo) ([]byte, *ErrorFal) {
 	c.terminarFuncion()
 
 	for _, f := range c.orden {
-		c.lineas, c.enPreludio = lineasUsuario, f.preludio
+		c.lineas, c.enPreludio, c.ruta = lineasUsuario, f.preludio, f.ruta
 		if f.preludio {
 			c.lineas = lineasPreludio
 		}
+		if f.lineas != nil {
+			c.lineas = f.lineas
+		}
 		if err := c.funcion(f); err != nil {
+			if f.ruta != "" {
+				return nil, enArchivo(err, f.ruta, f.usaEn)
+			}
 			return nil, err
 		}
 	}
@@ -258,7 +277,16 @@ var integradasNucleo = map[string][2]int{
 	"copia_region":     {5, 5},
 	"o_exclusivo":      {2, 2},
 	"suma_doble":       {2, 2},
-	"gira_doble":       {2, 2},
+
+	"suma_cuadruple":        {2, 2},
+	"producto_cuadruple":    {2, 2},
+	"o_exclusivo_cuadruple": {2, 2},
+	"gira_cuadruple":        {2, 2},
+	"mitad_baja":            {1, 1},
+	"mitad_alta":            {1, 1},
+	"hay_azar":              {0, 0},
+	"azar_del_procesador":   {0, 0},
+	"gira_doble":            {2, 2},
 }
 
 // Lo que no tiene sentido en un programa porque habla de cosas que solo
@@ -272,7 +300,62 @@ var soloEnElNucleo = map[string]bool{
 	"mapa_de_puertos": true,
 }
 
-func (c *compiladorNucleo) recogerFunciones(programa []Instruccion, preludio bool) *ErrorFal {
+// recogerUsados mete en el programa las funciones de los archivos que trae
+// con "usa". Solo funciones: el sistema y un programa comparten el cifrado, y
+// una global de ese archivo viviria en dos sitios distintos sin que se notara.
+func (c *compiladorNucleo) recogerUsados(programa []Instruccion) *ErrorFal {
+	for _, ins := range programa {
+		u, es := ins.(*InsUsa)
+		if !es {
+			continue
+		}
+		literal, es := u.Ruta.(*ExValor)
+		ruta := ""
+		if es {
+			ruta, es = literal.V.(string)
+		}
+		if !es || u.Apodo != "" {
+			return nuevoError(`En el nucleo, "usa" lleva solo la ruta, escrita entre comillas.`, u.Ln,
+				"Se junta al compilar, asi que no puede salir de una cuenta ni llevar apodo.", ClaseValor)
+		}
+		c.usados[u] = true
+		if c.yaUsados[ruta] {
+			continue
+		}
+		c.yaUsados[ruta] = true
+		if c.leer == nil {
+			return nuevoError(`Aqui no hay archivos que leer para "usa".`, u.Ln, "", ClaseValor)
+		}
+		fuente, e := c.leer(ruta)
+		if e != nil {
+			return nuevoError(`No pude abrir "`+ruta+`".`, u.Ln,
+				"La ruta se cuenta desde la carpeta del archivo que se compila.", ClaseValor)
+		}
+		fuente = quitarBOM(fuente)
+		piezas, err := armarFuente(fuente)
+		if err != nil {
+			return enArchivo(err, ruta, u.Ln)
+		}
+		for _, otra := range piezas {
+			if _, es := otra.(*InsFuncion); !es {
+				return enArchivo(nuevoError("Un archivo que se usa desde el nucleo solo puede tener funciones.",
+					otra.linea(), "Las constantes y las variables van en el archivo que lo usa.", ClaseSintaxis), ruta, u.Ln)
+			}
+		}
+		if err := c.recogerFunciones(piezas, false, strings.Split(fuente, "\n"), ruta, u.Ln); err != nil {
+			return enArchivo(err, ruta, u.Ln)
+		}
+	}
+	return nil
+}
+
+func enArchivo(err *ErrorFal, ruta string, ln int) *ErrorFal {
+	err.Mensaje = ruta + ", linea " + itoa(err.Linea) + ": " + err.Mensaje
+	err.Linea = ln
+	return err
+}
+
+func (c *compiladorNucleo) recogerFunciones(programa []Instruccion, preludio bool, lineas []string, ruta string, usaEn int) *ErrorFal {
 	for _, ins := range programa {
 		f, es := ins.(*InsFuncion)
 		if !es {
@@ -293,7 +376,8 @@ func (c *compiladorNucleo) recogerFunciones(programa []Instruccion, preludio boo
 		for _, p := range f.Parametros {
 			params = append(params, clave(p))
 		}
-		nueva := &funcionNucleo{nombre, params, f.Cuerpo, f.Ln, c.e.nueva(), preludio}
+		nueva := &funcionNucleo{nombre: nombre, params: params, cuerpo: f.Cuerpo, linea: f.Ln,
+			entrada: c.e.nueva(), preludio: preludio, lineas: lineas, ruta: ruta, usaEn: usaEn}
 		c.funciones[nombre] = nueva
 		c.orden = append(c.orden, nueva)
 	}

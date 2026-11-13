@@ -41,7 +41,9 @@ casillas de 2 bytes, la letra y su color.
 Un Fal más pequeño que el del intérprete:
 
 - **Números enteros** de 64 bits. Si una cuenta se sale, el programa se para y
-  lo dice; nunca da la vuelta en silencio.
+  lo dice; nunca da la vuelta en silencio. Para cifrar hace falta justo que la
+  dé, y para eso están las funciones `_doble` (32 bits) y `_cuadruple` (64):
+  ahí dar la vuelta es lo que se pide, y se ve en el nombre.
 - **Textos** escritos en el programa. Se leen byte a byte con `elemento`, se
   miden con `largo` y se recorren con `para cada`.
 - `verdadero`, `falso` y `nada`.
@@ -72,6 +74,12 @@ Para la parte entera está `cociente con 7 y 2`, y para lo que sobra,
 | `o_exclusivo con a y b` | el o exclusivo bit a bit de dos números de 32 bits |
 | `suma_doble con a y b` | la suma que da la vuelta al pasar de 32 bits |
 | `gira_doble con x y n` | gira `x` `n` bits a la izquierda dentro de 32 bits |
+| `suma_cuadruple con a y b`, `producto_cuadruple con a y b` | suman y multiplican dando la vuelta a los 64 bits |
+| `o_exclusivo_cuadruple con a y b` | el o exclusivo de los 64 bits enteros |
+| `gira_cuadruple con x y n` | gira `x` `n` bits a la izquierda dentro de 64 bits |
+| `mitad_baja de x`, `mitad_alta de x` | los 32 bits de abajo o los de arriba, sin signo |
+| `hay_azar` | si el procesador tiene generador de azar (RDRAND) |
+| `azar_del_procesador` | 64 bits al azar del procesador; si no lo tiene, revienta |
 | `copia_region con d y i y o y j y n` | copia `n` elementos de `o` desde `j` a `d` desde `i`, de golpe y comprobado |
 | `congela` | para el procesador para siempre |
 | `atiende_interrupcion con n y f` | la función `f` atiende la interrupción `n` |
@@ -309,8 +317,11 @@ iba a ejecutar y qué dirección quiso tocar.
   nada. Ampliarlo es cambiar las tablas de páginas, que también es trabajo
   del sistema.
 - **Funciones guardadas en variables, tipos y `intenta`.**
-- **Varios archivos.** Un núcleo es un solo `.fal`, más los programas que
-  incluya con `incluye_programa`, que van aparte.
+- **Módulos como los del intérprete.** `usa "ruta"` trae las funciones de otro
+  archivo y nada más: ni globales ni constantes, porque el sistema y un programa
+  que usen el mismo archivo tendrían cada uno las suyas en otro sitio, y eso no
+  se ve leyendo el código. La ruta se cuenta desde la carpeta del archivo que se
+  compila. Los programas aparte siguen yendo con `incluye_programa`.
 
 Si usas algo de esto, `fal --nucleo` lo dice al compilar, con la línea.
 

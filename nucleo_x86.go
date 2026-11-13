@@ -177,6 +177,11 @@ func (e *ensamblador) xor(dst, src int)  { e.bytes(0x48, 0x31, 0xC0|byte(src)<<3
 // vuelta sola y el giro no arrastra bits de fuera.
 func (e *ensamblador) add32(dst, src int) { e.bytes(0x01, 0xC0|byte(src)<<3|byte(dst)) }
 func (e *ensamblador) rol32(r int)        { e.bytes(0xD3, 0xC0|byte(r)) } // rol r32, cl
+func (e *ensamblador) rol64(r int)        { e.bytes(0x48, 0xD3, 0xC0|byte(r)) }
+func (e *ensamblador) mov32(dst, src int) { e.bytes(0x89, 0xC0|byte(src)<<3|byte(dst)) }
+
+func (e *ensamblador) cpuid()       { e.bytes(0x0F, 0xA2) }
+func (e *ensamblador) rdrand(r int) { e.bytes(0x48, 0x0F, 0xC7, 0xF0|byte(r)) }
 
 func (e *ensamblador) shl(r int, n byte) { e.bytes(0x48, 0xC1, 0xE0|byte(r), n) }
 func (e *ensamblador) shr(r int, n byte) { e.bytes(0x48, 0xC1, 0xE8|byte(r), n) }
