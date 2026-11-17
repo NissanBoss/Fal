@@ -70,8 +70,34 @@
       </div>
     </div>
     <figure>
-      <div class="pantalla"><img src="falos/dia-16.png" width="960" height="600" alt="busca pide permiso para preguntar al DNS, y con deja 1 le llegan las direcciones de fal-lang.org"></div>
-      <figcaption>Día 16: <code>busca</code> quiere preguntar al DNS. Hasta que le dejas, no sale nada.</figcaption>
+      <div class="pantalla consola" id="consola" role="img" aria-label="busca pide permiso para preguntar al DNS por fal-lang.org; con deja 1 puede hablar con esa dirección y con nadie más">
+        <div class="barra" aria-hidden="true">
+          <span>FalOS</span>
+          <span class="aviso" id="aviso">busca habla con 10.0.2.3</span>
+          <span class="hora" id="hora">15:46 UTC</span>
+          <span>día 16</span>
+        </div>
+<pre id="texto" aria-hidden="true"><span class="p">&gt;</span> lanza busca
+  <span class="g">busca: 30 KB leídos del disco. Nace sin permisos, en su propia caja.</span>
+
+  <span class="v">busca</span> quiere conectarse a 10.0.2.3, puerto 53 (DNS).
+  Mandaría 30 bytes. Si le dejas: deja 1. Si no: niega 1.
+  Hasta que me contestes, espera, y no sale nada.
+
+<span class="p">&gt;</span> deja 1
+  <span class="v">busca puede hablar con 10.0.2.3:53 hasta que se cierre. Con nadie más.</span>
+
+<span class="p">&gt;</span> <span class="cursor">_</span></pre>
+        <div class="ventana" id="ventana" aria-hidden="true">
+          <div class="titulo"><span id="ventanaNombre">1 busca</span><span class="x">x</span></div>
+<pre id="ventanaTexto">fal-lang.org esta en:
+  185.199.108.153
+  185.199.109.153
+  185.199.110.153
+  185.199.111.153</pre>
+        </div>
+      </div>
+      <figcaption id="pie">Día 16: <code>busca</code> quiere preguntar al DNS. Hasta que le dejas, no sale nada.</figcaption>
     </figure>
   </div>
 </header>
@@ -274,6 +300,162 @@ fal --arranca sistema.fal</pre>
     <span class="lejos">Hecho en español, a propósito.</span>
   </div>
 </footer>
+
+<script>
+const sinMovimiento = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const $consola = document.getElementById("consola");
+const $texto = document.getElementById("texto");
+const $aviso = document.getElementById("aviso");
+const $ventana = document.getElementById("ventana");
+const $ventanaNombre = document.getElementById("ventanaNombre");
+const $ventanaTexto = document.getElementById("ventanaTexto");
+const $pie = document.getElementById("pie");
+const $hora = document.getElementById("hora");
+
+function ponerHora() {
+  const ahora = new Date();
+  const dos = n => String(n).padStart(2, "0");
+  $hora.textContent = `${dos(ahora.getUTCHours())}:${dos(ahora.getUTCMinutes())} UTC`;
+}
+ponerHora();
+setInterval(ponerHora, 20000);
+
+const ACTOS = [
+  {
+    pie: 'Día 16: <code>busca</code> quiere preguntar al DNS. Hasta que le dejas, no sale nada.',
+    programa: "busca",
+    orden: "lanza busca",
+    pide: [
+      '  <span class="g">busca: 30 KB leídos del disco. Nace sin permisos, en su propia caja.</span>',
+      "",
+      '  <span class="v">busca</span> quiere conectarse a 10.0.2.3, puerto 53 (DNS).',
+      "  Mandaría 30 bytes. Si le dejas: deja 1. Si no: niega 1.",
+      "  Hasta que me contestes, espera, y no sale nada."
+    ],
+    ventana: "pregunto al DNS por fal-lang.org",
+    respuesta: "deja 1",
+    decide: '  <span class="v">busca puede hablar con 10.0.2.3:53 hasta que se cierre. Con nadie más.</span>',
+    aviso: true,
+    despues: "fal-lang.org esta en:\n  185.199.108.153\n  185.199.109.153\n  185.199.110.153\n  185.199.111.153"
+  },
+  {
+    pie: 'Día 16: <code>chivato</code> quiere contar lo que haces. Le dices que no, y no sale ni una trama.',
+    programa: "chivato",
+    orden: "lanza chivato",
+    pide: [
+      '  <span class="g">chivato: 21 KB leídos del disco. Nace sin permisos, en su propia caja.</span>',
+      "",
+      '  <span class="v">chivato</span> quiere conectarse a 203.0.113.66, puerto 4444.',
+      "  Mandaría 24 bytes. Si le dejas: deja 1. Si no: niega 1.",
+      "  Hasta que me contestes, espera, y no sale nada."
+    ],
+    ventana: "quiero contarle a un servidor\nlo que haces en FalOS",
+    respuesta: "niega 1",
+    decide: '  <span class="r">chivato no se conectará a 203.0.113.66:4444. No ha salido nada.</span>',
+    aviso: false,
+    despues: "quiero contarle a un servidor\nlo que haces en FalOS\n  no me dejan"
+  }
+];
+
+let lineas = [];
+let vuelta = 0;
+let enPantalla = false;
+let turno = 0;
+
+const CURSOR = '<span class="p">&gt;</span> <span class="cursor">_</span>';
+
+function pintar(conCursor) {
+  $texto.innerHTML = lineas.join("\n") + (conCursor ? "\n" + CURSOR : "");
+}
+
+function esperar(ms, mia) {
+  return new Promise((bien, mal) => setTimeout(() => (mia === vuelta ? bien() : mal()), ms));
+}
+
+async function teclear(orden, mia) {
+  lineas.push('<span class="p">&gt;</span> ');
+  const n = lineas.length - 1;
+  for (const letra of orden) {
+    await esperar(55 + Math.random() * 70, mia);
+    lineas[n] += letra;
+    $texto.innerHTML = lineas.join("\n") + '<span class="cursor">_</span>';
+  }
+  await esperar(380, mia);
+}
+
+async function representar(n) {
+  const mia = ++vuelta;
+  const acto = ACTOS[n];
+  turno = n;
+  lineas = [];
+  $texto.style.opacity = 1;
+  $aviso.classList.remove("encendido");
+  $ventana.classList.add("escondida");
+  $pie.innerHTML = acto.pie;
+  pintar(true);
+  try {
+    await esperar(900, mia);
+    await teclear(acto.orden, mia);
+    lineas.push(acto.pide[0]);
+    pintar(false);
+    await esperar(350, mia);
+    $ventanaNombre.textContent = "1 " + acto.programa;
+    $ventanaTexto.textContent = acto.ventana;
+    $ventana.classList.remove("escondida");
+    await esperar(500, mia);
+    for (const linea of acto.pide.slice(1)) {
+      lineas.push(linea);
+      pintar(false);
+      await esperar(120, mia);
+    }
+    lineas.push("");
+    pintar(true);
+    await esperar(2200, mia);
+    await teclear(acto.respuesta, mia);
+    lineas.push(acto.decide, "");
+    pintar(true);
+    if (acto.aviso) $aviso.classList.add("encendido");
+    await esperar(450, mia);
+    $ventanaTexto.textContent = acto.despues;
+    await esperar(3000, mia);
+    $aviso.classList.remove("encendido");
+    await esperar(2600, mia);
+    $texto.style.opacity = 0;
+    $ventana.classList.add("escondida");
+    await esperar(500, mia);
+  } catch (e) {
+    return;
+  }
+  if (enPantalla) representar((n + 1) % ACTOS.length);
+}
+
+if ("IntersectionObserver" in window && !sinMovimiento) {
+  $texto.style.transition = "opacity .4s";
+  const vigiaConsola = new IntersectionObserver(entradas => {
+    const antes = enPantalla;
+    enPantalla = entradas[0].isIntersecting && !document.hidden;
+    if (enPantalla && !antes) representar(turno);
+    if (!enPantalla) vuelta++;
+  }, { threshold: 0.4 });
+  vigiaConsola.observe($consola);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { enPantalla = false; vuelta++; }
+    else if ($consola.getBoundingClientRect().bottom > 0) { enPantalla = true; representar(turno); }
+  });
+
+  const tarjetas = document.querySelectorAll(".dias li, .reglas div");
+  tarjetas.forEach(t => t.classList.add("aparece"));
+  const vigiaTarjetas = new IntersectionObserver(entradas => {
+    for (const e of entradas) {
+      if (!e.isIntersecting) continue;
+      e.target.classList.add("visto");
+      vigiaTarjetas.unobserve(e.target);
+    }
+  }, { rootMargin: "0px 0px -8% 0px" });
+  tarjetas.forEach(t => vigiaTarjetas.observe(t));
+}
+</script>
 
 </body>
 </html>
