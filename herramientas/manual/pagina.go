@@ -215,6 +215,7 @@ main { padding: 34px 48px 100px; min-width: 0; }
       <a href="probar.html">Probar</a>
       <a href="https://aprende.fal-lang.org">Aprender</a>
       <a href="https://foro.fal-lang.org/">Foro</a>
+      <a href="/falos">FalOS</a>
       <a class="opcional" href="manual.html" aria-current="page">Manual</a>
       <a class="opcional" href="https://github.com/NissanBoss/Fal">Código</a>
     </div>

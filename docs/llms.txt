@@ -28,6 +28,7 @@ Lo que cuesta, dicho por los autores: en cuanto una expresión crece, escribirla
 
 - [Repositorio](https://github.com/NissanBoss/Fal): el intérprete, escrito en Go sin una sola dependencia externa.
 - [Descargas](https://github.com/NissanBoss/Fal/releases): un ejecutable por sistema, para Windows, Mac y Linux.
+- [FalOS](https://fal-lang.org/falos): un sistema operativo de 64 bits escrito desde cero en Fal, un paso cada día. Ningún programa sale a la red, guarda en el disco ni recibe teclas sin permiso de quien lo usa. El código está en [github.com/NissanBoss/FalOS](https://github.com/NissanBoss/FalOS).
 
 ## Opcional
 

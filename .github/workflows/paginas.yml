@@ -55,6 +55,7 @@ jobs:
             for par in "/:docs/index.html:1.0" \
                        "/manual.html:MANUAL.md:0.9" \
                        "/probar.html:docs/probar.html:0.8" \
+                       "/falos:docs/falos.html:0.8" \
                        "/aviso-legal.html:docs/aviso-legal.html:0.2" \
                        "/privacidad.html:docs/privacidad.html:0.2" \
                        "/cookies.html:docs/cookies.html:0.2"; do

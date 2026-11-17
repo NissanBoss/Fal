@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FalOS, un sistema operativo escrito en Fal</title>
+<meta name="description" content="Un sistema operativo hecho desde cero en Fal, un lenguaje de programación en español. Ningún programa sale a la red, guarda en el disco ni ve tus teclas sin que tú lo digas. Un paso cada día.">
+<link rel="canonical" href="https://fal-lang.org/falos">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="fuentes/newsreader.woff2" as="font" type="font/woff2" crossorigin>
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16171a" media="(prefers-color-scheme: dark)">
+<meta property="og:image" content="https://fal-lang.org/falos/vista-previa.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="FalOS, un sistema operativo que pregunta antes: el programa busca pide permiso para preguntar al DNS.">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:title" content="FalOS, un sistema operativo escrito en Fal">
+<meta property="og:description" content="Hecho desde cero en un lenguaje en español. Ningún programa sale a la red ni toca tus cosas sin tu permiso.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fal-lang.org/falos">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "FalOS",
+  "description": "Un sistema operativo de 64 bits escrito desde cero en Fal, un lenguaje de programación en español. Cada programa corre en su caja, sin permisos, y no sale a la red ni guarda en el disco sin preguntar.",
+  "inLanguage": "es",
+  "url": "https://fal-lang.org/falos",
+  "codeRepository": "https://github.com/NissanBoss/FalOS",
+  "programmingLanguage": { "@type": "ComputerLanguage", "name": "Fal", "url": "https://fal-lang.org/" },
+  "license": "https://opensource.org/licenses/MIT"
+}
+</script>
+<link rel="stylesheet" href="comun.css">
+<link rel="stylesheet" href="falos.css">
+</head>
+<body>
+
+<nav class="sitio">
+  <div class="centro fila">
+    <a class="marca" href="/">Fal<span>.</span></a>
+    <div class="enlaces">
+      <a href="/probar.html">Probar</a>
+      <a href="https://aprende.fal-lang.org/">Aprender</a>
+      <a href="https://foro.fal-lang.org/">Foro</a>
+      <a href="/falos" aria-current="page">FalOS</a>
+      <a class="opcional" href="/manual.html">Manual</a>
+      <a class="opcional" href="https://github.com/NissanBoss/FalOS">Código</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<header class="cabeza-os">
+  <div class="centro dos">
+    <div>
+      <span class="versalitas">Un sistema operativo escrito en Fal</span>
+      <h1>FalOS<span>.</span></h1>
+      <p class="entrada">Hecho desde cero, en un lenguaje en español, un paso cada
+      día. <em>Ningún programa sale a la red, guarda en el disco ni ve tus teclas
+      sin que tú lo digas.</em></p>
+      <div class="botones">
+        <a class="boton lleno" href="https://github.com/NissanBoss/FalOS">Ver el código</a>
+        <a class="boton" href="#dias">Día a día</a>
+        <a class="boton gris" href="https://www.tiktok.com/@fal.lang">En TikTok</a>
+      </div>
+    </div>
+    <figure>
+      <div class="pantalla"><img src="falos/dia-16.png" width="960" height="600" alt="busca pide permiso para preguntar al DNS, y con deja 1 le llegan las direcciones de fal-lang.org"></div>
+      <figcaption>Día 16: <code>busca</code> quiere preguntar al DNS. Hasta que le dejas, no sale nada.</figcaption>
+    </figure>
+  </div>
+</header>
+
+<section class="bloque">
+  <div class="centro">
+    <h2>Por qué</h2>
+    <p>Casi todo lo que corre debajo de tus programas está escrito en C, y C deja
+    leer y escribir la memoria fuera de donde toca. De ahí salen la mayoría de los
+    agujeros graves: Microsoft y Chromium calculan que son cerca del 70 % de los
+    que corrigen. En Fal, salirse de la memoria no es un descuido posible: es un
+    error que para el sistema y dice en qué línea.</p>
+    <p>Y aprender cómo funciona un sistema operativo por dentro pasa casi siempre
+    por leer C y leer inglés. FalOS se lee en español, de principio a fin.</p>
+    <div class="reglas">
+      <div>
+        <b>Nada sin preguntarte</b>
+        <p>Para guardar en el disco o salir a la red, el programa espera a que digas
+        que sí. Y tus teclas solo le llegan si le das el teclado.</p>
+      </div>
+      <div>
+        <b>Cada programa en su caja</b>
+        <p>Corren en el anillo 3, sin permisos, cada uno con su memoria. Si tocan lo
+        que no deben, el procesador los para.</p>
+      </div>
+      <div>
+        <b>Y una prueba que lo graba</b>
+        <p>Cada vez que se sube código, una prueba arranca FalOS, intenta romperlo y
+        graba lo que sale por la tarjeta de red.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bloque" id="dias">
+  <div class="centro">
+    <h2>Día a día</h2>
+    <p>Empezó el 2 de noviembre de 2026. Cada día, un paso que se pueda ver, subido
+    al repositorio y contado en el <a href="https://github.com/NissanBoss/FalOS/blob/main/DIARIO.md">diario</a>,
+    con lo que costó.</p>
+    <ol class="dias" reversed>
+      <li>
+        <div class="pantalla"><img src="falos/dia-16.png" width="960" height="600" loading="lazy" alt="busca pide permiso para conectarse, y con deja 1 le llegan las direcciones"></div>
+        <p class="cuando versalitas">Día 16 · 17 de noviembre</p>
+        <h3>Un programa solo sale a la red si le dejas</h3>
+        <p>FalOS te dice quién quiere conectarse, a dónde y cuántos bytes mandaría.
+        Si le dejas, solo puede hablar con esa dirección; si quiere otra, vuelve a
+        preguntar.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-15.png" width="960" height="600" loading="lazy" alt="ping a 10.0.2.2: cuatro de cuatro, y sale porque lo has pedido tú"></div>
+        <p class="cuando versalitas">Día 15 · 16 de noviembre</p>
+        <h3>La red, y nada sale sin que lo pidas</h3>
+        <p>Una tarjeta de red con su controlador en su propia caja, y <code>ping</code>.
+        Al arrancar, FalOS no envía ni una trama.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-14.png" width="960" height="600" loading="lazy" alt="Modo invitado: veces guarda, pero solo en memoria, y el disco no se toca"></div>
+        <p class="cuando versalitas">Día 14 · 15 de noviembre</p>
+        <h3>Todo lo que se guarda va cifrado</h3>
+        <p>Cada programa con su clave, sin que lo pida ni lo pueda evitar. Y un modo
+        invitado que no escribe nada en el disco.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-13.png" width="960" height="600" loading="lazy" alt="Copiado de la consola y pegado en cambiazo: la barra dice cuánto le queda y dónde lo pegaste"></div>
+        <p class="cuando versalitas">Día 13 · 14 de noviembre</p>
+        <h3>Lo que copias solo lo ves tú</h3>
+        <p>Copiar y pegar sin que ningún programa pueda leerlo. A los 30 segundos se
+        borra solo.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-12.png" width="960" height="600" loading="lazy" alt="FalOS bloqueado: pide la contraseña, y los programas siguen sin ver tus teclas"></div>
+        <p class="cuando versalitas">Día 12 · 13 de noviembre</p>
+        <h3>Contraseña para entrar</h3>
+        <p>Bloqueado, los programas siguen corriendo pero no ven tus teclas ni pintan
+        en la pantalla. Las notas van con Argon2id, y firmadas.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-11.png" width="960" height="600" loading="lazy" alt="El registro: qué programa ha leído o guardado qué, cuándo, y qué decidiste tú"></div>
+        <p class="cuando versalitas">Día 11 · 12 de noviembre</p>
+        <h3>Quién ha tocado tus cosas</h3>
+        <p>Un registro de qué programa leyó o guardó qué, y cuándo. Y de lo que
+        decidiste tú.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-10.png" width="960" height="600" loading="lazy" alt="El bloc de notas acaba de guardar, y la barra dice quién está escribiendo en el disco"></div>
+        <p class="cuando versalitas">Día 10 · 11 de noviembre</p>
+        <h3>Notas cifradas con tu contraseña</h3>
+        <p>Un bloc de notas que guarda con ChaCha20. La barra de arriba dice qué
+        programa está usando el disco.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-9.png" width="960" height="600" loading="lazy" alt="La serpiente acaba de guardar el récord en el disco"></div>
+        <p class="cuando versalitas">Día 9 · 10 de noviembre</p>
+        <h3>Escribir en el disco, preguntando</h3>
+        <p>Un programa ya puede guardar en su archivo, pero la primera vez te pregunta.
+        La serpiente se acuerda de tu récord.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-8.png" width="960" height="600" loading="lazy" alt="La serpiente, en su ventana, con el teclado"></div>
+        <p class="cuando versalitas">Día 8 · 9 de noviembre</p>
+        <h3>Un juego escrito en Fal</h3>
+        <p>Una serpiente de 320 líneas, en su ventana. Solo le llegan tus teclas si
+        tú se las das.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-7.png" width="960" height="600" loading="lazy" alt="FalOS con cuatro programas, cada uno en su ventana"></div>
+        <p class="cuando versalitas">Día 7 · 8 de noviembre</p>
+        <h3>Ventanas y ratón</h3>
+        <p>Cada programa en su ventana, del color de su caja. Se mueven, se traen
+        delante y se cierran con el ratón.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-6.png" width="960" height="600" loading="lazy" alt="FalOS en modo gráfico"></div>
+        <p class="cuando versalitas">Día 6 · 7 de noviembre</p>
+        <h3>Gráficos, y su propia letra</h3>
+        <p>960 por 600 píxeles y una letra dibujada a mano, punto a punto. Los
+        programas ya se cargan del disco.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-5.png" width="960" height="600" loading="lazy" alt="FalOS lanza otro teclado después de que el suyo se cuelgue"></div>
+        <p class="cuando versalitas">Día 5 · 6 de noviembre</p>
+        <h3>El teclado sale del núcleo</h3>
+        <p>Ahora es un programa sin permisos, que traduce la ñ y las tildes él solo.
+        Si se cuelga, FalOS lanza otro.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-4.png" width="960" height="600" loading="lazy" alt="curioso consigue el secreto de caja"></div>
+        <p class="cuando versalitas">Día 4 · 5 de noviembre</p>
+        <h3>Los programas hablan, si les dejas</h3>
+        <p>Pueden mandarse mensajes, pero solo con permiso, y se lo quitas en el acto.
+        Un programa que prueba miles de llaves no abre nada.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-3.png" width="960" height="600" loading="lazy" alt="apaga intenta apagar el ordenador"></div>
+        <p class="cuando versalitas">Día 3 · 4 de noviembre</p>
+        <h3>Varias cosas a la vez</h3>
+        <p>Programas que trabajan mientras escribes, en el anillo 3. Uno intenta apagar
+        el ordenador, y el procesador lo para.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-2.png" width="960" height="600" loading="lazy" alt="La orden memoria"></div>
+        <p class="cuando versalitas">Día 2 · 3 de noviembre</p>
+        <h3>La memoria</h3>
+        <p>FalOS sabe cuánta tiene y la reparte en páginas de 4 KB. De 127 MB, él ocupa
+        524 KB.</p>
+      </li>
+      <li>
+        <div class="pantalla"><img src="falos/dia-1.png" width="960" height="600" loading="lazy" alt="FalOS al arrancar"></div>
+        <p class="cuando versalitas">Día 1 · 2 de noviembre</p>
+        <h3>Arrancar</h3>
+        <p>Pasa a 64 bits, escribe en la pantalla con tildes y ñ, lee el teclado y
+        duerme cuando no hay nada que hacer.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="bloque" id="probar">
+  <div class="centro">
+    <h2>Probarlo</h2>
+    <p>Hace falta <a href="https://go.dev/dl/">Go</a> para compilar Fal, y
+    <a href="https://www.qemu.org/download/">QEMU</a> para tener un ordenador virtual.</p>
+<pre class="orden">git clone https://github.com/NissanBoss/Fal
+cd Fal && go build -o fal .</pre>
+<pre class="orden">git clone https://github.com/NissanBoss/FalOS
+cd FalOS
+fal haz_disco.fal
+fal --arranca sistema.fal</pre>
+    <p>Dentro, <code>ayuda</code> enseña las órdenes. Para la red, el
+    <a href="https://github.com/NissanBoss/FalOS#readme">README</a> dice cómo
+    arrancar QEMU con tarjeta.</p>
+  </div>
+</section>
+
+<section class="bloque">
+  <div class="centro">
+    <h2>Lo que no hace todavía</h2>
+    <ul class="todavia">
+      <li>Solo ha arrancado en una máquina virtual. Un ordenador de verdad es lo siguiente.</li>
+      <li>De la red sabe poco: <code>ping</code>, y que un programa mande un mensaje y espere la respuesta. Ni webs ni descargas.</li>
+      <li>Los programas se compilan fuera. Dentro de FalOS todavía no se puede escribir uno.</li>
+      <li>Es para aprender cómo funciona un sistema por dentro y probar ideas, no para usarlo cada día.</li>
+    </ul>
+    <p>La lista entera, con el porqué de cada cosa, está en el
+    <a href="https://github.com/NissanBoss/FalOS#lo-que-no-cubre">README</a>.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="centro">
+    <span>FalOS es software libre, con licencia MIT.</span>
+    <a href="https://github.com/NissanBoss/FalOS">Código</a>
+    <a href="https://github.com/NissanBoss/FalOS/blob/main/DIARIO.md">Diario</a>
+    <a href="/">Fal</a>
+    <a href="/aviso-legal.html">Aviso legal</a>
+    <a href="/privacidad.html">Privacidad</a>
+    <span class="lejos">Hecho en español, a propósito.</span>
+  </div>
+</footer>
+
+</body>
+</html>
