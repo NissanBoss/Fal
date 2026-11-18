@@ -32,8 +32,17 @@ const (
 	vectorLlamadas    = 0x80
 )
 
+// Las banderas piden los modulos alineados a pagina (bit 0), el mapa de la
+// memoria (bit 1), decir que modo de pantalla quiere (bit 2) y cargar con los
+// campos de direccion (bit 16). Sin el bit 2, GRUB en un ordenador con UEFI
+// no deja ninguna pantalla que el sistema sepa usar: alli no hay modo de
+// texto. Se pide 1024x768 a 32 bits porque es el modo que casi todas las
+// tarjetas tienen, por BIOS y por UEFI, y porque GRUB 2.14 hace caso a la
+// cabecera y no al gfxpayload de grub.cfg: con la lista en grub.cfg y la
+// cabecera a cero, en QEMU daba 800x600 a 24 bits (comprobado con FalOS).
+// El modo que quede se lee en datos_de_arranque.
 func emitirCabecera(e *ensamblador) {
-	const magia, banderas = 0x1BADB002, 0x00010002
+	const magia, banderas = 0x1BADB002, 0x00010007
 	e.d32(magia)
 	e.d32(banderas)
 	suma := uint32(magia + banderas)
@@ -43,6 +52,10 @@ func emitirCabecera(e *ensamblador) {
 	e.ref(4, "fin_archivo", 0)
 	e.ref(4, "fin_bss", 0)
 	e.ref(4, "entrada32", 0)
+	e.d32(0) // modo de pixeles
+	e.d32(1024)
+	e.d32(768)
+	e.d32(32)
 }
 
 // emitirArranque deja la maquina en 64 bits con el primer giga mapeado tal

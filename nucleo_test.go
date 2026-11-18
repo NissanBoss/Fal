@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/binary"
 	"errors"
 	"os"
 	"os/exec"
@@ -376,6 +377,23 @@ usa_tablas con base
 codigo es region con inicio_del_codigo y 4 y 4
 escribe (elemento 1 de codigo) es 464367618
 `
+
+// GRUB solo da una pantalla de pixeles si la cabecera la pide, y en UEFI no
+// hay otra. Con la cabecera en modo de texto, FalOS se quedaba en texto aunque
+// grub.cfg dijera otra cosa.
+func TestNucleoCabeceraPidePantalla(t *testing.T) {
+	imagen, err := compilarImagen("escribe 1", opcionesNucleo{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	palabra := func(sitio int) uint32 { return binary.LittleEndian.Uint32(imagen[sitio:]) }
+	if palabra(0) != 0x1BADB002 || palabra(4) != 0x00010007 || palabra(0)+palabra(4)+palabra(8) != 0 {
+		t.Fatalf("cabecera rara: %#x %#x %#x", palabra(0), palabra(4), palabra(8))
+	}
+	if palabra(32) != 0 || palabra(36) != 1024 || palabra(40) != 768 || palabra(44) != 32 {
+		t.Fatalf("modo pedido: %d %dx%dx%d", palabra(32), palabra(36), palabra(40), palabra(44))
+	}
+}
 
 func TestNucleoMemoriaProtegida(t *testing.T) {
 	salida, reventado := arrancarEnQemu(t, tablasProtegidas+"escribe \"sigue\"")

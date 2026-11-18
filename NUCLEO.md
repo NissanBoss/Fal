@@ -330,6 +330,17 @@ Si usas algo de esto, `fal --nucleo` lo dice al compilar, con la línea.
 - La imagen lleva una cabecera **multiboot**, así que la arrancan QEMU (con
   `-kernel`) y GRUB. Es un binario plano y no un ELF porque QEMU no carga los
   ELF de 64 bits por multiboot.
+- La cabecera le pide a GRUB una pantalla de píxeles de 1024x768 a 32 bits,
+  que tienen casi todas las tarjetas, por BIOS y por UEFI. Es lo único que
+  hay en un ordenador que arranca con UEFI, porque allí no existe el modo de
+  texto. `datos_de_arranque` trae dónde está la pantalla: la dirección en el
+  byte 88, los bytes por fila en el 96, el ancho en el 100, el alto en el 104
+  y los bits por punto en el 108. Ojo con los colores: la especificación los
+  pone desde el byte 110, pero GRUB 2.14 los deja desde el 112. Si el byte
+  111 (el tamaño del rojo) vale 0, léelos dos bytes más allá.
+  QEMU con `-kernel` no cambia de modo y avisa con "multiboot knows VBE. we
+  don't.", que no es un error. Los módulos que cargue GRUB (`module` en
+  `grub.cfg`) llegan alineados a página.
 - El arranque pasa del modo de 32 bits al de 64, mapea el primer giga con
   páginas de 2 megas y llama al programa. Al terminar, el procesador se para.
 - Delante de tu programa va un **preludio** escrito en el mismo Fal
