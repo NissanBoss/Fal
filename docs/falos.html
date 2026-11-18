@@ -119,6 +119,14 @@
     con lo que costó.</p>
     <ol class="dias" reversed>
       <li>
+        <div class="pantalla"><img src="falos/dia-17.jpg" width="960" height="600" loading="lazy" alt="FalOS en la pantalla de un ThinkPad L450, arrancado desde un pendrive"></div>
+        <p class="cuando versalitas">Día 17 · 18 de noviembre</p>
+        <h3>En un ordenador de verdad</h3>
+        <p>Sale de la máquina virtual y arranca desde un pendrive en un portátil de
+        2015. Se lleva su disco entero a la memoria: no toca el del ordenador, y lo
+        que guardas se borra al apagar.</p>
+      </li>
+      <li>
         <div class="pantalla"><img src="falos/dia-16.png" width="960" height="600" loading="lazy" alt="busca pide permiso para conectarse, y con deja 1 le llegan las direcciones"></div>
         <p class="cuando versalitas">Día 16 · 17 de noviembre</p>
         <h3>Un programa solo sale a la red si le dejas</h3>
@@ -249,6 +257,9 @@ fal --arranca sistema.fal</pre>
     <p>Dentro, <code>ayuda</code> enseña las órdenes. Para la red, el
     <a href="https://github.com/NissanBoss/FalOS#readme">README</a> dice cómo
     arrancar QEMU con tarjeta.</p>
+    <p>También arranca desde un pendrive, sin instalarse ni tocar el disco del
+    ordenador. Cómo hacerlo, en el
+    <a href="https://github.com/NissanBoss/FalOS#en-un-ordenador-de-verdad">README</a>.</p>
   </div>
 </section>
 
@@ -256,7 +267,7 @@ fal --arranca sistema.fal</pre>
   <div class="centro">
     <h2>Lo que no hace todavía</h2>
     <ul class="todavia">
-      <li>Solo ha arrancado en una máquina virtual. Un ordenador de verdad es lo siguiente.</li>
+      <li>En un ordenador de verdad solo se ha probado en un portátil, y allí no tiene red: la única tarjeta que sabe usar es la que trae QEMU.</li>
       <li>De la red sabe poco: <code>ping</code>, y que un programa mande un mensaje y espere la respuesta. Ni webs ni descargas.</li>
       <li>Los programas se compilan fuera. Dentro de FalOS todavía no se puede escribir uno.</li>
       <li>Es para aprender cómo funciona un sistema por dentro y probar ideas, no para usarlo cada día.</li>
