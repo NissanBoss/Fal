@@ -119,6 +119,13 @@
     con lo que costó.</p>
     <ol class="dias" reversed>
       <li>
+        <div class="pantalla"><img src="falos/dia-18.png" width="960" height="600" loading="lazy" alt="La orden reto: las siete cosas que tendría que conseguir un programa para ganar"></div>
+        <p class="cuando versalitas">Día 18 · 19 de noviembre</p>
+        <h3>Se descarga, y se puede intentar romper</h3>
+        <p>GitHub publica la imagen solo si pasan todas las pruebas. Y <code>reto</code>
+        dice qué tendría que conseguir un programa para ganarle a FalOS.</p>
+      </li>
+      <li>
         <div class="pantalla"><img src="falos/dia-17.jpg" width="960" height="600" loading="lazy" alt="FalOS en la pantalla de un ThinkPad L450, arrancado desde un pendrive"></div>
         <p class="cuando versalitas">Día 17 · 18 de noviembre</p>
         <h3>En un ordenador de verdad</h3>
@@ -260,6 +267,36 @@ fal --arranca sistema.fal</pre>
     <p>También arranca desde un pendrive, sin instalarse ni tocar el disco del
     ordenador. Cómo hacerlo, en el
     <a href="https://github.com/NissanBoss/FalOS#en-un-ordenador-de-verdad">README</a>.</p>
+    <p>Sin compilar nada: en <a href="https://github.com/NissanBoss/FalOS/releases/latest">Releases</a>
+    están la imagen para el pendrive, el núcleo y el disco para QEMU, y el
+    compilador de Fal para Linux, Windows y Mac.</p>
+  </div>
+</section>
+
+<section class="bloque" id="reto">
+  <div class="centro">
+    <h2>El reto</h2>
+    <p>FalOS promete que ningún programa hace nada a tus espaldas. Eso no vale hasta
+    que alguien intenta romperlo y no puede. Gana un programa que consiga una de
+    estas cosas:</p>
+    <ol class="todavia">
+      <li>Leer lo que guarda otro programa, o lo que escribes en otra ventana.</li>
+      <li>Salir a la red sin que digas <code>deja</code>, o ir a otro sitio del que dejaste.</li>
+      <li>Guardar en el disco sin tu permiso, o pisar lo que guardó otro.</li>
+      <li>Leer lo que copias sin que tú se lo pegues.</li>
+      <li>Tocar memoria que no es suya, o un aparato, y seguir corriendo.</li>
+      <li>Tirar o colgar FalOS entero, no solo a sí mismo.</li>
+      <li>Ver o tocar algo con la pantalla bloqueada.</li>
+    </ol>
+    <p>Y vale igual que FalOS te mienta: que la pregunta de permiso diga otro programa
+    u otro sitio de lo que de verdad pasa. No vale cambiar el código de FalOS ni
+    hacerlo desde fuera de la máquina. Si lo consigues, tu nombre sale en el
+    repositorio, en el diario y en el vídeo del día que lo arregle.</p>
+    <div class="botones-reto">
+      <a class="boton lleno" href="https://github.com/NissanBoss/FalOS/releases/latest">Descargar FalOS</a>
+      <a class="boton" href="https://github.com/NissanBoss/FalOS/blob/main/RETO.md">Las reglas</a>
+      <a class="boton gris" href="https://github.com/NissanBoss/FalOS/issues/new?template=reto.yml">He roto FalOS</a>
+    </div>
   </div>
 </section>
 

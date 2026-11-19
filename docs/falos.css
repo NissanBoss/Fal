@@ -49,6 +49,7 @@ pre.orden {
 .todavia { max-width: 40em; padding-left: 20px; font-size: 16.5px; }
 .todavia li { margin: 8px 0; }
 .todavia li::marker { color: var(--tierra); }
+.botones-reto { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
 
 @media (max-width: 900px) {
   .cabeza-os .dos { grid-template-columns: 1fr; }
