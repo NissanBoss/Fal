@@ -525,6 +525,9 @@ a.tarjeta:hover { border-color: color-mix(in srgb, var(--tierra) 50%, var(--bord
 .sistema h3 { margin: 0 0 4px; font-size: 16px; font-family: var(--sans); }
 .sistema p { margin: 0; font-size: 14.5px; color: var(--suave); max-width: none; }
 .sistema code { font-size: 13px; }
+.bajar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.bajar .boton { padding: 8px 14px; font-size: 14.5px; }
+.sistema.tuyo .bajar .boton:first-child { background: var(--azul); color: var(--papel); }
 .final { font-size: 15px; color: var(--suave); margin-top: 22px; }
 
 footer { border-top: 1px solid var(--borde); padding: 34px 0 48px; font-size: 14.5px; color: var(--suave); }
@@ -978,16 +981,27 @@ escribe a con 10</pre>
         <span class="tuyo-marca">el tuyo</span>
         <h3>Windows</h3>
         <p>Descarga <code>fal-windows.zip</code>, descomprímelo entero y haz doble clic en <code>instalar.bat</code>.</p>
+        <div class="bajar">
+          <a class="boton hueco" href="https://github.com/NissanBoss/Fal/releases/latest/download/fal-windows.zip">Descargar para Windows</a>
+        </div>
       </div>
       <div class="sistema" data-sistema="unix">
         <span class="tuyo-marca">el tuyo</span>
         <h3>Mac y Linux</h3>
         <p>Descarga el paquete de tu sistema, descomprímelo y ejecuta <code>sh instalar.sh</code>.</p>
+        <div class="bajar" id="bajar-unix">
+          <a class="boton hueco" data-para="mac" href="https://github.com/NissanBoss/Fal/releases/latest/download/fal-mac-apple.tar.gz">Mac con chip Apple</a>
+          <a class="boton hueco" data-para="mac" href="https://github.com/NissanBoss/Fal/releases/latest/download/fal-mac-intel.tar.gz">Mac con Intel</a>
+          <a class="boton hueco" data-para="linux" href="https://github.com/NissanBoss/Fal/releases/latest/download/fal-linux.tar.gz">Linux</a>
+          <a class="boton hueco" data-para="linux" href="https://github.com/NissanBoss/Fal/releases/latest/download/fal-linux-arm.tar.gz">Linux ARM</a>
+        </div>
       </div>
     </div>
     <p class="final">
       El instalador no pide permisos de administrador y deja todo en tu carpeta de usuario.
       Al terminar, abre una terminal nueva y escribe <code>fal --ayuda</code>.
+      Las versiones anteriores y la extensión para VS Code están en
+      <a href="https://github.com/NissanBoss/Fal/releases/latest">la página de descargas</a>.
     </p>
   </div>
 </section>
@@ -1490,6 +1504,10 @@ if ("IntersectionObserver" in window && !sinMovimiento) {
 const sistema = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent;
 const tuyo = /win/i.test(sistema) ? "windows" : /mac|linux|x11|cros/i.test(sistema) && !/android|iphone|ipad/i.test(sistema) ? "unix" : "";
 if (tuyo) document.querySelector(`[data-sistema="${tuyo}"]`).classList.add("tuyo");
+if (tuyo === "unix" && !/mac/i.test(sistema)) {
+  const lista = document.getElementById("bajar-unix");
+  lista.querySelectorAll('[data-para="linux"]').forEach((a, i) => lista.insertBefore(a, lista.children[i]));
+}
 </script>
 
 </body>
