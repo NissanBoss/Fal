@@ -1003,6 +1003,41 @@ func (c *compiladorNucleo) integrada(nombre string, args []Expresion, ln int) *E
 		e.movImm(rax, etiquetaNada)
 		e.movImm(rdx, 0)
 
+	case "tablas_al_entrar", "tablas_al_volver":
+		if err := c.expr(args[0]); err != nil {
+			return err
+		}
+		c.exige(rax, etiquetaNumero, ln, `"`+nombre+`" necesita la direccion de la tabla de arriba del todo, o 0.`, "")
+		mal := c.panico(ln, "Las tablas de paginas empiezan en un multiplo de 4096, dentro del primer giga.", "")
+		e.mov(rcx, rdx)
+		e.andImm(rcx, 4095)
+		e.cmpImm(rcx, 0)
+		e.jcc(siDistinto, mal)
+		e.cmpImm(rdx, 0)
+		e.jcc(siMenor, mal)
+		e.cmpImm(rdx, memoriaVisible)
+		e.jcc(siMayorOIgual, mal)
+		if nombre == "tablas_al_entrar" {
+			e.guardaAbs("cr3_entrar", rdx)
+		} else {
+			e.guardaAbs("cr3_volver", rdx)
+		}
+		e.movImm(rax, etiquetaNada)
+		e.movImm(rdx, 0)
+
+	case "inicio_de_la_entrada":
+		e.movSimbolo(rdx, "entrada_inicio", 0)
+		e.movImm(rax, etiquetaNumero)
+	case "final_de_la_entrada":
+		e.movSimbolo(rdx, "entrada_fin", 0)
+		e.movImm(rax, etiquetaNumero)
+	case "inicio_de_los_descriptores":
+		e.movSimbolo(rdx, "descriptores_inicio", 0)
+		e.movImm(rax, etiquetaNumero)
+	case "final_de_los_descriptores":
+		e.movSimbolo(rdx, "descriptores_fin", 0)
+		e.movImm(rax, etiquetaNumero)
+
 	case "contexto":
 		e.leeAbs(rdx, "contexto")
 		e.movImm(rax, etiquetaNumero)
@@ -1459,9 +1494,16 @@ func (c *compiladorNucleo) emitirRutinas() {
 		"Pista: una funcion que se llama a si misma necesita un caso en el que deja de hacerlo.")
 
 	if !c.programa {
+		// Todo lo que corre antes de cambiar a las tablas del nucleo, o despues
+		// de volver a las de un programa, va junto y en sus propias paginas: es
+		// lo unico del nucleo que un sistema necesita poner en las tablas de
+		// sus programas (ver tablas_al_entrar).
+		e.alinea(4096)
+		e.marca("entrada_inicio")
 		c.emitirTrampas()
 		for _, n := range ordenados(c.atenciones) {
 			e.marca("atencion:" + n)
+			c.entraEnLasTablasDelNucleo(8)
 			c.entrarEnAtencion()
 			e.call(c.funciones[n].entrada)
 			c.salirDeAtencion()
@@ -1480,6 +1522,9 @@ func (c *compiladorNucleo) emitirRutinas() {
 			e.call(c.funciones[n].entrada)
 			c.salirDeAtencion()
 		}
+		emitirGDT(e)
+		e.alinea(4096)
+		e.marca("entrada_fin")
 	}
 
 	// rtLugar: coleccion en rcx/rbx y posicion en rax/rdx. Deja en rsi la
@@ -1648,11 +1693,44 @@ func (c *compiladorNucleo) entrarEnAtencion() {
 	e.guardaAbs("suelo", rax)
 }
 
+// entraEnLasTablasDelNucleo pasa a las tablas que dijo tablas_al_entrar si la
+// interrupcion llega de un programa. desp es donde queda cs en la pila. Con
+// las tablas del nucleo puestas mientras corre un programa, un procesador que
+// lee por adelantado (Meltdown) le deja ver por tiempos lo que no le deja
+// leer: lo que no esta en sus tablas no lo puede adivinar.
+func (c *compiladorNucleo) entraEnLasTablasDelNucleo(desp byte) {
+	e := c.e
+	dentro, sin := e.nueva(), e.nueva()
+	e.bytes(0xF6, 0x44, 0x24, desp, 3) // test byte [rsp+desp], 3: el anillo de cs
+	e.jcc(siIgual, dentro)
+	e.push(rax)
+	e.leeAbs(rax, "cr3_entrar")
+	e.bytes(0x48, 0x85, 0xC0) // test rax, rax
+	e.jcc(siIgual, sin)
+	e.bytes(0x0F, 0x22, 0xD8) // mov cr3, rax
+	e.aqui(sin)
+	e.pop(rax)
+	e.aqui(dentro)
+}
+
 func (c *compiladorNucleo) salirDeAtencion() {
 	e := c.e
 	e.movSimbolo(rax, "pila_suelo", 0)
 	e.guardaAbs("suelo", rax)
 	e.leeAbs(rsp, "contexto")
+	// Las tablas de quien sigue, si el sistema las ha dicho y no son las que
+	// ya hay: cargar las mismas solo vaciaria la cache de traducciones. Desde
+	// aqui hasta iretq todo esta en las paginas de entrada, y la pila es la
+	// de entrada de esa tarea, que el sistema pone tambien en sus tablas.
+	sigue := e.nueva()
+	e.leeAbs(rax, "cr3_volver")
+	e.bytes(0x48, 0x85, 0xC0) // test rax, rax
+	e.jcc(siIgual, sigue)
+	e.bytes(0x0F, 0x20, 0xD9) // mov rcx, cr3
+	e.cmp(rcx, rax)
+	e.jcc(siIgual, sigue)
+	e.bytes(0x0F, 0x22, 0xD8) // mov cr3, rax
+	e.aqui(sigue)
 	e.devuelveAltos()
 	for _, r := range []int{rdi, rsi, rbp, rbx, rdx, rcx, rax} {
 		e.pop(r)
@@ -1694,7 +1772,8 @@ func (c *compiladorNucleo) emitirTrampas() {
 	// viene de un programa, o si nadie se encarga, sigue al aviso rojo.
 	nucleo := e.nueva()
 	e.aqui(comun)
-	e.bytes(0xFA, 0xFC)                 // cli; cld
+	e.bytes(0xFA, 0xFC) // cli; cld
+	c.entraEnLasTablasDelNucleo(24)
 	e.bytes(0x48, 0x83, 0x3C, 0x24, 32) // cmp qword [rsp], 32
 	e.jcc(siMayorOIgual, nucleo)
 	e.bytes(0xF6, 0x44, 0x24, 24, 3) // test byte [rsp+24], 3: el anillo de cs

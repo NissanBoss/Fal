@@ -99,6 +99,10 @@ Para la parte entera está `cociente con 7 y 2`, y para lo que sobra,
 | `contexto` | dónde está guardado lo que se acaba de interrumpir |
 | `pon_contexto con d` | al salir de la interrupción, sigue por otro contexto |
 | `pila_de_entrada con d` | la pila a la que salta el procesador al entrar desde un programa |
+| `tablas_al_entrar con d` | las tablas que pone el núcleo al entrar desde un programa, o 0 para no cambiar |
+| `tablas_al_volver con d` | las que pone justo antes de volver, o 0 |
+| `inicio_de_la_entrada`, `final_de_la_entrada` | el código que corre antes de cambiar de tablas y después de volver |
+| `inicio_de_los_descriptores`, `final_de_los_descriptores` | lo que lee el procesador al entrar: la tabla de interrupciones y el TSS |
 
 Se cuenta desde el 1 y `menos 1` es el último, igual que en todo Fal.
 
@@ -247,6 +251,34 @@ se le dice al procesador dónde acaba, y el contexto de un programa recién
 hecho va 160 bytes por debajo. La función que atiende la interrupción no corre
 ahí sino en una pila aparte, una sola para todo el sistema, como en seL4: las
 interrupciones están cerradas mientras dura y nada la pisa.
+
+### Que los programas no vean el núcleo
+
+Si las tablas de un programa llevan también la memoria del núcleo, aunque sea
+sin el bit de usuario, un procesador que lee por adelantado puede dejarla
+adivinar midiendo tiempos: es [Meltdown](https://meltdownattack.com). Lo que no
+está en sus tablas no se adivina. Para eso el núcleo cambia de tablas él solo,
+al entrar y al salir:
+
+- `tablas_al_entrar con d` son las que pone al llegar una interrupción desde el
+  anillo 3. Lo normal es darle las del sistema una vez, al arrancar.
+- `tablas_al_volver con d` son las que pone justo antes de volver. El sistema
+  las cambia junto con `pon_contexto`, con las del programa que sigue. Si son
+  las que ya hay, no las recarga: solo vaciaría la caché de traducciones.
+
+Con 0, que es como empiezan, no cambia nada. Mientras atiende la interrupción
+el núcleo corre con las tablas de `tablas_al_entrar`, así que las de cada
+programa solo tienen que llevar tres cosas del núcleo, todas en páginas
+enteras y con las mismas direcciones que en las del sistema:
+
+- de `inicio_de_la_entrada` a `final_de_la_entrada`, de solo lectura y sin el
+  bit de usuario: el código que corre antes de cambiar y después de volver;
+- de `inicio_de_los_descriptores` a `final_de_los_descriptores`, de solo
+  lectura y sin ejecutar;
+- la página de `pila_de_entrada` de ese programa, para escribir y sin ejecutar.
+
+Cada cambio cuesta: sin PCID, el procesador tira lo que tenía traducido. En
+FalOS, una llamada al sistema pasa de 0,2 a 0,44 µs.
 
 ### Llamadas al sistema
 

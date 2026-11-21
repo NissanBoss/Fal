@@ -634,6 +634,90 @@ escribe sin_fin con 1
 	}
 }
 
+// Con tablas_al_entrar y tablas_al_volver el programa corre con unas tablas
+// donde el nucleo no esta: solo la entrada, los descriptores y su pila. Leer
+// el nucleo ya no choca con un permiso sino con una pagina que no existe, y
+// eso es lo que para a Meltdown.
+func TestNucleoTablasSeparadas(t *testing.T) {
+	programa := strings.Replace(anillo3, "        pon_contexto con tope menos 160",
+		"        tablas_al_volver con raiz2\n        pon_contexto con tope menos 160", 1)
+	programa = strings.Replace(programa, "pon_contexto con vuelta",
+		"tablas_al_volver con raiz\n    pon_contexto con vuelta", -1)
+	programa = "raiz2 es final_del_nucleo mas 1048576\n" + programa + `
+otras es region con raiz2 y 4096 y 8
+para cada i desde 1 hasta 4096
+    elemento i de otras es 0
+fin
+arriba2 es region con raiz2 y 512 y 8
+elemento 1 de arriba2 es raiz2 mas 4096 mas USUARIO
+medio2 es region con raiz2 mas 4096 y 512 y 8
+elemento 1 de medio2 es raiz2 mas 8192 mas USUARIO
+directorio2 es region con raiz2 mas 8192 y 512 y 8
+elemento 385 de directorio2 es raiz mas 12288 mas USUARIO
+libre es raiz2 mas 12288
+
+funcion pon con principio y final y permisos
+    comparte libre
+    d es principio
+    mientras d es menor que final
+        sitio es (cociente con d y 2097152) mas 1
+        si (elemento sitio de directorio2) es 0
+            elemento sitio de directorio2 es libre mas 3
+            libre es libre mas 4096
+        fin
+        tabla es elemento sitio de directorio2
+        hojas es region con (tabla menos (tabla resto 4096)) y 512 y 8
+        elemento ((cociente con d y 4096) resto 512) mas 1 de hojas es d mas permisos
+        d es d mas 4096
+    fin
+fin
+
+pon con inicio_de_la_entrada y final_de_la_entrada y 1
+pon con inicio_de_los_descriptores y final_de_los_descriptores y 1
+pon con tope menos 4096 y tope y 3
+tablas_al_entrar con raiz
+
+cargar con (incluye_programa de "hola.fal")
+llama_al_sistema con 99
+cargar con (incluye_programa de "espia.fal")
+llama_al_sistema con 99
+escribe "de vuelta en el nucleo"
+escribe fallos
+`
+	salida, reventado := arrancarConProgramas(t, programa, map[string]string{
+		"hola.fal": `
+suma es 0
+para cada i desde 1 hasta 10
+    suma es suma mas i
+fin
+escribe "hola desde el anillo 3"
+escribe suma
+llama_al_sistema con 0 y (llama_al_sistema con 1 y 33)
+`,
+		"espia.fal": `
+nucleo es region con 1048576 y 4
+escribe elemento 1 de nucleo
+escribe "he podido"
+`,
+	})
+	if reventado {
+		t.Fatalf("el nucleo se paro:\n%s", salida)
+	}
+	if strings.Contains(salida, "he podido") {
+		t.Errorf("un programa leyo el nucleo:\n%s", salida)
+	}
+	quiere := []string{
+		"hola desde el anillo 3\n55\n!salio con\n77\n",
+		"fallo\n14\n4\n1048576\n", // la pagina no esta: el bit 0 del codigo, a 0
+		"de vuelta en el nucleo\n1\n",
+	}
+	for _, q := range quiere {
+		if !strings.Contains(salida, q) {
+			t.Errorf("no aparece %q en:\n%s", q, salida)
+		}
+	}
+}
+
 // El reloj tiene que sacar de la CPU a un programa que no la suelta nunca.
 func TestNucleoEchaAUnPrograma(t *testing.T) {
 	programa := anillo3 + `

@@ -210,7 +210,6 @@ func compilarImagen(fuente string, op opcionesNucleo) ([]byte, *ErrorFal) {
 	if op.programa {
 		colocarBSSPrograma(e, len(c.globales))
 	} else {
-		emitirGDT(e)
 		colocarBSS(e, len(c.globales))
 	}
 	if falta := e.resolver(); falta != "" {
@@ -262,6 +261,13 @@ var integradasNucleo = map[string][2]int{
 	"hay_no_ejecutar":   {0, 0},
 	"usa_tablas":        {1, 1},
 
+	"inicio_de_la_entrada":       {0, 0},
+	"final_de_la_entrada":        {0, 0},
+	"inicio_de_los_descriptores": {0, 0},
+	"final_de_los_descriptores":  {0, 0},
+	"tablas_al_entrar":           {1, 1},
+	"tablas_al_volver":           {1, 1},
+
 	"contexto":         {0, 0},
 	"pon_contexto":     {1, 1},
 	"pila_de_entrada":  {1, 1},
@@ -297,7 +303,9 @@ var integradasNucleo = map[string][2]int{
 var soloEnElNucleo = map[string]bool{
 	"atiende_interrupcion": true, "contexto": true, "pon_contexto": true, "pila_de_entrada": true,
 	"atiende_llamadas": true, "atiende_fallos": true, "incluye_programa": true,
-	"mapa_de_puertos": true,
+	"mapa_de_puertos": true, "inicio_de_la_entrada": true, "final_de_la_entrada": true,
+	"inicio_de_los_descriptores": true, "final_de_los_descriptores": true,
+	"tablas_al_entrar": true, "tablas_al_volver": true,
 }
 
 // recogerUsados mete en el programa las funciones de los archivos que trae

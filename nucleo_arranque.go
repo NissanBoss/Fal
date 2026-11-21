@@ -252,9 +252,9 @@ func emitirGDT(e *ensamblador) {
 }
 
 // colocarBSS reparte la memoria que va a cero detras del archivo. La pila va
-// justo despues de las tablas de paginas y antes de las globales: si se
-// desborda pisaria las tablas, y por eso cada funcion mira antes que quede
-// sitio (ver pila_suelo).
+// justo despues de las tablas de paginas y los descriptores, y antes de las
+// globales: si se desborda los pisaria, y por eso cada funcion mira antes que
+// quede sitio (ver pila_suelo).
 func colocarBSS(e *ensamblador, globales int) {
 	e.marca("fin_archivo")
 	pos := (cargaEn + int64(len(e.b)) + 4095) &^ 4095
@@ -266,7 +266,16 @@ func colocarBSS(e *ensamblador, globales int) {
 	poner("pml4", 4096)
 	poner("pdpt", 4096)
 	poner("pd", 4096)
+	// Lo que el procesador lee al entrar desde un programa y al volver, antes
+	// de que el nucleo cambie de tablas: va aparte y en paginas enteras para
+	// que el sistema lo pueda poner en las de cada programa sin nada mas.
+	poner("descriptores_inicio", 0)
 	poner("idt", 4096)
+	poner("tss", tamanoTSS+tamanoMapaPuertos)
+	poner("cr3_entrar", 8)
+	poner("cr3_volver", 8)
+	pos = (pos + 4095) &^ 4095
+	e.simbolos["descriptores_fin"] = pos
 	poner("pila", tamanoPila)
 	e.simbolos["pila_suelo"] = e.simbolos["pila"] + margenPila
 	e.simbolos["pila_tope"] = pos
@@ -283,7 +292,6 @@ func colocarBSS(e *ensamblador, globales int) {
 	poner("manejador_fallos", 8)
 	poner("fallo_numero", 8)
 	poner("fallo_codigo", 8)
-	poner("tss", tamanoTSS+tamanoMapaPuertos)
 	e.simbolos["fin_bss"] = pos
 	e.simbolos["fin_nucleo"] = (pos + 4095) &^ 4095
 	e.simbolos["palabras_bss"] = (pos - e.simbolos["inicio_bss"]) / 4
