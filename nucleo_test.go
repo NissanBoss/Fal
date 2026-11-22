@@ -1115,6 +1115,20 @@ fin
 	}
 }
 
+// wbinvd tiene que dejar seguir al nucleo como si nada: solo baja a la
+// memoria lo que habia en las caches.
+func TestNucleoVaciaCaches(t *testing.T) {
+	salida, reventado := arrancarEnQemu(t, `
+pagina es region con final_del_nucleo y 8 y 8
+elemento 1 de pagina es 77
+vacia_caches
+escribe elemento 1 de pagina
+`)
+	if salida != "77\n" || reventado {
+		t.Errorf("vacia_caches no deja seguir:\n%q (reventado %v)", salida, reventado)
+	}
+}
+
 func TestNucleoUsa(t *testing.T) {
 	salida, reventado := arrancarConProgramas(t, `usa "comun/dobla.fal"
 escribe dobla de 21

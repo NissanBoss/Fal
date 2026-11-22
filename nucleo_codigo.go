@@ -961,6 +961,14 @@ func (c *compiladorNucleo) integrada(nombre string, args []Expresion, ln int) *E
 		// despierta al hlt en vez de colarse antes y dejarlo dormido sin
 		// nadie que lo despierte.
 		e.bytes(0xFB, 0xF4)
+	case "vacia_caches":
+		// wbinvd: lo que el procesador tiene en sus caches baja a la memoria.
+		// Hace falta para los aparatos que leen la memoria sin mirar las
+		// caches, como el IOMMU de muchos portatiles cuando busca en sus
+		// tablas.
+		e.bytes(0x0F, 0x09)
+		e.movImm(rax, etiquetaNada)
+		e.movImm(rdx, 0)
 
 	case "datos_de_arranque":
 		e.movSimbolo(rdx, "datos_arranque", 0)

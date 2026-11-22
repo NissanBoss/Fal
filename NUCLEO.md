@@ -86,6 +86,7 @@ Para la parte entera está `cociente con 7 y 2`, y para lo que sobra,
 | `activa_interrupciones` | deja que lleguen |
 | `desactiva_interrupciones` | las cierra |
 | `espera_interrupcion` | duerme el procesador hasta que llegue una |
+| `vacia_caches` | baja a la memoria lo que el procesador tiene en sus cachés, para los aparatos que no las miran |
 | `datos_de_arranque` | dónde dejó el cargador sus datos, o 0 si no hay |
 | `final_del_nucleo` | la primera dirección libre después del programa, en un múltiplo de 4096 |
 | `inicio_del_codigo`, `final_del_codigo` | dónde está el código del programa (con sus textos) |
