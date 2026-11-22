@@ -119,6 +119,15 @@
     con lo que costó.</p>
     <ol class="dias" reversed>
       <li>
+        <div class="pantalla"><img src="falos/dia-21.png" width="960" height="600" loading="lazy" alt="dma: con IOMMU, el aparato de prueba copia dentro de su página, y leer el núcleo o escribir en una página ajena queda bloqueado"></div>
+        <p class="cuando versalitas">Día 21 · 22 de noviembre</p>
+        <h3>El IOMMU: los aparatos solo tocan su trozo</h3>
+        <p>Una tarjeta o un disco escriben en la memoria sin pasar por el
+        procesador, y ninguna protección de los programas los para. FalOS
+        enciende el IOMMU con todo cerrado: el aparato de prueba de QEMU copia
+        en su página, y leer el núcleo o escribir en otra queda bloqueado.</p>
+      </li>
+      <li>
         <div class="pantalla"><img src="falos/dia-20.png" width="960" height="600" loading="lazy" alt="tablas 10: la consola ve 7 páginas del núcleo, cuando antes eran 196.607, y espia ya no lo encuentra en sus tablas"></div>
         <p class="cuando versalitas">Día 20 · 21 de noviembre</p>
         <h3>Meltdown: el núcleo sale de las tablas de los programas</h3>
