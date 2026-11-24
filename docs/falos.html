@@ -119,6 +119,15 @@
     con lo que costó.</p>
     <ol class="dias" reversed>
       <li>
+        <div class="pantalla"><img src="falos/dia-23.png" width="960" height="600" loading="lazy" alt="FalOS recién arrancado desde un pendrive: el registro dice que alguien probó una contraseña mala, que abriste lo guardado en el pendrive, y la barra, que veces guarda en el pendrive"></div>
+        <p class="cuando versalitas">Día 23 · 24 de noviembre</p>
+        <h3>Guardar en el pendrive, cifrado</h3>
+        <p>Con contraseña, lo que guardan los programas sigue ahí después de
+        apagar, y quien se lleve el pendrive no lee ni los nombres. Sin ella,
+        no se escribe ni un byte. Hay dos copias firmadas: si lo quitas a medias
+        o alguien cambia un bit, FalOS abre la otra y lo dice.</p>
+      </li>
+      <li>
         <div class="pantalla"><img src="falos/dia-22.png" width="960" height="600" loading="lazy" alt="Un teclado USB recién enchufado: arriba, en amarillo, FalOS dice qué código de 6 cifras hay que teclear en él"></div>
         <p class="cuando versalitas">Día 22 · 23 de noviembre</p>
         <h3>Teclado USB: encerrado, y sin código no escribe</h3>
@@ -302,7 +311,7 @@ fal --arranca sistema.fal</pre>
     <a href="https://github.com/NissanBoss/FalOS#readme">README</a> dice cómo
     arrancar QEMU con tarjeta.</p>
     <p>También arranca desde un pendrive, sin instalarse ni tocar el disco del
-    ordenador. Cómo hacerlo, en el
+    ordenador, y con contraseña guarda en él, cifrado. Cómo hacerlo, en el
     <a href="https://github.com/NissanBoss/FalOS#en-un-ordenador-de-verdad">README</a>.</p>
     <p>Sin compilar nada: en <a href="https://github.com/NissanBoss/FalOS/releases/latest">Releases</a>
     están la imagen para el pendrive, el núcleo y el disco para QEMU, y el
@@ -324,10 +333,11 @@ fal --arranca sistema.fal</pre>
       <li>Tocar memoria que no es suya, o un aparato, y seguir corriendo.</li>
       <li>Tirar o colgar FalOS entero, no solo a sí mismo.</li>
       <li>Ver o tocar algo con la pantalla bloqueada.</li>
+      <li>Sacar algo de un pendrive de FalOS sin su contraseña. Esto sí vale desde fuera.</li>
     </ol>
     <p>Y vale igual que FalOS te mienta: que la pregunta de permiso diga otro programa
-    u otro sitio de lo que de verdad pasa. No vale cambiar el código de FalOS ni
-    hacerlo desde fuera de la máquina. Si lo consigues, tu nombre sale en el
+    u otro sitio de lo que de verdad pasa. No vale cambiar el código de FalOS ni,
+    salvo lo del pendrive, hacerlo desde fuera de la máquina. Si lo consigues, tu nombre sale en el
     repositorio, en el diario y en el vídeo del día que lo arregle.</p>
     <div class="botones-reto">
       <a class="boton lleno" href="https://github.com/NissanBoss/FalOS/releases/latest">Descargar FalOS</a>
