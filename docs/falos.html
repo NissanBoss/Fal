@@ -119,6 +119,16 @@
     con lo que costó.</p>
     <ol class="dias" reversed>
       <li>
+        <div class="pantalla"><img src="falos/dia-24.png" width="960" height="600" loading="lazy" alt="FalOS hace ping: se presenta con una dirección recién inventada, la red le da otra, y contestan las cuatro respuestas"></div>
+        <p class="cuando versalitas">Día 24 · 25 de noviembre</p>
+        <h3>La tarjeta Intel de los portátiles, encerrada</h3>
+        <p>El controlador es un programa sin permisos y el IOMMU vigila la tarjeta:
+        solo alcanza 21 páginas, y si le piden mandar el núcleo por el cable, no
+        sale. La dirección de fábrica no se usa, FalOS se inventa una, y a la red
+        no le pide nada hasta que tú la usas. Probado en QEMU; en un portátil,
+        todavía no.</p>
+      </li>
+      <li>
         <div class="pantalla"><img src="falos/dia-23.png" width="960" height="600" loading="lazy" alt="FalOS recién arrancado desde un pendrive: el registro dice que alguien probó una contraseña mala, que abriste lo guardado en el pendrive, y la barra, que veces guarda en el pendrive"></div>
         <p class="cuando versalitas">Día 23 · 24 de noviembre</p>
         <h3>Guardar en el pendrive, cifrado</h3>
@@ -351,7 +361,7 @@ fal --arranca sistema.fal</pre>
   <div class="centro">
     <h2>Lo que no hace todavía</h2>
     <ul class="todavia">
-      <li>En un ordenador de verdad solo se ha probado en un portátil, y allí no tiene red: la única tarjeta que sabe usar es la que trae QEMU.</li>
+      <li>En un ordenador de verdad solo se ha probado en un portátil, y allí la red no se ha probado: la tarjeta Intel solo ha funcionado en QEMU.</li>
       <li>De la red sabe poco: <code>ping</code>, y que un programa mande un mensaje y espere la respuesta. Ni webs ni descargas.</li>
       <li>Los programas se compilan fuera. Dentro de FalOS todavía no se puede escribir uno.</li>
       <li>Es para aprender cómo funciona un sistema por dentro y probar ideas, no para usarlo cada día.</li>
